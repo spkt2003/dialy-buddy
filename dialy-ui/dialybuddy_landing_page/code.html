@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Lexend:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#685783",
+                    "surface-variant": "#e0e2ed",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#535b6e",
+                    "on-primary-fixed-variant": "#002f67",
+                    "secondary": "#575f72",
+                    "primary-fixed": "#75a5fd",
+                    "primary-container": "#75a5fd",
+                    "on-error-container": "#6e0a12",
+                    "surface-bright": "#faf9fe",
+                    "tertiary-fixed": "#e1cbfe",
+                    "tertiary-fixed-dim": "#d2bef0",
+                    "surface-container-highest": "#e0e2ed",
+                    "on-surface": "#2f323a",
+                    "on-primary-fixed": "#000616",
+                    "on-primary": "#f9f8ff",
+                    "error-container": "#fa746f",
+                    "on-secondary-fixed": "#373f51",
+                    "on-secondary-container": "#4a5264",
+                    "tertiary-container": "#e1cbfe",
+                    "on-tertiary-fixed-variant": "#5b4b75",
+                    "primary": "#255db0",
+                    "background": "#faf9fe",
+                    "secondary-dim": "#4b5366",
+                    "secondary-fixed-dim": "#ccd4eb",
+                    "outline-variant": "#afb2bc",
+                    "on-tertiary": "#fef7ff",
+                    "inverse-surface": "#0d0e12",
+                    "on-tertiary-container": "#52416b",
+                    "inverse-on-surface": "#9c9ca2",
+                    "surface-container": "#ededf6",
+                    "surface": "#faf9fe",
+                    "on-surface-variant": "#5c5f68",
+                    "secondary-container": "#dae2f9",
+                    "inverse-primary": "#75a5fd",
+                    "error": "#a83836",
+                    "surface-tint": "#255db0",
+                    "surface-dim": "#d8d9e4",
+                    "on-primary-container": "#002656",
+                    "on-secondary": "#f9f8ff",
+                    "primary-dim": "#1151a3",
+                    "primary-fixed-dim": "#6898ee",
+                    "on-error": "#fff7f6",
+                    "outline": "#787a84",
+                    "secondary-fixed": "#dae2f9",
+                    "surface-container-high": "#e7e8f1",
+                    "on-tertiary-fixed": "#3e2e57",
+                    "error-dim": "#67040d",
+                    "surface-container-low": "#f3f3fa",
+                    "on-background": "#2f323a",
+                    "tertiary-dim": "#5c4b76"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Lexend"],
+                    "label": ["Lexend"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body overflow-x-hidden">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#faf9fe]/80 dark:bg-[#2f323a]/80 backdrop-blur-xl shadow-[0_12px_32px_-4px_rgba(47,50,58,0.06)]">
+<div class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#1A56A8] dark:text-[#75a5fd] text-3xl" data-icon="clinical_notes">clinical_notes</span>
+<span class="text-2xl font-bold tracking-tight text-[#1A56A8] dark:text-[#75a5fd] font-headline">Dialybuddy</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#1A56A8] dark:text-[#75a5fd] font-bold border-b-2 border-[#1A56A8] pb-1 font-label" href="#">Solutions</a>
+<a class="text-[#2f323a] dark:text-[#faf9fe] font-medium opacity-80 hover:text-[#255db0] dark:hover:text-[#75a5fd] transition-colors duration-300 font-label" href="#">Insights</a>
+<a class="text-[#2f323a] dark:text-[#faf9fe] font-medium opacity-80 hover:text-[#255db0] dark:hover:text-[#75a5fd] transition-colors duration-300 font-label" href="#">Trust Center</a>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-xl font-semibold shadow-sm hover:scale-95 duration-200 ease-in-out font-label">
+                Get Started
+            </button>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative px-6 py-16 md:py-32 max-w-7xl mx-auto overflow-hidden">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+<div class="space-y-8 z-10">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 bg-tertiary-container text-on-tertiary-container rounded-full text-xs font-bold tracking-wider uppercase font-label">
+<span class="material-symbols-outlined text-sm" data-icon="kidney">nephrology</span>
+                        Specialized Care
+                    </div>
+<h1 class="text-5xl md:text-7xl font-extrabold font-headline leading-[1.1] tracking-tight text-on-background">
+                        Find your perfect care buddy for hospital visits &amp; enjoy <span class="text-primary">safe, AI-assisted meals.</span>
+</h1>
+<p class="text-xl md:text-2xl text-on-surface-variant max-w-xl font-light">
+                        Designed specifically for kidney disease patients to live happily and eat safely without monotony.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-xl text-lg font-bold shadow-lg hover:scale-95 duration-200 ease-in-out flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+                            Find a Buddy
+                        </button>
+<button class="bg-secondary-container text-on-secondary-container px-8 py-4 rounded-xl text-lg font-bold hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+                            Try AI Menu
+                        </button>
+</div>
+</div>
+<div class="relative flex justify-center">
+<div class="absolute -top-12 -right-12 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-12 -left-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10 bg-surface-container-lowest p-4 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(47,50,58,0.12)]">
+<img alt="Dialybuddy interface showing a friendly caregiver profile and a kidney-friendly meal plan" class="rounded-[2rem] w-full h-auto object-cover aspect-[4/5] min-w-[320px]" data-alt="a friendly caregiver in clinical scrub smiling and a vibrant dish of steamed sea bass with ginger and greens on a clean white plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0TvnLRCnuPtr9vah2KAOeu56Hn_MglurR2opEW7USLvMGYmirQTWBkpWU76Q3j8iw2Vnh1KSZGJRnjmNV-WKk2EBE3vOam1IazbzBtnW-6dQEFZ409VPIE3IJmywC-S0NVLKvv3jkhhXKQL1e5b48sqioec3-z_S0o-mU6kdLWqjbjFeJr2mZWxwEdfOXHRMj89tbU0MCqRktQLCueR5T0xPs7Gp2wtkyU3IJtylM-q24DTwoGU4Sc-mIGQve5k5zaE2dnk1dtX4"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Market Insight Section -->
+<section class="bg-surface-container-low py-20">
+<div class="max-w-7xl mx-auto px-6">
+<div class="bg-surface-container-lowest rounded-[2rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 overflow-hidden relative shadow-sm">
+<div class="md:w-1/2 space-y-6">
+<h2 class="text-3xl md:text-4xl font-extrabold font-headline text-on-background">Understanding the Impact in Thailand</h2>
+<p class="text-lg text-on-surface-variant">Kidney health is a growing concern. We're here to bridge the gap between clinical requirements and everyday living.</p>
+<div class="flex items-center gap-4 py-4">
+<div class="h-12 w-1.5 bg-primary rounded-full"></div>
+<span class="text-6xl font-extrabold font-headline text-primary">17.6%</span>
+<span class="text-xl text-on-surface-variant font-medium">Of the population</span>
+</div>
+</div>
+<div class="md:w-1/2 relative flex justify-center">
+<div class="w-72 h-72 rounded-full border-[16px] border-surface-container-high relative flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-[16px] border-primary" style="clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 17.6% 0%);"></div>
+<div class="text-center">
+<p class="text-4xl font-extrabold font-headline text-on-background">11.6M</p>
+<p class="text-sm font-label uppercase tracking-widest text-on-surface-variant">Total Patients</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Core Solutions -->
+<section class="py-24 max-w-7xl mx-auto px-6">
+<div class="text-center mb-16">
+<h2 class="text-4xl md:text-5xl font-extrabold font-headline mb-4">Peace of mind, <span class="text-tertiary">delivered daily.</span></h2>
+<p class="text-on-surface-variant text-lg">Simplified care through technology and human connection.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Solution 1 -->
+<div class="bg-surface-container-lowest p-10 rounded-[2rem] space-y-6 transition-transform hover:-translate-y-1">
+<div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="clinical_notes">clinical_notes</span>
+</div>
+<h3 class="text-3xl font-bold font-headline">Escort Buddy</h3>
+<p class="text-lg text-on-surface-variant leading-relaxed">Never walk into a hospital alone. Our trained Escort Buddies provide companionship, help with registrations, and ensure you feel supported during every dialysis session or check-up.</p>
+<ul class="space-y-3 pt-4">
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle" data-weight="fill">check_circle</span>
+                            Registration Assistance
+                        </li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle" data-weight="fill">check_circle</span>
+                            Medication Memo Support
+                        </li>
+</ul>
+</div>
+<!-- Solution 2 -->
+<div class="bg-surface-container-lowest p-10 rounded-[2rem] space-y-6 transition-transform hover:-translate-y-1">
+<div class="w-16 h-16 bg-tertiary/10 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-4xl" data-icon="restaurant_menu">restaurant_menu</span>
+</div>
+<h3 class="text-3xl font-bold font-headline">AI Meal Planner</h3>
+<p class="text-lg text-on-surface-variant leading-relaxed">Eat with confidence. Our AI analyzes nutritional data specific to your stage of kidney disease, offering flavorful recipes and meal tracking that won't compromise your health.</p>
+<ul class="space-y-3 pt-4">
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="check_circle" data-weight="fill">check_circle</span>
+                            Sodium &amp; Potassium Tracking
+                        </li>
+<li class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="check_circle" data-weight="fill">check_circle</span>
+                            Personalized Meal Logs
+                        </li>
+</ul>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-6">
+<h2 class="text-4xl font-extrabold font-headline mb-16 text-center">How It Works</h2>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="relative text-center group">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-outline-variant/15 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="badge">badge</span>
+</div>
+<h4 class="font-bold text-xl mb-2">Step 1: Profiling</h4>
+<p class="text-sm text-on-surface-variant px-4">Set up your health profile and specific requirements in minutes.</p>
+</div>
+<div class="relative text-center group">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-outline-variant/15 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="timer">timer</span>
+</div>
+<h4 class="font-bold text-xl mb-2">Step 2: Trial Period</h4>
+<p class="text-sm text-on-surface-variant px-4">Experience a test run with your selected buddy or AI meal plan.</p>
+</div>
+<div class="relative text-center group">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-outline-variant/15 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="distance">distance</span>
+</div>
+<h4 class="font-bold text-xl mb-2">Step 3: Live Tracking</h4>
+<p class="text-sm text-on-surface-variant px-4">Family members can track your status and safety in real-time.</p>
+</div>
+<div class="relative text-center group">
+<div class="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-outline-variant/15 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl" data-icon="verified">verified</span>
+</div>
+<h4 class="font-bold text-xl mb-2">Step 4: Fair Release</h4>
+<p class="text-sm text-on-surface-variant px-4">Service completed. Secure escrow release ensures both parties are happy.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Choose Us -->
+<section class="py-24 max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="space-y-8">
+<h2 class="text-4xl font-extrabold font-headline leading-tight">Safety and trust are our <span class="text-primary">non-negotiable</span> foundations.</h2>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="p-3 bg-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<h4 class="font-bold text-xl">100% Background Checks</h4>
+<p class="text-on-surface-variant">Every Buddy undergoes rigorous criminal and professional screening.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-3 bg-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="payments">payments</span>
+</div>
+<div>
+<h4 class="font-bold text-xl">Fair GP (10-15% Commission)</h4>
+<p class="text-on-surface-variant">Transparent pricing ensures your Buddy is fairly compensated for their care.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-3 bg-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="map">map</span>
+</div>
+<div>
+<h4 class="font-bold text-xl">Real-time Tracking</h4>
+<p class="text-on-surface-variant">GPS-enabled check-ins for complete family visibility during visits.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="p-3 bg-secondary-container rounded-xl">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="security">security</span>
+</div>
+<div>
+<h4 class="font-bold text-xl">Secure Escrow</h4>
+<p class="text-on-surface-variant">Payments are held safely until the service is successfully concluded.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-tertiary-container/30 rounded-[3rem] p-12 relative">
+<div class="bg-surface-container-lowest rounded-[2rem] p-8 shadow-xl">
+<div class="flex items-center gap-4 mb-8">
+<img alt="Trust symbol and secure interface" class="w-16 h-16 rounded-full object-cover" data-alt="close-up of a high-tech digital security shield icon glowing with soft blue light on a clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJYUl5XTTZTLe0nbi-kN9eEYodiXg-RVHVju1LHjQhOmfVryGRa5O-CjX0zbBCGt6MjVFI0mR1pg9JJeBZ5ondJus5x1VcJjQ9qAi19hJcHQESzKFIMDvluY8NcSVhTt9lzhjGxS1hVx_bddS_hB88iuDXLERMQA-AU17dEEzBZbpLVlaaxye3Si0vM7FlGxxn4kbwqfKdt61ej7hpouJlzULD4ArFZSW4ZWX8NTAWyvf0XyrCmAXP1dPxds0IcZQdaQiVr5vWI64"/>
+<div>
+<p class="font-bold text-lg">Verified Care Ecosystem</p>
+<p class="text-sm text-on-surface-variant">Active Monitoring Enabled</p>
+</div>
+</div>
+<div class="space-y-4">
+<div class="h-4 bg-surface-container-high rounded-full w-3/4"></div>
+<div class="h-4 bg-surface-container-high rounded-full w-full"></div>
+<div class="h-4 bg-surface-container-high rounded-full w-1/2"></div>
+<div class="h-4 bg-surface-container-high rounded-full w-2/3"></div>
+</div>
+</div>
+<div class="absolute -bottom-8 -right-8 glass-panel p-6 rounded-2xl shadow-lg border border-outline-variant/15">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+                            Verified Safe
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trusted Partners -->
+<section class="py-20 bg-surface-container-low overflow-hidden">
+<div class="max-w-7xl mx-auto px-6">
+<p class="text-center text-sm font-label uppercase tracking-[0.2em] text-on-surface-variant mb-12">Building Trust with Industry Leaders</p>
+<div class="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="flex items-center gap-2 font-bold text-xl font-headline">
+<span class="material-symbols-outlined" data-icon="local_hospital">local_hospital</span> Hospitals
+                    </div>
+<div class="flex items-center gap-2 font-bold text-xl font-headline">
+<span class="material-symbols-outlined" data-icon="health_and_safety">health_and_safety</span> Dialysis Centers
+                    </div>
+<div class="flex items-center gap-2 font-bold text-xl font-headline">
+<span class="material-symbols-outlined" data-icon="nutrition">nutrition</span> Dietitians
+                    </div>
+<div class="flex items-center gap-2 font-bold text-xl font-headline">
+<span class="material-symbols-outlined" data-icon="policy">policy</span> Insurance
+                    </div>
+<div class="flex items-center gap-2 font-bold text-xl font-headline">
+<span class="material-symbols-outlined" data-icon="workspace_premium">workspace_premium</span> Professionals
+                    </div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full rounded-t-[2rem] mt-20 bg-[#f3f3fa] dark:bg-[#1f2128]">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 px-8 py-12 max-w-7xl mx-auto">
+<div class="space-y-4">
+<span class="text-xl font-bold text-[#2f323a] dark:text-[#faf9fe] font-headline">Dialybuddy</span>
+<p class="text-[#4a5264] dark:text-[#afb2bc] text-sm leading-relaxed">Dedicated to the Curated Caregiver. Making kidney care more human, one visit at a time.</p>
+</div>
+<div class="flex flex-col gap-3">
+<p class="font-bold text-on-background mb-2">Company</p>
+<a class="text-[#4a5264] dark:text-[#afb2bc] hover:text-[#1A56A8] dark:hover:text-[#75a5fd] transition-all text-sm" href="#">Solutions</a>
+<a class="text-[#4a5264] dark:text-[#afb2bc] hover:text-[#1A56A8] dark:hover:text-[#75a5fd] transition-all text-sm" href="#">Insights</a>
+</div>
+<div class="flex flex-col gap-3">
+<p class="font-bold text-on-background mb-2">Legal</p>
+<a class="text-[#4a5264] dark:text-[#afb2bc] hover:text-[#1A56A8] dark:hover:text-[#75a5fd] transition-all text-sm" href="#">Trust Center</a>
+<a class="text-[#4a5264] dark:text-[#afb2bc] hover:text-[#1A56A8] dark:hover:text-[#75a5fd] transition-all text-sm" href="#">Privacy Policy</a>
+</div>
+<div class="space-y-4">
+<p class="font-bold text-on-background">Stay Updated</p>
+<div class="flex gap-2">
+<input class="bg-surface-container-high border-none rounded-lg text-sm w-full focus:ring-primary" placeholder="Email address" type="email"/>
+<button class="bg-primary text-on-primary p-2 rounded-lg">
+<span class="material-symbols-outlined text-sm" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+<div class="px-8 py-6 border-t border-outline-variant/10 text-center text-[#4a5264] dark:text-[#afb2bc] text-xs tracking-wide font-label">
+            © 2024 Dialybuddy. Dedicated to the Curated Caregiver.
+        </div>
+</footer>
+</body></html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dialybuddy - Trust &amp; Process</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Lexend:wght@300;400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#0d0e12",
+                    "secondary-container": "#dae2f9",
+                    "error": "#a83836",
+                    "on-tertiary-container": "#52416b",
+                    "on-primary": "#f9f8ff",
+                    "on-error-container": "#6e0a12",
+                    "on-tertiary-fixed": "#3e2e57",
+                    "outline-variant": "#afb2bc",
+                    "primary-fixed": "#75a5fd",
+                    "inverse-on-surface": "#9c9ca2",
+                    "inverse-primary": "#75a5fd",
+                    "surface-container-high": "#e7e8f1",
+                    "background": "#faf9fe",
+                    "tertiary": "#685783",
+                    "on-error": "#fff7f6",
+                    "secondary-dim": "#4b5366",
+                    "outline": "#787a84",
+                    "on-secondary-container": "#4a5264",
+                    "surface-container": "#ededf6",
+                    "on-tertiary-fixed-variant": "#5b4b75",
+                    "surface": "#faf9fe",
+                    "on-surface": "#2f323a",
+                    "surface-container-highest": "#e0e2ed",
+                    "on-background": "#2f323a",
+                    "secondary-fixed": "#dae2f9",
+                    "tertiary-container": "#e1cbfe",
+                    "on-primary-container": "#002656",
+                    "tertiary-fixed": "#e1cbfe",
+                    "surface-dim": "#d8d9e4",
+                    "surface-tint": "#255db0",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#575f72",
+                    "primary-fixed-dim": "#6898ee",
+                    "secondary-fixed-dim": "#ccd4eb",
+                    "error-dim": "#67040d",
+                    "tertiary-fixed-dim": "#d2bef0",
+                    "on-surface-variant": "#5c5f68",
+                    "on-secondary-fixed": "#373f51",
+                    "surface-variant": "#e0e2ed",
+                    "on-tertiary": "#fef7ff",
+                    "on-secondary-fixed-variant": "#535b6e",
+                    "error-container": "#fa746f",
+                    "primary": "#255db0",
+                    "surface-container-low": "#f3f3fa",
+                    "primary-container": "#75a5fd",
+                    "tertiary-dim": "#5c4b76",
+                    "on-primary-fixed": "#000616",
+                    "primary-dim": "#1151a3",
+                    "surface-bright": "#faf9fe",
+                    "on-secondary": "#f9f8ff",
+                    "on-primary-fixed-variant": "#002f67"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Lexend"],
+                    "label": ["Lexend"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-line-rule { border: none !important; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#faf9fe]/80 dark:bg-[#2f323a]/80 backdrop-blur-xl no-line-rule tonal-shift bg-[#f3f3fa] dark:bg-[#3d414d]">
+<div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<img alt="Dialybuddy Logo" class="h-10 w-10 object-contain" data-alt="minimalist health tech logo featuring a stylized blue heart and a subtle medical pulse line clean professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATDNAGCfFkooHekUxdUKl9Kh8G20RodASDTck-aIcEZUXLPSszJoUNtimqa23GFjdOgP_wd2dwqdthRetrgc7PbNSFin677lfGNAiZ6p1nvGjaf7UO3upbllhe6Co1yAIL_QcE_QQrne8EsmaA7eIN91SSNeW0IfGm1MOEkgTTqa_sN3DpkvC7HViTjwHJYOc7fSE1lFdFIuHenxOj4lQDZ5eV7-9sGyDOiGE_ErfEYWY9KHw_IkJJskAeuUO0OwwP0r-cGBu7yDQ"/>
+<span class="text-2xl font-extrabold bg-gradient-to-r from-[#255db0] to-[#75a5fd] bg-clip-text text-transparent font-['Manrope'] tracking-tight">Serene Sanctuary</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#255db0] dark:text-[#75a5fd] font-bold border-b-2 border-[#255db0] transition-colors" href="#">Process</a>
+<a class="text-[#2f323a] dark:text-[#e7e8f1] font-medium hover:text-[#255db0] dark:hover:text-[#75a5fd] transition-colors" href="#">Safety</a>
+<a class="text-[#2f323a] dark:text-[#e7e8f1] font-medium hover:text-[#255db0] dark:hover:text-[#75a5fd] transition-colors" href="#">Partners</a>
+<button class="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-2.5 rounded-xl font-semibold hover:opacity-90 active:scale-95 transition-all">Get Started</button>
+</nav>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<main class="pt-24">
+<!-- Market Insight Section -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+<div class="bg-surface-container-low rounded-[2.5rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12">
+<div class="flex-1 space-y-6">
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-secondary-container text-on-secondary-container rounded-full text-sm font-medium">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                        Market Insight
+                    </div>
+<h2 class="text-4xl md:text-5xl font-extrabold text-on-surface leading-tight tracking-tight">
+                        Thailand's Silent <span class="text-primary">Health Crisis</span>
+</h2>
+<p class="text-lg text-on-surface-variant leading-relaxed max-w-xl">
+                        With over <span class="font-bold text-on-surface">11.6 Million</span> patients, kidney disease is a growing challenge. We are building the infrastructure to support 17.6% of our population through curated care and advanced technology.
+                    </p>
+</div>
+<div class="flex-1 flex justify-center items-center relative">
+<!-- Custom Pie Chart Visualization -->
+<div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-container-highest" cx="50%" cy="50%" fill="transparent" r="45%" stroke="currentColor" stroke-width="25"></circle>
+<circle class="transition-all duration-1000" cx="50%" cy="50%" fill="transparent" r="45%" stroke="url(#gradient)" stroke-dasharray="100 100" stroke-dashoffset="82.4" stroke-linecap="round" stroke-width="30"></circle>
+<defs>
+<lineargradient id="gradient" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#255db0"></stop>
+<stop offset="100%" stop-color="#75a5fd"></stop>
+</lineargradient>
+</defs>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-5xl font-extrabold text-primary">17.6%</span>
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-widest">Of Population</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="max-w-7xl mx-auto px-8 py-16 overflow-hidden">
+<div class="text-center mb-16 space-y-4">
+<h2 class="text-3xl md:text-4xl font-extrabold text-on-surface">Precision Care Process</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">Our four-step methodology ensures every patient receives personalized, safe, and transparent kidney care management.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<!-- Step 1 -->
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] space-y-6 group hover:bg-primary-container/10 transition-colors">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-3xl">clinical_notes</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-on-surface">Profiling</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Deep medical history analysis to match you with the right specialist team.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] space-y-6 group hover:bg-primary-container/10 transition-colors">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-3xl">experiment</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-on-surface">Trial Period</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">A 14-day calibration phase to ensure the treatment plan fits your lifestyle.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] space-y-6 group hover:bg-primary-container/10 transition-colors">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-3xl">monitoring</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-on-surface">Live Tracking</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Continuous vital monitoring and real-time adjustment of your vitals.</p>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] space-y-6 group hover:bg-primary-container/10 transition-colors">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-3xl">verified_user</span>
+</div>
+<div class="space-y-2">
+<h3 class="text-xl font-bold text-on-surface">Fair Release</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Secure transaction settlement only after verified service delivery.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Section - Bento Grid Layout -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-auto md:h-[600px]">
+<div class="md:col-span-8 bg-[#255db0] rounded-[2.5rem] p-10 flex flex-col justify-end relative overflow-hidden text-on-primary">
+<div class="absolute top-0 right-0 p-8 opacity-20">
+<span class="material-symbols-outlined text-[12rem]">security</span>
+</div>
+<div class="relative z-10 space-y-4">
+<h2 class="text-4xl font-extrabold">100% Background Checks</h2>
+<p class="text-primary-container text-lg max-w-lg">Every caregiver and partner clinic undergoes a rigorous 5-tier verification process before joining our network.</p>
+</div>
+</div>
+<div class="md:col-span-4 bg-tertiary-container rounded-[2.5rem] p-10 flex flex-col justify-between">
+<div class="w-12 h-12 bg-on-tertiary-container text-white rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">balance</span>
+</div>
+<div>
+<h3 class="text-2xl font-bold text-on-tertiary-container mb-2">Fair GP Policy</h3>
+<p class="text-on-tertiary-fixed-variant">Ethical pricing and guaranteed service standards across all partner clinics.</p>
+</div>
+</div>
+<div class="md:col-span-4 bg-secondary-container rounded-[2.5rem] p-10 flex flex-col justify-between">
+<div class="w-12 h-12 bg-on-secondary-container text-white rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">share_location</span>
+</div>
+<div>
+<h3 class="text-2xl font-bold text-on-secondary-container mb-2">Real-time Tracking</h3>
+<p class="text-on-secondary-fixed-variant">Know exactly where your medication or home-care specialist is at any moment.</p>
+</div>
+</div>
+<div class="md:col-span-8 bg-surface-container-high rounded-[2.5rem] p-10 flex items-center gap-8 group">
+<div class="hidden md:flex w-32 h-32 bg-surface-container-lowest rounded-full items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-5xl text-primary" data-weight="fill">lock</span>
+</div>
+<div class="flex-1">
+<h3 class="text-2xl font-bold text-on-surface mb-2">Secure Escrow</h3>
+<p class="text-on-surface-variant">Your payments are held in a secure third-party account and only released when care is completed to your satisfaction.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Partner Section -->
+<section class="max-w-7xl mx-auto px-8 py-16">
+<div class="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+<div class="space-y-4">
+<h2 class="text-3xl font-extrabold">Our Ecosystem Partners</h2>
+<p class="text-on-surface-variant max-w-xl">We collaborate with the nation's leading medical institutions and specialists to ensure seamless care delivery.</p>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 hover:translate-x-1 transition-transform">
+                    View All Partners <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Hospitals -->
+<div class="p-8 bg-surface-container-low rounded-3xl text-center space-y-4 hover:shadow-lg transition-all border border-outline-variant/10">
+<div class="text-primary opacity-60"><span class="material-symbols-outlined text-4xl">domain</span></div>
+<h4 class="font-bold text-lg">Top Hospitals</h4>
+<p class="text-xs text-on-surface-variant">Tier-1 Medical Centers nationwide</p>
+</div>
+<!-- Dialysis Centers -->
+<div class="p-8 bg-surface-container-low rounded-3xl text-center space-y-4 hover:shadow-lg transition-all border border-outline-variant/10">
+<div class="text-primary opacity-60"><span class="material-symbols-outlined text-4xl">blood_pressure</span></div>
+<h4 class="font-bold text-lg">Dialysis Centers</h4>
+<p class="text-xs text-on-surface-variant">Specialized Renal Care Units</p>
+</div>
+<!-- Dietitians -->
+<div class="p-8 bg-surface-container-low rounded-3xl text-center space-y-4 hover:shadow-lg transition-all border border-outline-variant/10">
+<div class="text-primary opacity-60"><span class="material-symbols-outlined text-4xl">nutrition</span></div>
+<h4 class="font-bold text-lg">Dietitians</h4>
+<p class="text-xs text-on-surface-variant">Renal-focused nutritionists</p>
+</div>
+<!-- Insurance -->
+<div class="p-8 bg-surface-container-low rounded-3xl text-center space-y-4 hover:shadow-lg transition-all border border-outline-variant/10">
+<div class="text-primary opacity-60"><span class="material-symbols-outlined text-4xl">health_and_safety</span></div>
+<h4 class="font-bold text-lg">Insurance</h4>
+<p class="text-xs text-on-surface-variant">Integrated coverage providers</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full rounded-t-[2rem] mt-12 bg-[#f3f3fa] dark:bg-[#3d414d] tonal-shift background-shift">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-10 w-full max-w-7xl mx-auto gap-8">
+<div class="space-y-2">
+<span class="text-lg font-bold text-[#2f323a] dark:text-[#ffffff] block">Serene Sanctuary</span>
+<p class="font-['Lexend'] text-sm leading-relaxed text-[#4a5264] dark:text-[#afb2bc]">© 2024 Serene Sanctuary. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-['Lexend'] text-sm leading-relaxed text-[#4a5264] dark:text-[#afb2bc] hover:text-[#255db0] underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-['Lexend'] text-sm leading-relaxed text-[#4a5264] dark:text-[#afb2bc] hover:text-[#255db0] underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-['Lexend'] text-sm leading-relaxed text-[#4a5264] dark:text-[#afb2bc] hover:text-[#255db0] underline transition-all opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-xl">share</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-xl">language</span>
+</button>
+</div>
+</div>
+</footer>
+</body></html>
