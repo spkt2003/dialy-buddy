@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { Apple, Upload, Loader2, CheckCircle2, FileText, Soup, Coffee, Moon, AlertCircle } from "lucide-react";
 
@@ -18,33 +18,8 @@ export default function AIPlannerPage() {
 
   // จำลองการวิเคราะห์ภาพ
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-
-    const file = e.target.files?.[0];
-
-    if (file) {
-
-      setPreview(URL.createObjectURL(file));
-
-      setStatus("analyzing");
-
-
-
-      // จำลองเวลาประมวลผล 3 วินาที
-
-      setTimeout(() => {
-
-        setStatus("success");
-
-      }, 3000);
-
-    }
-
-  };
 
   const [analysisResult, setAnalysisResult] = useState<any>(null);
-
-
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
