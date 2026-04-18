@@ -6,11 +6,30 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'patient' | 'buddy'>('patient');
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    router.push('/dashboard');
+
+    // 1. บันทึกข้อมูลบัญชี (อีเมล/เบอร์ และ รหัสผ่าน) ลง Local Storage
+    // สมมติว่าเราใช้เบอร์โทรเป็น Username ไปก่อน
+    localStorage.setItem("registeredPhone", phone);
+    localStorage.setItem("registeredPassword", password);
+
+    // 2. บันทึกข้อมูลทั่วไป
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userName", name);
+
+    if (role === 'buddy') {
+      localStorage.setItem("role", "provider");
+      router.push("/provider/dashboard");
+    } else {
+      localStorage.setItem("role", "customer");
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -30,31 +49,33 @@ export default function RegisterPage() {
         <p className="text-on-surface-variant font-body mb-8 text-lg">สร้างบัญชีผู้ใช้งานเพื่อเริ่มต้นใช้งานแพลตฟอร์ม</p>
 
         <div className="flex bg-surface-container-high rounded-xl p-1 mb-8 shadow-inner">
-          <button 
+          <button
             type="button"
             onClick={() => setRole('patient')}
-            className={`flex-1 py-3 text-base font-bold font-label rounded-lg transition-colors ${role === 'patient' ? 'bg-surface-container-lowest text-on-background shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+            className={`flex-1 py-3 text-base font-bold font-label rounded-lg transition-colors ${role === 'patient' ? 'bg-white text-blue-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
           >
             ผู้ป่วยโรคไต / ญาติ
           </button>
-          <button 
+          <button
             type="button"
             onClick={() => setRole('buddy')}
-            className={`flex-1 py-3 text-base font-bold font-label rounded-lg transition-colors ${role === 'buddy' ? 'bg-surface-container-lowest text-on-background shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+            className={`flex-1 py-3 text-base font-bold font-label rounded-lg transition-colors ${role === 'buddy' ? 'bg-white text-blue-700 shadow-sm border border-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
           >
             ผู้ดูแล (Care Buddy)
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleRegister} className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-bold font-label text-on-surface w-full block">ชื่อ-นามสกุล ของคุณ</label>
             <div className="relative">
-              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant" />
-              <input 
-                type="text" 
-                placeholder="ระบุชื่อและนามสกุลจริง" 
-                className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface font-body focus:ring-2 focus:ring-primary/50 focus:outline-none text-base"
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="ระบุชื่อและนามสกุลจริง"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 pl-12 pr-4 text-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:outline-none"
                 required
               />
             </div>
@@ -62,11 +83,13 @@ export default function RegisterPage() {
           <div className="space-y-2">
             <label className="text-sm font-bold font-label text-on-surface w-full block">เบอร์โทรศัพท์ที่ติดต่อได้</label>
             <div className="relative">
-              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant" />
-              <input 
-                type="tel" 
-                placeholder="ตัวอย่าง 0812345678" 
-                className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface font-body focus:ring-2 focus:ring-primary/50 focus:outline-none text-base"
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="ตัวอย่าง 0812345678"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 pl-12 pr-4 text-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:outline-none"
                 required
               />
             </div>
@@ -74,23 +97,26 @@ export default function RegisterPage() {
           <div className="space-y-2">
             <label className="text-sm font-bold font-label text-on-surface w-full block">ตั้งรหัสผ่านความปลอดภัย</label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant" />
-              <input 
-                type="password" 
-                placeholder="ระบุอย่างน้อย 8 ตัวอักษร" 
-                className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface font-body focus:ring-2 focus:ring-primary/50 focus:outline-none text-base"
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="ระบุอย่างน้อย 8 ตัวอักษร"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-4 pl-12 pr-4 text-slate-800 focus:ring-2 focus:ring-blue-500/50 focus:outline-none"
                 required
+                minLength={8}
               />
             </div>
           </div>
 
-          <button type="submit" className="w-full mt-6 flex items-center justify-center bg-blue-700 text-white font-bold font-label py-4 rounded-xl shadow-md hover:bg-blue-800 transition-colors text-lg">
+          <button type="submit" className="w-full mt-6 flex items-center justify-center bg-blue-600 text-white font-bold font-label py-4 rounded-xl shadow-md hover:bg-blue-700 transition-colors text-lg">
             ลงทะเบียนใช้งาน
           </button>
         </form>
 
-        <p className="text-center text-base font-body text-on-surface-variant mt-8">
-          มีบัญชีผู้ใช้งานระบบอยู่แล้วใช่ไหม? <Link href="/login" className="text-primary font-bold hover:underline">คลิกเพื่อเข้าสู่ระบบ</Link>
+        <p className="text-center text-base font-body text-on-surface-variant mt-8 text-slate-600">
+          มีบัญชีผู้ใช้งานระบบอยู่แล้วใช่ไหม? <Link href="/login" className="text-blue-600 font-bold hover:underline">คลิกเพื่อเข้าสู่ระบบ</Link>
         </p>
       </div>
     </div>
