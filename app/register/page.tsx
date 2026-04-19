@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Stethoscope, User, Lock, Phone } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'patient' | 'buddy'>('patient');
@@ -10,6 +11,8 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+
+  const { login } = useAuth();
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,15 +22,11 @@ export default function RegisterPage() {
     localStorage.setItem("registeredPhone", phone);
     localStorage.setItem("registeredPassword", password);
 
-    // 2. บันทึกข้อมูลทั่วไป
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("userName", name);
-
     if (role === 'buddy') {
-      localStorage.setItem("role", "provider");
+      login("caregiver", name);
       router.push("/caregiver/dashboard");
     } else {
-      localStorage.setItem("role", "customer");
+      login("patient", name);
       router.push("/dashboard");
     }
   };

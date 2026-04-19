@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Stethoscope, Mail, Lock, AlertCircle } from "lucide-react"; // เพิ่ม AlertCircle
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -10,6 +11,8 @@ export default function LoginPage() {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // State สำหรับเก็บข้อความ Error
+
+  const { login } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,28 +26,22 @@ export default function LoginPage() {
 
     // 1. ตรวจสอบสิทธิ์ Admin (คงไว้เหมือนเดิม)
     if (emailOrPhone === "admin" && password === "admin123") {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userName", "ผู้ดูแลระบบ");
-      localStorage.setItem("role", "admin");
-      router.push("/dashboard");
+      login("caregiver", "ผู้ดูแลระบบ");
+      router.push("/caregiver/dashboard");
     }
     // 2. ตรวจสอบกับข้อมูลที่ Register ไว้
     else if (emailOrPhone === registeredPhone && password === registeredPassword) {
-      localStorage.setItem("isLoggedIn", "true");
-      // ไม่ต้องเซ็ต userName หรือ role ใหม่ เพราะมีอยู่ใน localStorage แล้วจากตอนสมัคร
-
-      // พาไปหน้าที่ถูกต้องตาม Role
-      if (registeredRole === "provider") {
+      if (registeredRole === "provider" || registeredRole === "caregiver") {
+        login("caregiver", registeredName);
         router.push("/caregiver/dashboard");
       } else {
+        login("patient", registeredName);
         router.push("/dashboard");
       }
     }
     // 3. Fallback (เผื่อกรณีไม่ได้กดสมัครก่อน แต่มาพิมพ์ user / user123 เลย)
     else if (emailOrPhone === "user" && password === "user123") {
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userName", "สมหมาย");
-      localStorage.setItem("role", "customer");
+      login("patient", "สมหมาย");
       router.push("/dashboard");
     }
     // 4. กรณีรหัสผ่านผิด
