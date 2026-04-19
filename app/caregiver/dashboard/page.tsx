@@ -1,53 +1,18 @@
 // app/caregiver/dashboard/page.tsx
 "use client";
 
-import { useState } from "react";
-import { Star, CheckCircle2, Clock, MapPin, Activity } from "lucide-react";
+import { Star, CheckCircle2, Clock, MapPin, Activity, AlertCircle, ArrowRight } from "lucide-react";
 import ChatBox from "../../../components/caregiver/ChatBox";
+import { useJobContext } from "../../../context/JobContext";
+import { useRouter } from "next/navigation";
 
 export default function CaregiverDashboard() {
-  // Mock job data
-  const initialJobs = [
-    { id: 1, title: "พาผู้ป่วยไปฟอกไต รพ.ศิริราช", patient: "คุณสมหมาย", time: "09:00 น.", status: "pending" },
-    { id: 2, title: "ดูแลผู้ป่วยหลังการผ่าตัด", patient: "คุณสมพร", time: "13:30 น.", status: "pending" },
-    { id: 3, title: "ตรวจสุขภาพประจำเดือน", patient: "คุณสมศรี", time: "15:00 น.", status: "pending" },
-  ];
+  const { pendingJobs, activeJob, completedJobs, acceptJob } = useJobContext();
+  const router = useRouter();
 
-  const [jobs, setJobs] = useState(initialJobs);
-  const [history, setHistory] = useState([] as typeof initialJobs);
-
-  const statusLabels: Record<string, string> = {
-    pending: "รับงาน",
-    inProgress: "กำลังดำเนินการ",
-    completed: "จบงาน",
-  };
-
-  const nextStatus: Record<string, string> = {
-    pending: "inProgress",
-    inProgress: "completed",
-    completed: "completed",
-  };
-
-  const statusColors: Record<string, string> = {
-    pending: "bg-blue-600 hover:bg-blue-700 text-white shadow-md", // Brand primary
-    inProgress: "bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-200",
-    completed: "bg-slate-100 text-slate-500",
-  };
-
-  const handleToggle = (jobId: number) => {
-    setJobs((prev) => {
-      return prev
-        .map((job) => {
-          if (job.id !== jobId) return job;
-          const newStatus = nextStatus[job.status];
-          if (newStatus === "completed") {
-            setHistory((h) => [...h, { ...job, status: newStatus }]);
-            return null as any;
-          }
-          return { ...job, status: newStatus };
-        })
-        .filter(Boolean) as typeof initialJobs;
-    });
+  const handleAcceptJob = (jobId: string) => {
+    acceptJob(jobId);
+    router.push("/caregiver/tracking");
   };
 
   return (
@@ -79,16 +44,40 @@ export default function CaregiverDashboard() {
           </div>
         </section>
 
+        {/* Active Job Banner */}
+        {activeJob && (
+          <section className="bg-blue-50 border border-blue-200 rounded-[2rem] p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mb-8 animate-in fade-in slide-in-from-bottom-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                <AlertCircle className="w-8 h-8 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-blue-900 font-headline">คุณมีงานที่กำลังดำเนินการอยู่</h2>
+                <p className="text-blue-700 font-medium mt-1">
+                  กำลังให้บริการ: {activeJob.patientName} ({activeJob.type})
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => router.push("/caregiver/tracking")}
+              className="w-full md:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-md active:scale-95 whitespace-nowrap"
+            >
+              ไปที่หน้าติดตามสถานะ
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </section>
+        )}
+
         {/* Job List Section */}
-        <section>
+        <section className={activeJob ? "opacity-50 pointer-events-none transition-opacity" : ""}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold font-headline text-slate-900">งานที่รอรับ</h2>
             <span className="bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">
-              {jobs.length} งาน
+              {pendingJobs.length} งาน
             </span>
           </div>
 
-          {jobs.length === 0 ? (
+          {pendingJobs.length === 0 ? (
             <div className="bg-white rounded-3xl p-10 text-center border border-slate-100 shadow-sm">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-8 h-8 text-slate-300" />
@@ -97,17 +86,17 @@ export default function CaregiverDashboard() {
             </div>
           ) : (
             <div className="space-y-4">
-              {jobs.map((job) => (
+              {pendingJobs.map((job) => (
                 <div
                   key={job.id}
                   className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                 >
                   <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-slate-900">{job.title}</h3>
+                    <h3 className="text-xl font-bold text-slate-900">{job.type} {job.destination}</h3>
                     <div className="flex flex-wrap items-center gap-4 text-slate-600 text-sm font-medium">
                       <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-lg">
                         <MapPin className="w-4 h-4 text-blue-500" />
-                        {job.patient}
+                        {job.patientName}
                       </span>
                       <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-lg">
                         <Clock className="w-4 h-4 text-blue-500" />
@@ -117,10 +106,11 @@ export default function CaregiverDashboard() {
                   </div>
                   
                   <button
-                    className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all active:scale-95 ${statusColors[job.status]}`}
-                    onClick={() => handleToggle(job.id)}
+                    className="w-full sm:w-auto px-8 py-3 rounded-xl font-bold transition-all active:scale-95 bg-blue-600 hover:bg-blue-700 text-white shadow-md whitespace-nowrap"
+                    onClick={() => handleAcceptJob(job.id)}
+                    disabled={!!activeJob}
                   >
-                    {statusLabels[job.status]}
+                    รับงาน
                   </button>
                 </div>
               ))}
@@ -130,20 +120,20 @@ export default function CaregiverDashboard() {
 
         {/* History Section */}
         <section>
-          <h2 className="text-2xl font-bold font-headline text-slate-900 mb-6 mt-10">ประวัติการทำงานวันนี้</h2>
-          {history.length === 0 ? (
-             <p className="text-slate-500 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">ยังไม่มีงานที่เสร็จสิ้นในวันนี้</p>
+          <h2 className="text-2xl font-bold font-headline text-slate-900 mb-6 mt-10">ประวัติการทำงาน</h2>
+          {completedJobs.length === 0 ? (
+             <p className="text-slate-500 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">ยังไม่มีงานที่เสร็จสิ้น</p>
           ) : (
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
               <div className="divide-y divide-slate-100">
-                {history.map((job) => (
+                {completedJobs.map((job) => (
                   <div key={job.id} className="flex items-center gap-4 p-5">
                     <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="font-bold text-slate-800">{job.title}</p>
-                      <p className="text-sm text-slate-500">สำเร็จแล้ว • {job.patient}</p>
+                      <p className="font-bold text-slate-800">{job.type} {job.destination}</p>
+                      <p className="text-sm text-slate-500">สำเร็จแล้ว • {job.patientName} • {job.date}</p>
                     </div>
                   </div>
                 ))}

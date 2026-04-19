@@ -3,6 +3,7 @@ import { Manrope, Lexend } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../context/AuthContext";
 import AuthGuard from "../components/auth/AuthGuard";
+import { JobProvider } from "../context/JobContext";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className="min-h-[100dvh] flex flex-col font-body bg-surface text-on-surface overflow-x-hidden">
         <AuthProvider>
           <AuthGuard>
-            {children}
+            <JobProvider>
+              {children}
+            </JobProvider>
           </AuthGuard>
         </AuthProvider>
       </body>
