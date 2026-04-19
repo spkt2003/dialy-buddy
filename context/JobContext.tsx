@@ -14,6 +14,7 @@ export interface Job {
   type: string;
   status: JobStatus;
   currentStep?: number;
+  earning?: number;
 }
 
 interface JobContextType {
@@ -35,6 +36,7 @@ const initialPendingJobs: Job[] = [
     date: "วันนี้",
     type: "พาไปฟอกไต",
     status: "pending",
+    earning: 800,
   },
   {
     id: "j2",
@@ -45,6 +47,7 @@ const initialPendingJobs: Job[] = [
     date: "พรุ่งนี้",
     type: "พาไปฟอกไต",
     status: "pending",
+    earning: 650,
   }
 ];
 
@@ -58,6 +61,18 @@ const initialCompletedJobs: Job[] = [
     date: "เมื่อวาน",
     type: "พาไปฟอกไต",
     status: "completed",
+    earning: 1200,
+  },
+  {
+    id: "c2",
+    patientName: "คุณวิไล ใจดี",
+    patientImage: "https://i.pravatar.cc/150?img=47",
+    destination: "รพ.จุฬาลงกรณ์",
+    time: "13:00 - 17:00",
+    date: "3 วันก่อน",
+    type: "ดูแลผู้ป่วยหลังการผ่าตัด",
+    status: "completed",
+    earning: 1500,
   }
 ];
 
