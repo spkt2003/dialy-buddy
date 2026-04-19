@@ -16,7 +16,7 @@ export default function CaregiverLayout({
   const navItems = [
     { name: "แผงควบคุม", href: "/caregiver/dashboard", icon: Home },
     { name: "งานของฉัน", href: "/caregiver/jobs", icon: Users },
-    { name: "ตั้งค่า", href: "/caregiver/profile", icon: Settings },
+    { name: "ตั้งค่า", href: "/caregiver/settings", icon: Settings },
   ];
 
   return (

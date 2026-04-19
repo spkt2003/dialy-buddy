@@ -96,7 +96,7 @@ export default function Navbar() {
 
                       {/* ลิงก์ไปหน้า Profile แยกตามสิทธิ์ */}
                       <Link
-                        href={role === 'caregiver' ? "/caregiver/profile" : "/profile"}
+                        href={role === 'caregiver' ? "/caregiver/settings" : "/profile"}
                         onClick={() => setIsProfileOpen(false)}
                         className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium font-label text-on-surface hover:bg-surface-container-low transition-colors"
                       >
