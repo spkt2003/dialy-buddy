@@ -35,7 +35,7 @@ export default function LoginPage() {
 
       // พาไปหน้าที่ถูกต้องตาม Role
       if (registeredRole === "provider") {
-        router.push("/provider/dashboard");
+        router.push("/caregiver/dashboard");
       } else {
         router.push("/dashboard");
       }

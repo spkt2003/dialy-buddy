@@ -24,16 +24,19 @@ export default function Navbar() {
     const checkLoginStatus = () => {
       const storedLoginStatus = localStorage.getItem("isLoggedIn");
       const storedUserName = localStorage.getItem("userName");
+      const storedRole = localStorage.getItem("role") || "";
 
       if (storedLoginStatus === "true") {
         setIsLoggedIn(true);
         setUserName(storedUserName || "ผู้ใช้งาน");
+        setRole(storedRole);
       } else {
         setIsLoggedIn(false);
+        setRole("");
 
         // แปลง Path เป็นตัวพิมพ์เล็กทั้งหมดเพื่อป้องกันปัญหา /Profile vs /profile
         const currentPath = pathname?.toLowerCase() || "";
-        const protectedPaths = ["/dashboard", "/profile", "/provider", "/booking"];
+        const protectedPaths = ["/dashboard", "/profile", "/provider", "/caregiver", "/booking"];
 
         // ถ้าไม่มีการ Login และพยายามเข้าหน้าเหล่านี้ ให้เด้งไป Login
         const isProtected = protectedPaths.some(path => currentPath.includes(path));
@@ -100,11 +103,11 @@ export default function Navbar() {
                   <div className="fixed inset-0 z-40" onClick={() => setIsProfileOpen(false)}></div>
                   <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl bg-surface-container-lowest shadow-ambient ghost-border animate-in fade-in slide-in-from-top-2">
                     <div className="p-2">
-                      {/* ถ้าเป็น Admin ให้โชว์ทางเข้าเมนู Dashboard ของผู้ดูแล */}
-                      {role === 'admin' && (
-                        <Link href="/provider/dashboard" onClick={() => setIsProfileOpen(false)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold font-label text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors mb-1">
+                      {/* ถ้าเป็น Admin หรือ Provider ให้โชว์ทางเข้าเมนู Dashboard ของผู้ดูแล */}
+                      {(role === 'admin' || role === 'provider') && (
+                        <Link href="/caregiver/dashboard" onClick={() => setIsProfileOpen(false)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold font-label text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors mb-1">
                           <LayoutDashboard className="h-4 w-4" />
-                          หน้าจัดการงาน (Provider)
+                          หน้าจัดการงาน (ผู้ดูแล)
                         </Link>
                       )}
 

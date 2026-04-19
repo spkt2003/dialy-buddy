@@ -25,7 +25,7 @@ export default function RegisterPage() {
 
     if (role === 'buddy') {
       localStorage.setItem("role", "provider");
-      router.push("/provider/dashboard");
+      router.push("/caregiver/dashboard");
     } else {
       localStorage.setItem("role", "customer");
       router.push("/dashboard");
