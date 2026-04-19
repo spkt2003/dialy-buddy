@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Home, Users, Settings, LogOut, HeartPulse } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -24,7 +25,7 @@ export default function CaregiverLayout({
       <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
           <Link href="/" className="flex items-center gap-4">
-            <img src="/logo.png" alt="DialyBuddy Logo" className="h-16 md:h-20 w-auto object-contain drop-shadow-sm" />
+            <Image src="/logo.png" alt="DialyBuddy Logo" width={250} height={250} className="object-contain" />
             <span className="text-slate-500 font-bold text-xl mt-1">ผู้ดูแล</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-2">
