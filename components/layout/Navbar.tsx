@@ -66,11 +66,11 @@ export default function Navbar() {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center gap-2 rounded-full border ghost-border bg-surface-container-lowest p-1.5 pr-4 transition-all hover:bg-surface-container-low hover:shadow-ambient"
               >
-                <div className={`flex h-8 w-8 items-center justify-center rounded-full ${role === 'admin' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary/10 text-primary'}`}>
-                  {role === 'admin' ? <ShieldCheck className="h-5 w-5" /> : <UserCircle className="h-5 w-5" />}
+                <div className={`flex h-8 w-8 items-center justify-center rounded-full ${role === 'caregiver' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary/10 text-primary'}`}>
+                  {role === 'caregiver' ? <ShieldCheck className="h-5 w-5" /> : <UserCircle className="h-5 w-5" />}
                 </div>
                 <span className="text-sm font-semibold font-label text-on-surface uppercase">
-                  {userName} {role === 'admin' && "(ผู้ดูแล)"}
+                  {userName} {role === 'caregiver' && "(ผู้ดูแล)"}
                 </span>
                 <ChevronDown className="h-4 w-4 text-on-surface-variant" />
               </button>
