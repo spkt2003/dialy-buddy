@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Stethoscope, User, Lock, Phone } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'patient' | 'buddy'>('patient');
