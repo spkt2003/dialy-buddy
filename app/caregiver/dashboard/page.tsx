@@ -2,15 +2,15 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Check, Clock, Send } from "lucide-react";
+import { Star, CheckCircle2, Clock, MapPin, Activity } from "lucide-react";
 import ChatBox from "../../../components/caregiver/ChatBox";
 
 export default function CaregiverDashboard() {
   // Mock job data
   const initialJobs = [
-    { id: 1, title: "พาผู้ป่วยไปฟอกไต รพ.ศิริราช", status: "pending" },
-    { id: 2, title: "ดูแลผู้ป่วยหลังการผ่าตัด", status: "pending" },
-    { id: 3, title: "ตรวจสุขภาพประจำเดือน", status: "pending" },
+    { id: 1, title: "พาผู้ป่วยไปฟอกไต รพ.ศิริราช", patient: "คุณสมหมาย", time: "09:00 น.", status: "pending" },
+    { id: 2, title: "ดูแลผู้ป่วยหลังการผ่าตัด", patient: "คุณสมพร", time: "13:30 น.", status: "pending" },
+    { id: 3, title: "ตรวจสุขภาพประจำเดือน", patient: "คุณสมศรี", time: "15:00 น.", status: "pending" },
   ];
 
   const [jobs, setJobs] = useState(initialJobs);
@@ -29,9 +29,9 @@ export default function CaregiverDashboard() {
   };
 
   const statusColors: Record<string, string> = {
-    pending: "bg-emerald-600 hover:bg-emerald-700",
-    inProgress: "bg-amber-600 hover:bg-amber-700",
-    completed: "bg-gray-600 hover:bg-gray-700",
+    pending: "bg-blue-600 hover:bg-blue-700 text-white shadow-md", // Brand primary
+    inProgress: "bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-200",
+    completed: "bg-slate-100 text-slate-500",
   };
 
   const handleToggle = (jobId: number) => {
@@ -51,78 +51,113 @@ export default function CaregiverDashboard() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      {/* Left side: profile, jobs, history */}
-      <div className="flex-1 space-y-10">
-        {/* Heading */}
-        <h1 className="text-3xl font-bold text-slate-900">แผงควบคุมผู้ดูแล</h1>
-
-        {/* Profile Card */}
-        <section className="max-w-md rounded-xl bg-blue-50 p-6 shadow-md border border-blue-200">
-          <div className="flex items-center space-x-4">
-            <div className="h-16 w-16 rounded-full bg-teal-300 flex items-center justify-center text-white text-xl font-semibold">
-              ส
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900">พยาบาลวิชาชีพ สมศรี</h2>
-              <div className="flex items-center text-sm text-slate-700 mt-1 space-x-2">
-                <Star className="h-4 w-4 text-amber-500" />
-                <span>คะแนน 4.9</span>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left Column: Profile & Jobs */}
+      <div className="lg:col-span-2 space-y-8">
+        
+        {/* Welcome & Profile Section */}
+        <section className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-6">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white text-3xl font-bold shadow-md shrink-0">
+            ส
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-3xl font-bold font-headline text-slate-900 mb-2">ยินดีต้อนรับ, สมศรี</h1>
+            <p className="text-lg text-slate-500 font-body">พยาบาลวิชาชีพ • ผู้ดูแลระดับพรีเมียม</p>
+            
+            <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
+              <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100 text-amber-700">
+                <Star className="w-5 h-5 fill-current" />
+                <span className="font-bold">4.9</span>
+                <span className="text-sm">(128 รีวิว)</span>
               </div>
-              <p className="text-sm text-slate-600 mt-2">
-                งานที่สำเร็จ: <strong>42</strong> ครั้ง
-              </p>
+              <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100 text-emerald-700">
+                <Activity className="w-5 h-5" />
+                <span className="font-bold">42</span>
+                <span className="text-sm">งานสำเร็จ</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Job List */}
+        {/* Job List Section */}
         <section>
-          <h2 className="text-2xl font-semibold text-slate-800 mb-4">รายการงาน</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold font-headline text-slate-900">งานที่รอรับ</h2>
+            <span className="bg-blue-100 text-blue-700 text-sm font-bold px-3 py-1 rounded-full">
+              {jobs.length} งาน
+            </span>
+          </div>
+
           {jobs.length === 0 ? (
-            <p className="text-slate-600">ไม่มีงานที่รออยู่</p>
+            <div className="bg-white rounded-3xl p-10 text-center border border-slate-100 shadow-sm">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-xl text-slate-500 font-medium">ไม่มีงานที่รอรับในขณะนี้</p>
+            </div>
           ) : (
-            <ul className="space-y-4">
+            <div className="space-y-4">
               {jobs.map((job) => (
-                <li
+                <div
                   key={job.id}
-                  className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm"
+                  className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                 >
-                  <span className="text-slate-800">{job.title}</span>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-slate-900">{job.title}</h3>
+                    <div className="flex flex-wrap items-center gap-4 text-slate-600 text-sm font-medium">
+                      <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-lg">
+                        <MapPin className="w-4 h-4 text-blue-500" />
+                        {job.patient}
+                      </span>
+                      <span className="flex items-center gap-1.5 bg-slate-50 px-3 py-1 rounded-lg">
+                        <Clock className="w-4 h-4 text-blue-500" />
+                        {job.time}
+                      </span>
+                    </div>
+                  </div>
+                  
                   <button
-                    className={`${statusColors[job.status]} text-white px-3 py-1 rounded-md text-sm font-medium transition-colors`}
+                    className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold transition-all active:scale-95 ${statusColors[job.status]}`}
                     onClick={() => handleToggle(job.id)}
                   >
                     {statusLabels[job.status]}
                   </button>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </section>
 
-        {/* Job History */}
+        {/* History Section */}
         <section>
-          <h2 className="text-2xl font-semibold text-slate-800 mb-4">ประวัติการทำงาน</h2>
+          <h2 className="text-2xl font-bold font-headline text-slate-900 mb-6 mt-10">ประวัติการทำงานวันนี้</h2>
           {history.length === 0 ? (
-            <p className="text-slate-600">ยังไม่มีประวัติการทำงาน</p>
+             <p className="text-slate-500 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">ยังไม่มีงานที่เสร็จสิ้นในวันนี้</p>
           ) : (
-            <ul className="space-y-2">
-              {history.map((job) => (
-                <li key={job.id} className="flex items-center p-2 border-b border-slate-200">
-                  <Check className="h-5 w-5 text-emerald-600 mr-2" />
-                  <span className="text-slate-800">{job.title}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+              <div className="divide-y divide-slate-100">
+                {history.map((job) => (
+                  <div key={job.id} className="flex items-center gap-4 p-5">
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800">{job.title}</p>
+                      <p className="text-sm text-slate-500">สำเร็จแล้ว • {job.patient}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
         </section>
       </div>
 
-      {/* Right side: Chat */}
-      <div className="flex-1 max-w-md">
-        <h2 className="text-2xl font-semibold text-slate-800 mb-4">แชทกับผู้ป่วย/ญาติ</h2>
-        <ChatBox />
+      {/* Right Column: Chat Widget */}
+      <div className="lg:col-span-1">
+        <div className="sticky top-28 h-[calc(100vh-140px)] min-h-[500px]">
+          <ChatBox />
+        </div>
       </div>
     </div>
   );
