@@ -24,9 +24,9 @@ export default function CaregiverLayout({
       <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
           <Link href="/" className="flex items-center gap-2">
-            <HeartPulse className="h-6 w-6 text-blue-600" />
-            <span className="text-2xl font-bold font-headline text-blue-700">
-              DialyBuddy <span className="text-slate-500 font-medium text-lg">ผู้ดูแล</span>
+            <img src="/logo.png" alt="DialyBuddy" className="h-10 w-auto object-contain drop-shadow-sm" />
+            <span className="text-2xl font-bold font-headline">
+              <span className="text-blue-600">Dialy</span><span className="text-emerald-500">Buddy</span> <span className="text-slate-500 font-medium text-lg">ผู้ดูแล</span>
             </span>
           </Link>
           <nav className="hidden md:flex items-center space-x-2">
@@ -65,7 +65,7 @@ export default function CaregiverLayout({
       <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
           <div className="flex items-center gap-2">
-            <HeartPulse className="h-4 w-4 text-blue-600" />
+            <img src="/logo.png" alt="DialyBuddy" className="h-6 w-auto object-contain grayscale opacity-70" />
             <span>© {new Date().getFullYear()} DialyBuddy – บริการดูแลผู้ป่วยผู้สูงอายุ</span>
           </div>
           <div className="flex gap-4">
