@@ -5,42 +5,42 @@ export default function FeaturesGrid() {
     <section id="features" className="py-24 max-w-7xl mx-auto px-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="space-y-8">
-          <h2 className="text-4xl font-extrabold font-headline leading-tight text-white">ความปลอดภัยและความน่าเชื่อถือ<span className="text-sky-400">คือรากฐาน</span>ของเรา</h2>
+          <h2 className="text-4xl font-extrabold font-headline leading-tight text-on-background">ความปลอดภัยและความน่าเชื่อถือ<span className="text-primary">คือรากฐาน</span>ของเรา</h2>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-slate-800 rounded-xl shrink-0">
-                <ShieldCheck className="text-sky-400 h-6 w-6" />
+              <div className="p-3 bg-primary/10 rounded-xl shrink-0">
+                <ShieldCheck className="text-primary h-6 w-6" />
               </div>
               <div>
-                <h4 className="font-bold font-headline text-xl text-white">ตรวจสอบประวัติ 100%</h4>
-                <p className="text-slate-300 font-body mt-2 leading-relaxed text-lg">ผู้ดูแลทุกคนผ่านการตรวจสอบประวัติอาชญากรรมและการคัดกรองทางวิชาชีพอย่างเข้มงวด</p>
+                <h4 className="font-bold font-headline text-xl text-on-background">ตรวจสอบประวัติ 100%</h4>
+                <p className="text-on-surface-variant font-body mt-2 leading-relaxed text-lg">ผู้ดูแลทุกคนผ่านการตรวจสอบประวัติอาชญากรรมและการคัดกรองทางวิชาชีพอย่างเข้มงวด</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-slate-800 rounded-xl shrink-0">
-                <Coins className="text-sky-400 h-6 w-6" />
+              <div className="p-3 bg-primary/10 rounded-xl shrink-0">
+                <Coins className="text-primary h-6 w-6" />
               </div>
               <div>
-                <h4 className="font-bold font-headline text-xl text-white">ค่าธรรมเนียมเป็นธรรม (10-15%)</h4>
-                <p className="text-slate-300 font-body mt-2 leading-relaxed text-lg">ระบบตั้งราคาที่โปร่งใส มั่นใจได้ว่าผู้ดูแลจะได้รับค่าตอบแทนที่เหมาะสมกับความมุ่งมั่นในการดูแล</p>
+                <h4 className="font-bold font-headline text-xl text-on-background">ค่าธรรมเนียมเป็นธรรม (10-15%)</h4>
+                <p className="text-on-surface-variant font-body mt-2 leading-relaxed text-lg">ระบบตั้งราคาที่โปร่งใส มั่นใจได้ว่าผู้ดูแลจะได้รับค่าตอบแทนที่เหมาะสมกับความมุ่งมั่นในการดูแล</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-slate-800 rounded-xl shrink-0">
-                <Map className="text-sky-400 h-6 w-6" />
+              <div className="p-3 bg-primary/10 rounded-xl shrink-0">
+                <Map className="text-primary h-6 w-6" />
               </div>
               <div>
-                <h4 className="font-bold font-headline text-xl text-white">ติดตามแบบเรียลไทม์ (Real-time)</h4>
-                <p className="text-slate-300 font-body mt-2 leading-relaxed text-lg">ระบบตรวจสอบด้วย GPS ช่วยให้ครอบครัวรับรู้สถานะการเดินทางได้ครบถ้วนตลอดการเดินทาง</p>
+                <h4 className="font-bold font-headline text-xl text-on-background">ติดตามแบบเรียลไทม์ (Real-time)</h4>
+                <p className="text-on-surface-variant font-body mt-2 leading-relaxed text-lg">ระบบตรวจสอบด้วย GPS ช่วยให้ครอบครัวรับรู้สถานะการเดินทางได้ครบถ้วนตลอดการเดินทาง</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-slate-800 rounded-xl shrink-0">
-                <Lock className="text-sky-400 h-6 w-6" />
+              <div className="p-3 bg-primary/10 rounded-xl shrink-0">
+                <Lock className="text-primary h-6 w-6" />
               </div>
               <div>
-                <h4 className="font-bold font-headline text-xl text-white">ระบบจ่ายเงินแบบ Escrow</h4>
-                <p className="text-slate-300 font-body mt-2 leading-relaxed text-lg">เงินของคุณจะถูกเก็บรักษาไว้โดยปลอดภัย จนกว่าการให้บริการจะสำเร็จลุล่วงด้วยดี</p>
+                <h4 className="font-bold font-headline text-xl text-on-background">ระบบจ่ายเงินแบบ Escrow</h4>
+                <p className="text-on-surface-variant font-body mt-2 leading-relaxed text-lg">เงินของคุณจะถูกเก็บรักษาไว้โดยปลอดภัย จนกว่าการให้บริการจะสำเร็จลุล่วงด้วยดี</p>
               </div>
             </div>
           </div>
