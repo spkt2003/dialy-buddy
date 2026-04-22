@@ -9,6 +9,21 @@ import Testimonials from "../components/home/Testimonials";
 import PartnersSection from "../components/home/PartnersSection";
 
 export default function Home() {
+  /**
+   * Home Component (หน้าแรกของแอปพลิเคชัน)
+   * 
+   * หน้าที่หลัก (Purpose):
+   * ทำหน้าที่เป็นหน้า Landing Page หลักของเว็บไซต์ (Root Page /)
+   * โดยจะนำเอา Component ย่อยต่างๆ (เช่น Hero, Stats, HowItWorks ฯลฯ) มาประกอบกันเพื่อแสดงผล
+   * 
+   * การจัดการ State (State Management):
+   * - เป็น Server/Static Component ในโครงสร้าง Next.js App Router (ไม่มี "use client")
+   * - ไม่มีการใช้ State หรือ Effect ภายในตัวเอง
+   * 
+   * Business Logic:
+   * - ควบคุม Layout ภาพรวมของหน้าแรก โดยมีการวาง Navbar ไว้ด้านบน, Footer ด้านล่าง 
+   * - และจัดเรียง Section ย่อยๆ (HeroSection, PartnersSection, ...) ภายใน <main> ตามลำดับเพื่อให้เนื้อหามีความต่อเนื่อง
+   */
   return (
     <>
       <Navbar />

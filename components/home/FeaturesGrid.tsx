@@ -1,6 +1,21 @@
 import { ShieldCheck, Coins, Map, Lock } from "lucide-react";
 
 export default function FeaturesGrid() {
+  /**
+   * FeaturesGrid Component (Presentational Component)
+   * 
+   * หน้าที่หลัก (Purpose):
+   * ใช้สำหรับแสดงจุดเด่น (Features) ด้านความปลอดภัยและความน่าเชื่อถือของแพลตฟอร์ม
+   * โดยออกแบบเป็น Grid Layout ที่แบ่งเป็น 2 ฝั่ง (ซ้าย: รายละเอียดข้อความ, ขวา: รูปภาพจำลอง UI)
+   * 
+   * การจัดการ State (State Management):
+   * - เป็น Stateless Component (ไม่มีการใช้ useState หรือ hook ที่จัดการ State) 
+   * - ทำหน้าที่เพียงแค่การแสดงผล UI แบบ Static ตามข้อมูลที่กำหนดไว้ในโค้ด (Hardcoded)
+   * 
+   * Business Logic:
+   * - ไม่มีลอจิกทางธุรกิจที่ซับซ้อนหรือการเชื่อมต่อ API เน้นไปที่การจัดวางเลย์เอาต์ (Layout) 
+   *   ให้สวยงามและรองรับ Responsive Design (Grid)
+   */
   return (
     <section id="features" className="py-24 max-w-7xl mx-auto px-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">

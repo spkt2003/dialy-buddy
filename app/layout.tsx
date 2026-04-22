@@ -25,6 +25,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  /**
+   * RootLayout Component (โครงสร้างหลักของแอปพลิเคชัน)
+   * 
+   * หน้าที่หลัก (Purpose):
+   * ทำหน้าที่เป็น Layout พื้นฐานสำหรับทุกหน้าในแอป (Next.js App Router)
+   * ซึ่งรวมถึงการตั้งค่าฟอนต์ (Fonts), CSS แบบ Global, โครงสร้าง HTML (html, body) 
+   * และการครอบแอปด้วย Provider ต่างๆ ที่จำเป็นต้องใช้แบบ Global
+   * 
+   * การจัดการ State (State Management):
+   * - ควบคุม Global State ผ่าน Context Providers:
+   *   1. <AuthProvider>: จัดการสถานะการเข้าสู่ระบบ (Authentication) ของผู้ใช้
+   *   2. <JobProvider>: จัดการสถานะข้อมูลงาน (Jobs) ที่เกี่ยวข้องกับผู้ดูแลหรือผู้ป่วย
+   * 
+   * Business Logic:
+   * - ใช้ <AuthGuard> เพื่อตรวจสอบสิทธิ์การเข้าถึงหน้าต่างๆ 
+   *   ป้องกันไม่ให้ผู้ใช้ที่ยังไม่ล็อกอิน หรือไม่มีสิทธิ์ เข้าถึงหน้าเว็บที่ต้องการการยืนยันตัวตน
+   * - ห่อหุ้ม {children} ซึ่งก็คือ Component ของแต่ละหน้า (Page) ให้อยู่ภายใต้ Provider และ AuthGuard
+   */
   return (
     <html lang="th" className={`${manrope.variable} ${lexend.variable} antialiased scroll-smooth`}>
       <body className="min-h-[100dvh] flex flex-col font-body bg-surface text-on-surface overflow-x-hidden">
