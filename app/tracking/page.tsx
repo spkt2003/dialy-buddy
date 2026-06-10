@@ -13,13 +13,8 @@ import {
   Car,
   AlertTriangle,
 } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
-
-interface Message {
-  id: number;
-  sender: "caregiver" | "patient";
-  text: string;
-}
+import { PatientPageShell } from "@/components/layout/PatientPageShell";
+import type { Message } from "@/types";
 
 export default function TrackingPage() {
   // Modal visibility state
@@ -49,9 +44,7 @@ export default function TrackingPage() {
 
   return (
     <>
-      <Navbar />
-      <div className="bg-slate-50/50 min-h-[calc(100vh-80px)] pt-8 pb-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <PatientPageShell maxWidth="max-w-6xl" pt="pt-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
             <div>
@@ -160,8 +153,7 @@ export default function TrackingPage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+      </PatientPageShell>
 
       {/* Chat Modal */}
       {isChatOpen && (

@@ -76,7 +76,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoggedIn(false);
     setRole(null);
     setUserName("ผู้ใช้งาน");
-    localStorage.clear();
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userName");
   };
 
   // รอจนกว่าจะตรวจสอบ localStorage เสร็จสมบูรณ์ ค่อยเริ่มแสดง UI เพื่อป้องกันจอแสดงข้อมูลสลับไปมาระหว่าง Guest กับ User

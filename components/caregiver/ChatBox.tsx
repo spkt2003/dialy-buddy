@@ -3,12 +3,7 @@
 
 import { useState } from "react";
 import { Send, Phone } from "lucide-react";
-
-interface Message {
-  id: number;
-  sender: "caregiver" | "patient";
-  text: string;
-}
+import type { Message } from "@/types";
 
 export default function ChatBox() {
   const [messages, setMessages] = useState<Message[]>([

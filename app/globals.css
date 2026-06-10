@@ -2,7 +2,7 @@
 
 @layer theme {
   :root {
-    --background: #faf9fe;
+    --background: #f5fafa;
     --foreground: #2f323a;
   }
 
@@ -15,57 +15,57 @@
 }
 
 @theme inline {
-  --color-tertiary: #685783;
+  --color-tertiary: #2d7d60;
   --color-surface-variant: #e0e2ed;
   --color-surface-container-lowest: #ffffff;
   --color-on-secondary-fixed-variant: #535b6e;
   --color-on-primary-fixed-variant: #002f67;
   --color-secondary: #575f72;
-  --color-primary-fixed: #75a5fd;
-  --color-primary-container: #75a5fd;
+  --color-primary-fixed: #67c4d0;
+  --color-primary-container: #67c4d0;
   --color-on-error-container: #6e0a12;
-  --color-surface-bright: #faf9fe;
-  --color-tertiary-fixed: #e1cbfe;
-  --color-tertiary-fixed-dim: #d2bef0;
+  --color-surface-bright: #f5fafa;
+  --color-tertiary-fixed: #d1f0e6;
+  --color-tertiary-fixed-dim: #b8e4d4;
   --color-surface-container-highest: #e0e2ed;
   --color-on-surface: #2f323a;
   --color-on-primary-fixed: #000616;
-  --color-on-primary: #f9f8ff;
+  --color-on-primary: #ffffff;
   --color-error-container: #fa746f;
   --color-on-secondary-fixed: #373f51;
   --color-on-secondary-container: #4a5264;
-  --color-tertiary-container: #e1cbfe;
-  --color-on-tertiary-fixed-variant: #5b4b75;
-  --color-primary: #255db0;
-  --color-background: #faf9fe;
+  --color-tertiary-container: #d1f0e6;
+  --color-on-tertiary-fixed-variant: #1f5c44;
+  --color-primary: #0c7a8a;
+  --color-background: #f5fafa;
   --color-secondary-dim: #4b5366;
   --color-secondary-fixed-dim: #ccd4eb;
   --color-outline-variant: #afb2bc;
-  --color-on-tertiary: #fef7ff;
+  --color-on-tertiary: #ffffff;
   --color-inverse-surface: #0d0e12;
-  --color-on-tertiary-container: #52416b;
+  --color-on-tertiary-container: #1a4d3a;
   --color-inverse-on-surface: #9c9ca2;
-  --color-surface-container: #ededf6;
-  --color-surface: #faf9fe;
+  --color-surface-container: #eaf4f4;
+  --color-surface: #f5fafa;
   --color-on-surface-variant: #5c5f68;
   --color-secondary-container: #dae2f9;
-  --color-inverse-primary: #75a5fd;
+  --color-inverse-primary: #67c4d0;
   --color-error: #a83836;
-  --color-surface-tint: #255db0;
+  --color-surface-tint: #0c7a8a;
   --color-surface-dim: #d8d9e4;
-  --color-on-primary-container: #002656;
+  --color-on-primary-container: #003a42;
   --color-on-secondary: #f9f8ff;
-  --color-primary-dim: #1151a3;
-  --color-primary-fixed-dim: #6898ee;
+  --color-primary-dim: #0a6070;
+  --color-primary-fixed-dim: #5ab4c0;
   --color-on-error: #fff7f6;
   --color-outline: #787a84;
   --color-secondary-fixed: #dae2f9;
-  --color-surface-container-high: #e7e8f1;
-  --color-on-tertiary-fixed: #3e2e57;
+  --color-surface-container-high: #e0eeed;
+  --color-on-tertiary-fixed: #0e3324;
   --color-error-dim: #67040d;
-  --color-surface-container-low: #f3f3fa;
+  --color-surface-container-low: #eff8f8;
   --color-on-background: #2f323a;
-  --color-tertiary-dim: #5c4b76;
+  --color-tertiary-dim: #226050;
 
   --font-headline: var(--font-manrope), sans-serif;
   --font-body: var(--font-lexend), sans-serif;
@@ -78,6 +78,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+  font-size: 17px;
 }
 
 .glass-panel {

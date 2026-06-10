@@ -1,0 +1,27 @@
+# Build output — never useful to read
+.next/
+
+# Dependencies — never read
+node_modules/
+
+# HTML mockups — 57 KB of inline-styled prototypes, not the live codebase
+# Reference visually via screen.png files if needed
+dialy-ui/
+
+# Binary and boilerplate public assets
+public/logo.jpg
+public/logo.png
+public/logo.svg
+public/next.svg
+public/vercel.svg
+public/globe.svg
+public/file.svg
+public/window.svg
+
+# Dependency lockfile — 10 k+ lines, never edit directly
+package-lock.json
+
+# Skill reference sub-docs — only relevant when a /skill is actively running
+# The SKILL.md entry points are still readable; only the deep reference material is excluded
+.agents/skills/critique/reference/
+.agents/skills/impeccable/reference/

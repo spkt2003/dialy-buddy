@@ -1,13 +1,10 @@
 import { Activity, Apple, HeartPulse, Clock, Calendar, CheckCircle2, FlaskConical } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/layout/Navbar";
+import { PatientPageShell } from "@/components/layout/PatientPageShell";
 
 export default function DashboardPage() {
   return (
-    <>
-      <Navbar />
-      <div className="bg-slate-50 min-h-screen pt-12 pb-24">
-        <div className="max-w-7xl mx-auto px-6">
+    <PatientPageShell maxWidth="max-w-7xl">
           <h1 className="text-4xl font-extrabold font-headline mb-2 text-slate-900">สวัสดี, คุณสมหมาย</h1>
           <p className="text-xl text-slate-600 font-body mb-8 leading-relaxed">นี่คือสรุปข้อมูลสุขภาพและกำหนดการของคุณในวันนี้</p>
 
@@ -80,8 +77,6 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </>
+    </PatientPageShell>
   );
 }

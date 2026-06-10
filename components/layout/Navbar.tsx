@@ -30,7 +30,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex h-20 items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
-            <Image src="/logo.png" alt="DialyBuddy Logo" width={250} height={250} className="object-contain" />
+            <div className="w-28 sm:w-36 md:w-44">
+              <Image src="/logo.png" alt="DialyBuddy Logo" width={250} height={250} className="w-full h-auto object-contain" />
+            </div>
           </Link>
         </div>
 
@@ -56,7 +58,7 @@ export default function Navbar() {
               <Link href="/login" className="text-sm font-label font-bold text-primary hover:text-primary-dim transition-colors hidden sm:block">
                 เข้าสู่ระบบ
               </Link>
-              <Link href="/register" className="rounded-xl font-label bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-2.5 text-sm font-semibold shadow-sm hover:scale-95 transition-transform duration-200">
+              <Link href="/register" className="rounded-xl font-label bg-primary text-on-primary px-6 py-2.5 text-sm font-semibold shadow-sm hover:brightness-105 active:scale-95 transition duration-200">
                 ลงทะเบียน
               </Link>
             </>

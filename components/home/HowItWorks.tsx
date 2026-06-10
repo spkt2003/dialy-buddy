@@ -25,10 +25,10 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 bg-surface-container-low border-t ghost-border">
+    <section id="how-it-works" className="py-16 md:py-24 bg-surface-container-low border-t ghost-border">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-extrabold font-headline mb-16 text-center text-on-background">วิธีการใช้งาน</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <h2 className="text-3xl md:text-4xl font-extrabold font-headline mb-10 md:mb-16 text-center text-on-background">จากบ้านถึงโรงพยาบาล ไม่ต้องเดินทางคนเดียวอีกต่อไป</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {steps.map((step, index) => (
             <div key={index} className="relative text-center group">
               <div className="w-20 h-20 bg-surface-container-lowest rounded-full flex items-center justify-center mx-auto mb-6 shadow-ambient border border-outline-variant/15 group-hover:bg-primary group-hover:text-on-primary transition-colors duration-300 text-on-background">

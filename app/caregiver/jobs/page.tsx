@@ -1,13 +1,15 @@
 "use client";
 
 import { useJobContext } from "../../../context/JobContext";
-import { Wallet, CheckCircle2, Clock, MapPin, CalendarDays, Coins } from "lucide-react";
+import { Wallet, CheckCircle2, Clock, CalendarDays, Coins } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { formatBaht } from "@/lib/utils";
 
 export default function CaregiverJobsPage() {
   const { completedJobs } = useJobContext();
 
   // Calculate total earnings, defaulting to 500 if earning is not defined
-  const totalEarnings = completedJobs.reduce((sum, job) => sum + (job.earning || 500), 0);
+  const totalEarnings = completedJobs.reduce((sum, job) => sum + (job.earning ?? 500), 0);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
@@ -31,7 +33,7 @@ export default function CaregiverJobsPage() {
           <div>
             <h2 className="text-xl font-bold text-slate-600 font-headline mb-1">ยอดรายได้สะสม</h2>
             <div className="text-5xl font-extrabold text-slate-900 tracking-tight">
-              ฿ {totalEarnings.toLocaleString()}
+              ฿ {formatBaht(totalEarnings)}
             </div>
           </div>
         </div>
@@ -48,16 +50,14 @@ export default function CaregiverJobsPage() {
         <h2 className="text-2xl font-bold font-headline text-slate-900 mb-6">ประวัติงานที่เสร็จสิ้น</h2>
         
         {completedJobs.length === 0 ? (
-          <div className="bg-white rounded-[2rem] p-12 text-center border border-slate-100 shadow-sm">
-            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CalendarDays className="w-10 h-10 text-slate-300" />
-            </div>
-            <p className="text-xl text-slate-500 font-medium">คุณยังไม่มีประวัติการทำงาน</p>
-          </div>
+          <EmptyState
+            icon={<CalendarDays className="w-10 h-10" />}
+            message="คุณยังไม่มีประวัติการทำงาน"
+          />
         ) : (
           <div className="space-y-5">
             {completedJobs.map((job) => {
-              const earning = job.earning || 500;
+              const earning = job.earning ?? 500;
               return (
                 <div 
                   key={job.id} 
@@ -97,7 +97,7 @@ export default function CaregiverJobsPage() {
                   {/* Earnings & Status Badge */}
                   <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto border-t md:border-t-0 border-slate-100 pt-4 md:pt-0 gap-4">
                     <div className="text-2xl font-bold text-emerald-600">
-                      + ฿ {earning.toLocaleString()}
+                      + ฿ {formatBaht(earning)}
                     </div>
                     {/* Desktop Badge */}
                     <span className="hidden md:flex items-center gap-1.5 bg-emerald-50 text-emerald-700 font-bold px-4 py-2 rounded-xl text-base shadow-sm">

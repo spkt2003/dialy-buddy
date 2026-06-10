@@ -2,33 +2,39 @@
 "use client";
 
 import { Star, CheckCircle2, Clock, MapPin, Activity, AlertCircle, ArrowRight } from "lucide-react";
-import ChatBox from "../../../components/caregiver/ChatBox";
+import { ChatColumn } from "@/components/caregiver/ChatColumn";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useJobContext } from "../../../context/JobContext";
 import { useRouter } from "next/navigation";
 
 export default function CaregiverDashboard() {
+  // All job state lives in JobContext — this page is purely presentational.
   const { pendingJobs, activeJob, completedJobs, acceptJob } = useJobContext();
   const router = useRouter();
 
+  // Accepts the job then immediately navigates to tracking — prevents a second accept before the UI updates.
   const handleAcceptJob = (jobId: string) => {
     acceptJob(jobId);
     router.push("/caregiver/tracking");
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    // Two-column on lg+: job list takes 2/3, chat widget takes 1/3.
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
       {/* Left Column: Profile & Jobs */}
-      <div className="lg:col-span-2 space-y-8">
-        
+      <div className="lg:col-span-2 space-y-6 md:space-y-8">
+
         {/* Welcome & Profile Section */}
-        <section className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-6">
+        <section className="bg-white rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center gap-6">
+          {/* shrink-0 keeps the avatar circle from collapsing if the caregiver name is long. */}
           <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white text-3xl font-bold shadow-md shrink-0">
             ส
           </div>
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-3xl font-bold font-headline text-slate-900 mb-2">ยินดีต้อนรับ, สมศรี</h1>
             <p className="text-lg text-slate-500 font-body">พยาบาลวิชาชีพ • ผู้ดูแลระดับพรีเมียม</p>
-            
+
+            {/* flex-wrap lets rating/jobs badges stack on mobile, then align inline on md+. */}
             <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
               <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100 text-amber-700">
                 <Star className="w-5 h-5 fill-current" />
@@ -44,9 +50,9 @@ export default function CaregiverDashboard() {
           </div>
         </section>
 
-        {/* Active Job Banner */}
+        {/* Active Job Banner — only shown when a job has been accepted. */}
         {activeJob && (
-          <section className="bg-blue-50 border border-blue-200 rounded-[2rem] p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 mb-8 animate-in fade-in slide-in-from-bottom-4">
+          <section className="bg-blue-50 border border-blue-200 rounded-[2rem] p-6 md:p-8 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 mb-6 md:mb-8 animate-in fade-in slide-in-from-bottom-4">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
                 <AlertCircle className="w-8 h-8 text-blue-600" />
@@ -68,7 +74,8 @@ export default function CaregiverDashboard() {
           </section>
         )}
 
-        {/* Job List Section */}
+        {/* Job List Section — visually locked while an active job is in progress. */}
+        {/* opacity-50 + pointer-events-none enforces the single-job constraint from JobContext. */}
         <section className={activeJob ? "opacity-50 pointer-events-none transition-opacity" : ""}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold font-headline text-slate-900">งานที่รอรับ</h2>
@@ -78,12 +85,10 @@ export default function CaregiverDashboard() {
           </div>
 
           {pendingJobs.length === 0 ? (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-100 shadow-sm">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-8 h-8 text-slate-300" />
-              </div>
-              <p className="text-xl text-slate-500 font-medium">ไม่มีงานที่รอรับในขณะนี้</p>
-            </div>
+            <EmptyState
+              icon={<CheckCircle2 className="w-8 h-8" />}
+              message="ไม่มีงานที่รอรับในขณะนี้"
+            />
           ) : (
             <div className="space-y-4">
               {pendingJobs.map((job) => (
@@ -104,7 +109,8 @@ export default function CaregiverDashboard() {
                       </span>
                     </div>
                   </div>
-                  
+
+                  {/* disabled={!!activeJob} is redundant with pointer-events-none above, but keeps the button semantically correct for screen readers. */}
                   <button
                     className="w-full sm:w-auto px-8 py-3 rounded-xl font-bold transition-all active:scale-95 bg-blue-600 hover:bg-blue-700 text-white shadow-md whitespace-nowrap"
                     onClick={() => handleAcceptJob(job.id)}
@@ -120,6 +126,7 @@ export default function CaregiverDashboard() {
 
         {/* History Section */}
         <section>
+          {/* mt-10 adds extra vertical separation between the job list above and the history list. */}
           <h2 className="text-2xl font-bold font-headline text-slate-900 mb-6 mt-10">ประวัติการทำงาน</h2>
           {completedJobs.length === 0 ? (
              <p className="text-slate-500 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">ยังไม่มีงานที่เสร็จสิ้น</p>
@@ -144,11 +151,7 @@ export default function CaregiverDashboard() {
       </div>
 
       {/* Right Column: Chat Widget */}
-      <div className="lg:col-span-1">
-        <div className="sticky top-28 h-[calc(100vh-140px)] min-h-[500px]">
-          <ChatBox />
-        </div>
-      </div>
+      <ChatColumn />
     </div>
   );
 }

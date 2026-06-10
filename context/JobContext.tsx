@@ -18,6 +18,7 @@ export interface Job {
 }
 
 interface JobContextType {
+  isInitialized: boolean;
   pendingJobs: Job[];
   activeJob: Job | null;
   completedJobs: Job[];
@@ -173,7 +174,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
   if (!isInitialized) return null;
 
   return (
-    <JobContext.Provider value={{ pendingJobs, activeJob, completedJobs, acceptJob, updateJobStep, completeJob }}>
+    <JobContext.Provider value={{ isInitialized, pendingJobs, activeJob, completedJobs, acceptJob, updateJobStep, completeJob }}>
       {children}
     </JobContext.Provider>
   );

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useJobContext } from "../../../context/JobContext";
 import { ArrowLeft, MapPin, Clock, CheckCircle2, User, Phone, Check } from "lucide-react";
-import ChatBox from "../../../components/caregiver/ChatBox";
+import { ChatColumn } from "@/components/caregiver/ChatColumn";
 
 const trackingSteps = [
   "กำลังเดินทางไปรับผู้ป่วย",
@@ -15,15 +15,16 @@ const trackingSteps = [
 ];
 
 export default function TrackingPage() {
-  const { activeJob, updateJobStep, completeJob } = useJobContext();
+  const { isInitialized, activeJob, updateJobStep, completeJob } = useJobContext();
   const router = useRouter();
 
-  // If no active job, redirect back to dashboard
+  // Wait for localStorage hydration before redirecting — avoids bouncing the user back
+  // to dashboard on the first render when acceptJob state hasn't committed yet.
   useEffect(() => {
-    if (!activeJob) {
+    if (isInitialized && !activeJob) {
       router.push("/caregiver/dashboard");
     }
-  }, [activeJob, router]);
+  }, [isInitialized, activeJob, router]);
 
   if (!activeJob) return null; // Or a loading spinner
 
@@ -159,11 +160,7 @@ export default function TrackingPage() {
       </div>
 
       {/* Right Column: Chat Widget */}
-      <div className="lg:col-span-1">
-        <div className="sticky top-28 h-[calc(100vh-140px)] min-h-[500px]">
-          <ChatBox />
-        </div>
-      </div>
+      <ChatColumn />
     </div>
   );
 }

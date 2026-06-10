@@ -1,13 +1,10 @@
 import { Calendar, Clock, MapPin, ShieldCheck, CheckCircle, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import Navbar from "@/components/layout/Navbar";
+import { PatientPageShell } from "@/components/layout/PatientPageShell";
 
 export default function BookingPage() {
   return (
-    <>
-      <Navbar />
-      <div className="bg-slate-50 min-h-[calc(100vh-80px)] py-12">
-        <div className="max-w-6xl mx-auto px-6">
+    <PatientPageShell maxWidth="max-w-6xl">
           <h1 className="text-4xl font-extrabold font-headline text-slate-900 mb-8">สรุปการจองและชำระเงิน</h1>
           <p className="text-xl text-slate-700 mb-8">กรุณาตรวจสอบข้อมูลการจองและยอดชำระ Escrow ให้ถูกต้อง</p>
 
@@ -101,8 +98,6 @@ export default function BookingPage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </>
+    </PatientPageShell>
   );
 }
