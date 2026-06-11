@@ -6,7 +6,7 @@ export const FADE_IN_UP =
 
 // Standard form input class applied to every <input> and <select> in settings pages.
 export const INPUT_CLS =
-  "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl " +
-  "focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none " +
-  "transition-all text-slate-900 text-base " +
-  "disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed";
+  "w-full px-4 py-3.5 bg-surface-container-low border border-outline-variant/20 rounded-xl " +
+  "focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none " +
+  "transition-all text-on-surface text-base " +
+  "disabled:bg-surface-container disabled:text-on-surface-variant disabled:cursor-not-allowed";

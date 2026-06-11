@@ -68,7 +68,7 @@ export default function Navbar() {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center gap-2 rounded-full border ghost-border bg-surface-container-lowest p-1.5 pr-4 transition-all hover:bg-surface-container-low hover:shadow-ambient"
               >
-                <div className={`flex h-8 w-8 items-center justify-center rounded-full ${role === 'caregiver' ? 'bg-emerald-100 text-emerald-600' : 'bg-primary/10 text-primary'}`}>
+                <div className={`flex h-8 w-8 items-center justify-center rounded-full ${role === 'caregiver' ? 'bg-tertiary-container/40 text-tertiary' : 'bg-primary/10 text-primary'}`}>
                   {role === 'caregiver' ? <ShieldCheck className="h-5 w-5" /> : <UserCircle className="h-5 w-5" />}
                 </div>
                 <span className="text-sm font-semibold font-label text-on-surface uppercase">
@@ -83,7 +83,7 @@ export default function Navbar() {
                   <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl bg-surface-container-lowest shadow-ambient ghost-border animate-in fade-in slide-in-from-top-2">
                     <div className="p-2">
                       {role === 'caregiver' && (
-                        <Link href="/caregiver/dashboard" onClick={() => setIsProfileOpen(false)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold font-label text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors mb-1">
+                        <Link href="/caregiver/dashboard" onClick={() => setIsProfileOpen(false)} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold font-label text-tertiary bg-tertiary-container/30 hover:bg-tertiary-container/40 transition-colors mb-1">
                           <LayoutDashboard className="h-4 w-4" />
                           หน้าจัดการงาน (ผู้ดูแล)
                         </Link>
@@ -110,7 +110,7 @@ export default function Navbar() {
                     <div className="border-t ghost-border p-2">
                       <button
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium font-label text-error hover:bg-red-50 transition-colors"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium font-label text-error hover:bg-error/10 transition-colors"
                       >
                         <LogOut className="h-4 w-4 text-error" />
                         ออกจากระบบ

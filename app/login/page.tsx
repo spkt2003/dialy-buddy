@@ -68,9 +68,9 @@ export default function LoginPage() {
 
         {/* --- ส่วนแสดงข้อความแจ้งเตือนเมื่อกรอกผิด --- */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-            <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
-            <p className="text-sm text-red-600 font-medium">{error}</p>
+          <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 text-error shrink-0" />
+            <p className="text-sm text-error font-medium">{error}</p>
           </div>
         )}
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full mt-6 flex items-center justify-center bg-blue-700 text-white font-bold font-label py-4 rounded-xl shadow-md hover:bg-blue-800 transition-colors text-lg"
+            className="w-full mt-6 flex items-center justify-center bg-primary text-on-primary font-bold font-label py-4 rounded-xl shadow-ambient hover:bg-primary-dim transition-colors text-lg"
           >
             เข้าสู่ระบบ
           </button>

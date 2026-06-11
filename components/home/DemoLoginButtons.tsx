@@ -40,7 +40,7 @@ export default function DemoLoginButtons() {
         </button>
         <button
           onClick={loginAsCaregiver}
-          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-surface-container-lowest ghost-border text-emerald-700 font-bold font-label text-sm hover:bg-emerald-50 transition-colors shadow-ambient"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-surface-container-lowest ghost-border text-tertiary font-bold font-label text-sm hover:bg-tertiary-container/30 transition-colors shadow-ambient"
         >
           <ShieldCheck className="h-4 w-4 shrink-0" />
           ทดลองในฐานะผู้ดูแล

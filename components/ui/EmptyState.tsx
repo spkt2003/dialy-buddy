@@ -15,15 +15,15 @@ export function EmptyState({ icon, message, subMessage, action, dashed = false }
     <div
       className={`flex flex-col items-center justify-center py-16 px-6 rounded-3xl text-center ${
         dashed
-          ? "border-2 border-dashed border-slate-200"
-          : "bg-white border border-slate-100 shadow-sm"
+          ? "border-2 border-dashed border-outline-variant/30"
+          : "bg-surface-container-lowest ghost-border shadow-ambient"
       }`}
     >
-      <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+      <div className="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-4 text-on-surface-variant">
         {icon}
       </div>
-      <p className="text-xl font-semibold text-slate-500">{message}</p>
-      {subMessage && <p className="text-sm text-slate-400 mt-2">{subMessage}</p>}
+      <p className="text-xl font-semibold text-on-surface-variant">{message}</p>
+      {subMessage && <p className="text-sm text-on-surface-variant mt-2">{subMessage}</p>}
       {action && <div className="mt-6">{action}</div>}
     </div>
   );

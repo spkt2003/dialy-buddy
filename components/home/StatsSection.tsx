@@ -4,7 +4,7 @@ export default function StatsSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="bg-surface-container-lowest rounded-[2rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-12 overflow-hidden relative shadow-ambient ghost-border">
           <div className="md:w-1/2 space-y-6">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-headline text-on-background leading-tight">ในไทย มีคนเป็นโรคไตกว่า 11 ล้านคน และทุกคนควรได้รับการดูแลที่ดีกว่านี้</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold font-headline text-on-background leading-tight">ในไทย มีคนเป็นโรคไตกว่า 11 ล้านคน <span className="text-primary">และทุกคนควรได้รับการดูแลที่ดีกว่านี้</span></h2>
             <p className="text-lg text-on-surface-variant font-body leading-relaxed">ปัญหาสุขภาพไตเป็นเรื่องที่เพิ่มสูงขึ้นอย่างต่อเนื่อง เราอยู่ที่นี่เพื่อช่วยเป็นศูนย์กลางเชื่อมโยงระหว่างการรักษาพยาบาล และการใช้ชีวิตประจำวันของคุณให้ง่ายขึ้น</p>
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 py-4">
               <div className="h-12 w-1.5 bg-primary rounded-full"></div>

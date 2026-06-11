@@ -3,7 +3,7 @@ import { Send } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="w-full rounded-t-[3rem] mt-20 bg-surface-container ghost-border border-t shadow-ambient relative z-10 overflow-hidden">
+    <footer className="w-full rounded-t-[3rem] mt-20 bg-surface-container ghost-border shadow-ambient relative z-10 overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8 px-8 py-16 max-w-7xl mx-auto">
         <div className="space-y-4">
           <span className="text-3xl font-bold text-on-background font-headline">Dialybuddy</span>
@@ -35,7 +35,7 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="px-8 py-6 border-t ghost-border text-center text-on-surface-variant text-sm font-label tracking-widest uppercase">
+      <div className="px-8 py-6 border-t border-outline-variant/20 text-center text-on-surface-variant text-sm font-label tracking-widest uppercase">
         © {new Date().getFullYear()} Dialybuddy. สงวนลิขสิทธิ์
       </div>
     </footer>

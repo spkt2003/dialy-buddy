@@ -18,7 +18,7 @@ export function FormInput({
 }: FormInputProps) {
   return (
     <div className="space-y-2">
-      {label && <label className="block text-sm font-semibold text-slate-700">{label}</label>}
+      {label && <label className="block text-sm font-semibold text-on-surface">{label}</label>}
       <input
         type={type}
         defaultValue={defaultValue}

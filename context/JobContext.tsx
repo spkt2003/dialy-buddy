@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 export type JobStatus = "pending" | "active" | "completed";
 
@@ -105,6 +106,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
     const storedPending = localStorage.getItem("pendingJobs");
     const storedCompleted = localStorage.getItem("completedJobs");
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (storedActive) setActiveJob(JSON.parse(storedActive));
     if (storedPending) setPendingJobs(JSON.parse(storedPending));
     if (storedCompleted) setCompletedJobs(JSON.parse(storedCompleted));
@@ -137,11 +139,26 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
    */
   const acceptJob = (jobId: string) => {
     if (activeJob) return; // ไม่สามารถรับซ้อนได้
-    
+
     const jobToAccept = pendingJobs.find(j => j.id === jobId);
     if (jobToAccept) {
-      setActiveJob({ ...jobToAccept, status: "active", currentStep: 0 });
+      const newActive = { ...jobToAccept, status: "active" as JobStatus, currentStep: 0 };
+      setActiveJob(newActive);
       setPendingJobs(prev => prev.filter(j => j.id !== jobId));
+      // Sync to Supabase so patient tracking page can see this job live
+      supabase.from("active_jobs").upsert({
+        id: newActive.id,
+        patient_name: newActive.patientName,
+        patient_image: newActive.patientImage,
+        destination: newActive.destination,
+        time_slot: newActive.time,
+        date: newActive.date,
+        type: newActive.type,
+        current_step: 0,
+        updated_at: new Date().toISOString(),
+      }).then(({ error }) => {
+        if (error) console.error("Supabase acceptJob:", error.message);
+      });
     }
   };
 
@@ -154,6 +171,13 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
   const updateJobStep = (stepIndex: number) => {
     if (activeJob) {
       setActiveJob({ ...activeJob, currentStep: stepIndex });
+      // Push step update to Supabase — patient page receives this via realtime
+      supabase.from("active_jobs")
+        .update({ current_step: stepIndex, updated_at: new Date().toISOString() })
+        .eq("id", activeJob.id)
+        .then(({ error }) => {
+          if (error) console.error("Supabase updateJobStep:", error.message);
+        });
     }
   };
 
@@ -167,6 +191,13 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
   const completeJob = () => {
     if (activeJob) {
       setCompletedJobs(prev => [{ ...activeJob, status: "completed" }, ...prev]);
+      // Delete from Supabase — patient tracking page will drop to empty state
+      supabase.from("active_jobs")
+        .delete()
+        .eq("id", activeJob.id)
+        .then(({ error }) => {
+          if (error) console.error("Supabase completeJob:", error.message);
+        });
       setActiveJob(null);
     }
   };

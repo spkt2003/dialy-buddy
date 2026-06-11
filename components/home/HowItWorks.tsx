@@ -27,7 +27,7 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" className="py-16 md:py-24 bg-surface-container-low border-t ghost-border">
       <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-3xl md:text-4xl font-extrabold font-headline mb-10 md:mb-16 text-center text-on-background">จากบ้านถึงโรงพยาบาล ไม่ต้องเดินทางคนเดียวอีกต่อไป</h2>
+        <h2 className="text-3xl md:text-4xl font-extrabold font-headline mb-10 md:mb-16 text-center text-on-background">จากบ้านถึงโรงพยาบาล <span className="text-tertiary">ไม่ต้องเดินทางคนเดียวอีกต่อไป</span></h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {steps.map((step, index) => (
             <div key={index} className="relative text-center group">
@@ -35,7 +35,7 @@ export default function HowItWorks() {
                 <step.icon className="h-8 w-8" />
               </div>
               <h4 className="font-bold font-headline text-xl mb-3 text-on-background">{step.title}</h4>
-              <p className="text-sm md:text-base text-on-surface-variant px-4 font-body leading-relaxed">{step.description}</p>
+              <p className="text-base text-on-surface-variant px-4 font-body leading-relaxed">{step.description}</p>
             </div>
           ))}
         </div>

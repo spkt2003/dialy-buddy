@@ -18,7 +18,7 @@ export default function Testimonials() {
               <Quote className="absolute top-8 right-8 h-12 w-12 text-primary/10" />
               <div className="flex gap-1 mb-6">
                 {[...Array(5)].map((_, j) => (
-                  <Star key={j} className={`h-5 w-5 ${j < item.stars ? "text-tertiary fill-tertiary" : "text-surface-container-highest fill-surface-container-highest"}`} />
+                  <Star key={j} className={`h-5 w-5 ${j < item.stars ? "text-amber-400 fill-amber-400" : "text-surface-container-highest fill-surface-container-highest"}`} />
                 ))}
               </div>
               <p className="text-on-surface-variant font-body mb-8 relative z-10 leading-relaxed text-lg">

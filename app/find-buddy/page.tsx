@@ -61,18 +61,18 @@ export default function FindBuddyPage() {
 
   return (
     <PatientPageShell maxWidth="max-w-5xl">
-          <h1 className="text-2xl sm:text-4xl font-extrabold font-headline mb-4 text-slate-900">ค้นหาผู้ดูแล (Care Buddy) ของคุณ</h1>
-          <p className="text-base sm:text-xl text-slate-700 font-body mb-6 sm:mb-8 leading-relaxed">เลือกผู้ดูแลที่ผ่านการตรวจสอบประวัติพร้อมช่วยเหลือคุณตลอดการเดินทางไปฟอกไต</p>
+          <h1 className="text-2xl sm:text-4xl font-extrabold font-headline mb-4 text-on-background">ค้นหาผู้ดูแล (Care Buddy) ของคุณ</h1>
+          <p className="text-base sm:text-xl text-on-surface font-body mb-6 sm:mb-8 leading-relaxed">เลือกผู้ดูแลที่ผ่านการตรวจสอบประวัติพร้อมช่วยเหลือคุณตลอดการเดินทางไปฟอกไต</p>
 
           {/* ส่วนช่องค้นหา */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-10">
+          <div className="bg-surface-container-lowest p-6 rounded-2xl shadow-ambient ghost-border mb-10">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 h-6 w-6" />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant h-6 w-6" />
                 <input
                   type="text"
                   placeholder="ระบุเขต หรือ โรงพยาบาล (เช่น ศิริราช, พญาไท...)"
-                  className="w-full rounded-2xl border border-slate-300 bg-slate-50 pl-16 pr-4 py-5 text-lg font-body text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-700/20 transition-all placeholder:text-slate-500"
+                  className="w-full rounded-2xl border border-outline-variant/20 bg-surface-container-low pl-16 pr-4 py-5 text-lg font-body text-on-surface focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all placeholder:text-on-surface-variant"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   // ให้กด Enter เพื่อค้นหาได้
@@ -81,14 +81,14 @@ export default function FindBuddyPage() {
               </div>
               <button
                 onClick={handleSearch}
-                className="bg-blue-700 text-white px-10 py-5 rounded-2xl font-bold font-label min-w-[150px] shadow-lg hover:bg-blue-800 transition-colors text-xl"
+                className="bg-primary text-on-primary px-10 py-5 rounded-2xl font-bold font-label min-w-[150px] shadow-ambient hover:bg-primary-dim transition-colors text-xl"
               >
                 ค้นหา
               </button>
             </div>
             {searchTerm && (
-              <p className="mt-3 text-sm text-slate-500">
-                กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-blue-600">"{searchTerm}"</span>
+              <p className="mt-3 text-sm text-on-surface-variant">
+                กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-primary">"{searchTerm}"</span>
               </p>
             )}
           </div>
@@ -97,36 +97,36 @@ export default function FindBuddyPage() {
             {/* 4. แสดงข้อมูลที่ผ่านการกรองแล้ว */}
             {filteredData.length > 0 ? (
               filteredData.map((c, i) => (
-                <div key={i} className="bg-white p-5 sm:p-8 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row gap-6 sm:gap-8 items-start md:items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="w-24 h-24 rounded-full bg-blue-100 border-4 border-white shadow-sm flex items-center justify-center shrink-0">
-                    <span className="text-blue-700 font-bold text-3xl">{c.name.charAt(0)}</span>
+                <div key={i} className="bg-surface-container-lowest p-5 sm:p-8 rounded-[2rem] shadow-ambient ghost-border flex flex-col md:flex-row gap-6 sm:gap-8 items-start md:items-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="w-24 h-24 rounded-full bg-primary/10 border-4 border-surface-container-lowest shadow-ambient flex items-center justify-center shrink-0">
+                    <span className="text-primary font-bold text-3xl">{c.name.charAt(0)}</span>
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg sm:text-2xl font-bold font-headline text-slate-900">{c.name}</h3>
-                      <ShieldCheck className="h-7 w-7 text-blue-600" />
+                      <h3 className="text-lg sm:text-2xl font-bold font-headline text-on-background">{c.name}</h3>
+                      <ShieldCheck className="h-7 w-7 text-primary" />
                     </div>
                     <div className="flex items-center gap-2 mb-3 text-lg">
                       <Star className="h-6 w-6 text-amber-400 fill-amber-400" />
-                      <span className="font-bold text-slate-900">{c.rating}</span>
-                      <span className="text-slate-600">({c.reviews} รีวิว)</span>
+                      <span className="font-bold text-on-background">{c.rating}</span>
+                      <span className="text-on-surface-variant">({c.reviews} รีวิว)</span>
                     </div>
-                    <p className="text-slate-800 font-body text-base sm:text-xl mb-2 leading-relaxed">{c.exp}</p>
-                    <p className="text-slate-600 font-body flex items-center gap-2 text-sm sm:text-lg mb-4">
-                      <MapPin className="h-6 w-6 text-slate-400 shrink-0" /> {c.location}
+                    <p className="text-on-surface font-body text-base sm:text-xl mb-2 leading-relaxed">{c.exp}</p>
+                    <p className="text-on-surface-variant font-body flex items-center gap-2 text-sm sm:text-lg mb-4">
+                      <MapPin className="h-6 w-6 text-on-surface-variant shrink-0" /> {c.location}
                     </p>
                     <div className="flex gap-2 flex-wrap">
                       {c.tags.map(tag => (
-                        <span key={tag} className="px-4 py-1.5 bg-blue-50 text-blue-800 rounded-full text-base font-label font-bold border border-blue-100">{tag}</span>
+                        <span key={tag} className="px-4 py-1.5 bg-primary/5 text-primary rounded-full text-base font-label font-bold border border-primary/10">{tag}</span>
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-col items-center md:items-end gap-6 shrink-0 mt-6 md:mt-0 w-full md:w-auto border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
+                  <div className="flex flex-col items-center md:items-end gap-6 shrink-0 mt-6 md:mt-0 w-full md:w-auto border-t md:border-t-0 md:border-l border-outline-variant/15 pt-6 md:pt-0 md:pl-8">
                     <div className="text-center md:text-right w-full">
-                      <div className="text-xl sm:text-3xl font-extrabold font-headline text-blue-700 bg-blue-50/50 inline-block px-4 py-2 rounded-xl">{c.rate}</div>
-                      <div className="text-slate-500 text-base mt-2">ยังไม่รวมค่าธรรมเนียมแพลตฟอร์ม</div>
+                      <div className="text-xl sm:text-3xl font-extrabold font-headline text-primary bg-primary/5 inline-block px-4 py-2 rounded-xl">{c.rate}</div>
+                      <div className="text-on-surface-variant text-base mt-2">ยังไม่รวมค่าธรรมเนียมแพลตฟอร์ม</div>
                     </div>
-                    <Link href="/booking" className="w-full text-center bg-blue-700 text-white px-8 py-4 rounded-xl font-bold font-label shadow-lg hover:bg-blue-800 transition-colors text-xl">
+                    <Link href="/booking" className="w-full text-center bg-primary text-on-primary px-8 py-4 rounded-xl font-bold font-label shadow-ambient hover:bg-primary-dim transition-colors text-xl">
                       จองคิวผู้ดูแล
                     </Link>
                   </div>
@@ -141,7 +141,7 @@ export default function FindBuddyPage() {
                 action={
                   <button
                     onClick={() => { setSearchTerm(""); setFilteredData(caregivers); }}
-                    className="text-blue-600 font-bold hover:underline"
+                    className="text-primary font-bold hover:underline"
                   >
                     ล้างการค้นหาและแสดงทั้งหมด
                   </button>

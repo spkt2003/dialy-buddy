@@ -1,4 +1,4 @@
-// TODO: PIN (2505) is hardcoded. Replace with Supabase auth or
+// TODO: PIN (1234) is hardcoded. Replace with Supabase auth or
 // Next.js middleware-based session before any real deployment.
 // RLS policy currently allows public read — restrict to authenticated users in production.
 
@@ -69,7 +69,7 @@ export default function BoothOperatorPage() {
   const [visits, setVisits] = useState<Visit[]>([]);
 
   const handlePinSubmit = () => {
-    if (pin === "2505") {
+    if (pin === "1234") {
       setUnlocked(true);
     } else {
       setPinError(true);

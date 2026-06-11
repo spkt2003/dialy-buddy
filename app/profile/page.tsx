@@ -23,12 +23,12 @@ export default function SettingsPage() {
   return (
     <PatientPageShell maxWidth="max-w-5xl" pt="pt-8">
       <div className="flex items-center gap-4 mb-8">
-        <Link href="/dashboard" className="p-2.5 bg-white rounded-full shadow-sm border border-slate-100 hover:bg-slate-50 transition-colors">
-          <ArrowLeft className="w-5 h-5 text-slate-600" />
+        <Link href="/dashboard" className="p-2.5 bg-surface-container-lowest rounded-full shadow-ambient ghost-border hover:bg-surface-container-low transition-colors">
+          <ArrowLeft className="w-5 h-5 text-on-surface-variant" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">ตั้งค่าบัญชี</h1>
-          <p className="text-sm text-slate-500 mt-0.5">จัดการข้อมูลส่วนตัวและความปลอดภัยของคุณ</p>
+          <h1 className="text-2xl font-bold text-on-background">ตั้งค่าบัญชี</h1>
+          <p className="text-sm text-on-surface-variant mt-0.5">จัดการข้อมูลส่วนตัวและความปลอดภัยของคุณ</p>
         </div>
       </div>
 
@@ -44,10 +44,10 @@ export default function SettingsPage() {
             การแจ้งเตือน
           </SettingsTabButton>
 
-          <div className="pt-6 mt-6 border-t border-slate-200">
+          <div className="pt-6 mt-6 border-t border-outline-variant/20">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 font-bold transition-all text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 shadow-sm"
+              className="flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 font-bold transition-all text-error bg-error/10 hover:bg-error/15 border border-error/20 shadow-ambient"
             >
               <LogOut className="w-5 h-5" />
               ออกจากระบบ
@@ -55,51 +55,51 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex-1 bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 md:p-10">
+        <div className="flex-1 bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border p-6 md:p-10">
           {activeTab === "profile" && (
             <div className={FADE_IN_UP}>
-              <h2 className="text-xl font-bold text-slate-900 mb-6">ข้อมูลส่วนตัว</h2>
+              <h2 className="text-xl font-bold text-on-background mb-6">ข้อมูลส่วนตัว</h2>
 
-              <div className="flex items-center gap-6 mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-6 mb-8 p-4 bg-surface-container-low rounded-2xl border border-outline-variant/10">
                 <div className="relative">
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-3xl font-bold border-4 border-white shadow-sm">
+                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary text-3xl font-bold border-4 border-surface-container-lowest shadow-ambient">
                     ส
                   </div>
-                  <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full border border-slate-200 shadow-sm hover:bg-slate-50 text-slate-600 transition-colors">
+                  <button className="absolute bottom-0 right-0 p-2 bg-surface-container-lowest rounded-full border border-outline-variant/20 shadow-ambient hover:bg-surface-container-low text-on-surface-variant transition-colors">
                     <Camera className="w-4 h-4" />
                   </button>
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-900">รูปโปรไฟล์</h3>
-                  <p className="text-xs text-slate-500 mt-1 mb-2">ไฟล์ JPG, GIF หรือ PNG ขนาดไม่เกิน 5MB</p>
-                  <button className="text-xs font-bold text-blue-600 hover:underline">อัปโหลดรูปใหม่</button>
+                  <h3 className="font-bold text-on-background">รูปโปรไฟล์</h3>
+                  <p className="text-xs text-on-surface-variant mt-1 mb-2">ไฟล์ JPG, GIF หรือ PNG ขนาดไม่เกิน 5MB</p>
+                  <button className="text-xs font-bold text-primary hover:underline">อัปโหลดรูปใหม่</button>
                 </div>
               </div>
 
               <form className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">ชื่อ</label>
-                    <input type="text" defaultValue="สมหมาย" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                    <label className="text-sm font-bold text-on-surface">ชื่อ</label>
+                    <input type="text" defaultValue="สมหมาย" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700">นามสกุล</label>
-                    <input type="text" defaultValue="ใจดี" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                    <label className="text-sm font-bold text-on-surface">นามสกุล</label>
+                    <input type="text" defaultValue="ใจดี" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">อีเมล</label>
-                  <input type="email" defaultValue="sommai@dialybuddy.com" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                  <label className="text-sm font-bold text-on-surface">อีเมล</label>
+                  <input type="email" defaultValue="sommai@dialybuddy.com" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">เบอร์โทรศัพท์</label>
-                  <input type="tel" defaultValue="081-234-5678" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                  <label className="text-sm font-bold text-on-surface">เบอร์โทรศัพท์</label>
+                  <input type="tel" defaultValue="081-234-5678" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
-                <div className="pt-6 mt-8 border-t border-slate-100 flex justify-end">
-                  <button type="button" className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 active:scale-95">
+                <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
+                  <button type="button" className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-ambient active:scale-95">
                     <Save className="w-4 h-4" />
                     บันทึกข้อมูล
                   </button>
@@ -110,24 +110,24 @@ export default function SettingsPage() {
 
           {activeTab === "security" && (
             <div className={FADE_IN_UP}>
-              <h2 className="text-xl font-bold text-slate-900 mb-6">เปลี่ยนรหัสผ่าน</h2>
+              <h2 className="text-xl font-bold text-on-background mb-6">เปลี่ยนรหัสผ่าน</h2>
               <form className="space-y-5">
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">รหัสผ่านปัจจุบัน</label>
-                  <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                  <label className="text-sm font-bold text-on-surface">รหัสผ่านปัจจุบัน</label>
+                  <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
-                <div className="border-t border-slate-100 my-6"></div>
+                <div className="border-t border-outline-variant/15 my-6"></div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">รหัสผ่านใหม่</label>
-                  <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                  <label className="text-sm font-bold text-on-surface">รหัสผ่านใหม่</label>
+                  <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700">ยืนยันรหัสผ่านใหม่</label>
-                  <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all text-slate-900 text-sm" />
+                  <label className="text-sm font-bold text-on-surface">ยืนยันรหัสผ่านใหม่</label>
+                  <input type="password" placeholder="••••••••" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
-                <div className="pt-6 mt-8 border-t border-slate-100 flex justify-end">
-                  <button type="button" className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-200 active:scale-95">
+                <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
+                  <button type="button" className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-ambient active:scale-95">
                     <Shield className="w-4 h-4" />
                     อัปเดตรหัสผ่าน
                   </button>
@@ -138,7 +138,7 @@ export default function SettingsPage() {
 
           {activeTab === "notifications" && (
             <div className={FADE_IN_UP}>
-              <h2 className="text-xl font-bold text-slate-900 mb-6">การตั้งค่าการแจ้งเตือน</h2>
+              <h2 className="text-xl font-bold text-on-background mb-6">การตั้งค่าการแจ้งเตือน</h2>
               <div className="space-y-4">
                 <NotifRow
                   title="แจ้งเตือนสถานะการจอง"

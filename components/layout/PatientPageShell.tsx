@@ -10,8 +10,8 @@ type PatientPageShellProps = {
   outerClass?: string;
 };
 
-// Wraps all patient-side pages: Navbar + bg-slate-50 full-height container + centred content box.
-// Eliminates the repeated <>Navbar /><div className="bg-slate-50 ..."><div className="max-w-* mx-auto px-6"> pattern.
+// Wraps all patient-side pages: Navbar + bg-background full-height container + centred content box.
+// Eliminates the repeated <>Navbar /><div className="bg-background ..."><div className="max-w-* mx-auto px-6"> pattern.
 export function PatientPageShell({
   children,
   maxWidth = "max-w-7xl",
@@ -21,7 +21,7 @@ export function PatientPageShell({
   return (
     <>
       <Navbar />
-      <div className={`bg-slate-50 min-h-screen pb-24 ${pt} ${outerClass}`}>
+      <div className={`bg-background min-h-screen pb-24 ${pt} ${outerClass}`}>
         <div className={`${maxWidth} mx-auto px-6`}>{children}</div>
       </div>
     </>

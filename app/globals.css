@@ -6,12 +6,6 @@
     --foreground: #2f323a;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: #0d0e12;
-      --foreground: #e0e2ed;
-    }
-  }
 }
 
 @theme inline {
