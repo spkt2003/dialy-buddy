@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react"; // 1. นำเข้า useState
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Star, ShieldCheck, MapPin, UserX } from "lucide-react";
-import Link from "next/link";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -45,11 +45,21 @@ const caregivers = [
 ];
 
 export default function FindBuddyPage() {
-  // 2. สร้าง State สำหรับการค้นหา
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState(caregivers);
 
-  // 3. ฟังก์ชันสำหรับการค้นหา
+  const handleBooking = (caregiver: typeof caregivers[0]) => {
+    const params = new URLSearchParams({
+      name: caregiver.name,
+      rating: String(caregiver.rating),
+      reviews: String(caregiver.reviews),
+      rate: caregiver.rate,
+      location: caregiver.location,
+    });
+    router.push(`/booking?${params.toString()}`);
+  };
+
   const handleSearch = () => {
     const results = caregivers.filter((c) =>
       c.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -88,7 +98,7 @@ export default function FindBuddyPage() {
             </div>
             {searchTerm && (
               <p className="mt-3 text-sm text-on-surface-variant">
-                กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-primary">"{searchTerm}"</span>
+                กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-primary">&quot;{searchTerm}&quot;</span>
               </p>
             )}
           </div>
@@ -126,9 +136,12 @@ export default function FindBuddyPage() {
                       <div className="text-xl sm:text-3xl font-extrabold font-headline text-primary bg-primary/5 inline-block px-4 py-2 rounded-xl">{c.rate}</div>
                       <div className="text-on-surface-variant text-base mt-2">ยังไม่รวมค่าธรรมเนียมแพลตฟอร์ม</div>
                     </div>
-                    <Link href="/booking" className="w-full text-center bg-primary text-on-primary px-8 py-4 rounded-xl font-bold font-label shadow-ambient hover:bg-primary-dim transition-colors text-xl">
+                    <button
+                      onClick={() => handleBooking(c)}
+                      className="w-full text-center bg-primary text-on-primary px-8 py-4 rounded-xl font-bold font-label shadow-ambient hover:bg-primary-dim transition-colors text-xl"
+                    >
                       จองคิวผู้ดูแล
-                    </Link>
+                    </button>
                   </div>
                 </div>
               ))

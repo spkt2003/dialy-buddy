@@ -2,52 +2,57 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Stethoscope, Mail, Lock, AlertCircle } from "lucide-react"; // เพิ่ม AlertCircle
-import { useAuth } from "../../context/AuthContext";
+import { ArrowLeft, Stethoscope, Mail, Lock, AlertCircle } from "lucide-react";
+import { useAuth, type Role } from "../../context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
   const router = useRouter();
 
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(""); // State สำหรับเก็บข้อความ Error
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    // ดึงข้อมูลบัญชีที่เพิ่งสมัครไว้จาก Local Storage
-    const registeredPhone = localStorage.getItem("registeredPhone");
-    const registeredPassword = localStorage.getItem("registeredPassword");
-    const registeredName = localStorage.getItem("userName") || "ผู้ใช้งานใหม่";
-    const registeredRole = localStorage.getItem("role") || "customer";
-
-    // 1. ตรวจสอบสิทธิ์ Admin (คงไว้เหมือนเดิม)
+    // 1. Dev credential: admin
     if (emailOrPhone === "admin" && password === "admin123") {
+      await supabase.auth.signOut(); // ล้าง Supabase session ก่อน ป้องกัน onAuthStateChange override
       login("caregiver", "ผู้ดูแลระบบ");
       router.push("/caregiver/dashboard");
+      return;
     }
-    // 2. ตรวจสอบกับข้อมูลที่ Register ไว้
-    else if (emailOrPhone === registeredPhone && password === registeredPassword) {
-      if (registeredRole === "provider" || registeredRole === "caregiver") {
-        login("caregiver", registeredName);
-        router.push("/caregiver/dashboard");
-      } else {
-        login("patient", registeredName);
-        router.push("/dashboard");
-      }
-    }
-    // 3. Fallback (เผื่อกรณีไม่ได้กดสมัครก่อน แต่มาพิมพ์ user / user123 เลย)
-    else if (emailOrPhone === "user" && password === "user123") {
+
+    // 2. Dev credential: user
+    if (emailOrPhone === "user" && password === "user123") {
+      await supabase.auth.signOut(); // ล้าง Supabase session ก่อน ป้องกัน onAuthStateChange override
       login("patient", "สมหมาย");
       router.push("/dashboard");
+      return;
     }
-    // 4. กรณีรหัสผ่านผิด
-    else {
+
+    // 3. Registered user via Supabase Auth
+    setIsSubmitting(true);
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      email: `${emailOrPhone}@dialybuddy.local`,
+      password,
+    });
+    setIsSubmitting(false);
+
+    if (signInError || !data.session) {
       setError("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
+      return;
     }
+
+    // ไม่เรียก login() — onAuthStateChange จะ update React state อัตโนมัติจาก Supabase session
+    // การเรียก login() จะเขียน isLoggedIn ลง localStorage ซึ่ง conflict กับ session expiry
+    const userRole = (data.session.user.user_metadata?.role as Role) || "patient";
+    router.push(userRole === "caregiver" ? "/caregiver/dashboard" : "/dashboard");
   };
 
   return (
@@ -109,9 +114,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full mt-6 flex items-center justify-center bg-primary text-on-primary font-bold font-label py-4 rounded-xl shadow-ambient hover:bg-primary-dim transition-colors text-lg"
+            disabled={isSubmitting}
+            className="w-full mt-6 flex items-center justify-center bg-primary text-on-primary font-bold font-label py-4 rounded-xl shadow-ambient hover:bg-primary-dim transition-colors text-lg disabled:opacity-60"
           >
-            เข้าสู่ระบบ
+            {isSubmitting ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
           </button>
         </form>
 

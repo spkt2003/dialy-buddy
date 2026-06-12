@@ -4,7 +4,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Home, Users, Settings, LogOut, HeartPulse } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CaregiverLayout({
   children,
@@ -12,6 +13,13 @@ export default function CaregiverLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+  };
   
   const navItems = [
     { name: "แผงควบคุม", href: "/caregiver/dashboard", icon: Home },
@@ -20,13 +28,13 @@ export default function CaregiverLayout({
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 font-body text-slate-900">
+    <div className="flex flex-col min-h-screen bg-surface font-body text-on-background">
       {/* Navbar */}
-      <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200">
+      <header className="sticky top-0 z-40 w-full bg-surface-container-lowest/90 backdrop-blur-md shadow-sm border-b border-outline-variant/20">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-20 px-6">
           <Link href="/" className="flex items-center gap-4">
             <Image src="/logo.png" alt="DialyBuddy Logo" width={250} height={250} className="object-contain" />
-            <span className="text-slate-500 font-bold text-xl mt-1">ผู้ดูแล</span>
+            <span className="text-on-surface-variant font-bold text-xl mt-1">ผู้ดูแล</span>
           </Link>
           <nav className="hidden md:flex items-center space-x-2">
             {navItems.map((item) => (
@@ -35,22 +43,22 @@ export default function CaregiverLayout({
                 href={item.href}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-colors font-medium ${
                   pathname === item.href
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    ? "bg-primary/10 text-primary"
+                    : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-background"
                 }`}
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.name}</span>
               </Link>
             ))}
-            <div className="w-px h-6 bg-slate-200 mx-2"></div>
-            <Link
-              href="/logout"
+            <div className="w-px h-6 bg-outline-variant/30 mx-2"></div>
+            <button
+              onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-rose-600 hover:bg-rose-50 transition-colors font-medium"
             >
               <LogOut className="h-5 w-5" />
               <span>ออกจากระบบ</span>
-            </Link>
+            </button>
           </nav>
         </div>
       </header>
@@ -61,15 +69,15 @@ export default function CaregiverLayout({
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-8 mt-auto">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-sm">
+      <footer className="bg-surface-container-lowest border-t border-outline-variant/20 py-8 mt-auto">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-on-surface-variant text-sm">
           <div className="flex items-center gap-2">
             <img src="/logo.png" alt="DialyBuddy" className="h-6 w-auto object-contain grayscale opacity-70" />
             <span>© {new Date().getFullYear()} DialyBuddy – บริการดูแลผู้ป่วยผู้สูงอายุ</span>
           </div>
           <div className="flex gap-4">
-            <Link href="/terms" className="hover:text-blue-600 transition-colors">เงื่อนไขการใช้งาน</Link>
-            <Link href="/privacy" className="hover:text-blue-600 transition-colors">นโยบายความเป็นส่วนตัว</Link>
+            <Link href="/terms" className="hover:text-primary transition-colors">เงื่อนไขการใช้งาน</Link>
+            <Link href="/privacy" className="hover:text-primary transition-colors">นโยบายความเป็นส่วนตัว</Link>
           </div>
         </div>
       </footer>

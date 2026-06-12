@@ -47,7 +47,6 @@ export default function Navbar() {
             <>
               <Link href="/find-buddy" className="text-sm font-label font-bold border-b-2 border-transparent hover:border-primary text-secondary hover:text-primary transition-colors py-1">ค้นหาผู้ดูแล</Link>
               <Link href="/ai-planner" className="text-sm font-label font-bold border-b-2 border-transparent hover:border-primary text-secondary hover:text-primary transition-colors py-1">AI จัดโภชนาการ</Link>
-              <Link href="/booking" className="text-sm font-label font-bold border-b-2 border-transparent hover:border-primary text-secondary hover:text-primary transition-colors py-1">การทำรายการจอง</Link>
             </>
           )}
         </nav>

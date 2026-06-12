@@ -1,34 +1,44 @@
 "use client";
 import Link from "next/link";
-import { ArrowLeft, Stethoscope, User, Lock, Phone } from "lucide-react";
+import { ArrowLeft, Stethoscope, User, Lock, Phone, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'patient' | 'buddy'>('patient');
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [registerError, setRegisterError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const { login } = useAuth();
-
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setRegisterError("");
+    setIsSubmitting(true);
 
-    // 1. บันทึกข้อมูลบัญชี (อีเมล/เบอร์ และ รหัสผ่าน) ลง Local Storage
-    // สมมติว่าเราใช้เบอร์โทรเป็น Username ไปก่อน
-    localStorage.setItem("registeredPhone", phone);
-    localStorage.setItem("registeredPassword", password);
+    const mappedRole = role === 'buddy' ? 'caregiver' : 'patient';
 
-    if (role === 'buddy') {
-      login("caregiver", name);
-      router.push("/caregiver/dashboard");
-    } else {
-      login("patient", name);
-      router.push("/dashboard");
+    // สร้าง Supabase Auth user — ใช้ phone@dialybuddy.local เป็น fake email
+    // (email confirmation ต้องปิดไว้ใน Supabase Auth settings สำหรับ project นี้)
+    const { error } = await supabase.auth.signUp({
+      email: `${phone}@dialybuddy.local`,
+      password,
+      options: { data: { role: mappedRole, userName: name } },
+    });
+
+    setIsSubmitting(false);
+
+    if (error) {
+      setRegisterError(error.message);
+      return;
     }
+
+    // ไม่เรียก login() — onAuthStateChange จะ update React state อัตโนมัติจาก Supabase session
+    // (การเรียก login() จะเขียน isLoggedIn ลง localStorage ซึ่ง conflict กับ session expiry)
+    router.push(mappedRole === 'caregiver' ? "/caregiver/dashboard" : "/dashboard");
   };
 
   return (
@@ -63,6 +73,13 @@ export default function RegisterPage() {
             ผู้ดูแล (Care Buddy)
           </button>
         </div>
+
+        {registerError && (
+          <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-error shrink-0" />
+            <p className="text-sm text-error font-medium">{registerError}</p>
+          </div>
+        )}
 
         <form onSubmit={handleRegister} className="space-y-6">
           <div className="space-y-2">
@@ -109,8 +126,8 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button type="submit" className="w-full mt-6 flex items-center justify-center bg-primary text-on-primary font-bold font-label py-4 rounded-xl shadow-ambient hover:bg-primary-dim transition-colors text-lg">
-            ลงทะเบียนใช้งาน
+          <button type="submit" disabled={isSubmitting} className="w-full mt-6 flex items-center justify-center bg-primary text-on-primary font-bold font-label py-4 rounded-xl shadow-ambient hover:bg-primary-dim transition-colors text-lg disabled:opacity-60">
+            {isSubmitting ? "กำลังสร้างบัญชี..." : "ลงทะเบียนใช้งาน"}
           </button>
         </form>
 

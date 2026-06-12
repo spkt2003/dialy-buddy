@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/context/AuthContext";
 import type { Message } from "@/types";
 
 // Matches caregiver trackingSteps labels — shown from the patient's perspective.
@@ -39,7 +40,9 @@ type ActiveJobRow = {
 };
 
 export default function TrackingPage() {
+  const { userName } = useAuth();
   const [liveJob, setLiveJob] = useState<ActiveJobRow | null>(null);
+  const [hasPendingBooking, setHasPendingBooking] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [isChatOpen, setChatOpen] = useState(false);
@@ -53,20 +56,28 @@ export default function TrackingPage() {
   const [chatInput, setChatInput] = useState("");
 
   useEffect(() => {
-    // Initial fetch — maybeSingle returns null (not an error) when no row exists.
+    // Check whether a caregiver has already accepted this patient's job.
     supabase
       .from("active_jobs")
       .select("id, patient_name, patient_image, destination, time_slot, date, type, current_step")
-      .order("updated_at", { ascending: false })
-      .limit(1)
+      .eq("patient_name", userName)
+      .maybeSingle()
+      .then(({ data }) => setLiveJob(data ?? null));
+
+    // Check whether this patient has a booking waiting for a caregiver to accept.
+    supabase
+      .from("pending_jobs")
+      .select("id")
+      .eq("patient_name", userName)
+      .eq("status", "pending")
       .maybeSingle()
       .then(({ data }) => {
-        setLiveJob(data ?? null);
+        setHasPendingBooking(!!data);
         setLoading(false);
       });
 
-    // Realtime — listens for INSERT (job accepted), UPDATE (step changed), DELETE (job done)
-    const channel = supabase
+    // Realtime: active_jobs — INSERT/UPDATE means caregiver accepted and is tracking steps.
+    const activeChannel = supabase
       .channel("active_jobs_patient_view")
       .on(
         "postgres_changes",
@@ -74,15 +85,28 @@ export default function TrackingPage() {
         (payload) => {
           if (payload.eventType === "DELETE") {
             setLiveJob(null);
-          } else {
+          } else if ((payload.new as ActiveJobRow).patient_name === userName) {
             setLiveJob(payload.new as ActiveJobRow);
           }
         }
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
-  }, []);
+    // Realtime: pending_jobs — DELETE means caregiver accepted (booking left the queue).
+    const pendingChannel = supabase
+      .channel("pending_jobs_patient_view")
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "pending_jobs" },
+        () => setHasPendingBooking(false)
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(activeChannel);
+      supabase.removeChannel(pendingChannel);
+    };
+  }, [userName]);
 
   const handleSend = () => {
     if (!chatInput.trim()) return;
@@ -109,6 +133,26 @@ export default function TrackingPage() {
     );
   }
 
+  // Booking submitted but no caregiver has accepted yet.
+  if (!liveJob && hasPendingBooking) {
+    return (
+      <PatientPageShell maxWidth="max-w-6xl" pt="pt-8">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6 py-16">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-on-background mb-2">กำลังรอผู้ดูแลรับงานของคุณ</h2>
+            <p className="text-on-surface-variant max-w-sm mx-auto">
+              คำจองของคุณถูกส่งแล้ว เมื่อผู้ดูแลรับงาน หน้านี้จะอัปเดตสถานะแบบเรียลไทม์โดยอัตโนมัติ
+            </p>
+          </div>
+        </div>
+      </PatientPageShell>
+    );
+  }
+
+  // No booking at all.
   if (!liveJob) {
     return (
       <PatientPageShell maxWidth="max-w-6xl" pt="pt-8">

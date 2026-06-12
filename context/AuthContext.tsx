@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export type Role = "patient" | "caregiver" | null;
 
@@ -30,24 +30,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   /**
-   * Business Logic: โหลดข้อมูลการล็อกอินจาก Local Storage
-   * 
-   * - ทำงานเมื่อแอปถูกโหลดครั้งแรก (on mount)
-   * - ไปอ่านค่าที่เคยเซฟไว้ใน localStorage เพื่อกู้คืน session ให้ผู้ใช้ไม่ต้องล็อกอินใหม่ทุกครั้งที่รีเฟรชหน้าเว็บ
+   * Business Logic: โหลด session จาก Supabase Auth (หลัก) หรือ localStorage (fallback สำหรับ dev credentials)
+   *
+   * onAuthStateChange fires ทันทีหลัง subscribe พร้อม session ปัจจุบัน (INITIAL_SESSION event)
+   * ทำให้ไม่ต้องเรียก getSession() แยก
    */
   useEffect(() => {
-    // โหลดข้อมูลจาก local storage
-    const storedLoginStatus = localStorage.getItem("isLoggedIn");
-    const storedRole = localStorage.getItem("role");
-    const storedUserName = localStorage.getItem("userName");
-
-    if (storedLoginStatus === "true") {
-      setIsLoggedIn(true);
-      setRole((storedRole as Role) || "patient");
-      setUserName(storedUserName || "ผู้ใช้งาน");
-    }
-    
-    setIsInitialized(true);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        // Supabase session — role และ userName เก็บไว้ใน user_metadata ตอน signUp
+        setIsLoggedIn(true);
+        setRole((session.user.user_metadata?.role as Role) || "patient");
+        setUserName(session.user.user_metadata?.userName || "ผู้ใช้งาน");
+      } else {
+        // ไม่มี Supabase session — fallback ไปเช็ค localStorage สำหรับ dev credentials (admin/user)
+        const storedLoginStatus = localStorage.getItem("isLoggedIn");
+        if (storedLoginStatus === "true") {
+          setIsLoggedIn(true);
+          setRole((localStorage.getItem("role") as Role) || "patient");
+          setUserName(localStorage.getItem("userName") || "ผู้ใช้งาน");
+        } else {
+          setIsLoggedIn(false);
+          setRole(null);
+          setUserName("ผู้ใช้งาน");
+        }
+      }
+      setIsInitialized(true);
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   /**
@@ -68,11 +78,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   /**
    * ฟังก์ชัน logout (การออกจากระบบ)
-   * 
-   * - เคลียร์ค่า React State ทั้งหมดให้กลับเป็นค่าเริ่มต้นเหมือนตอนเข้ามาเว็บครั้งแรก
-   * - ลบข้อมูลทั้งหมดที่เก็บอยู่ใน localStorage ด้วย localStorage.clear() 
+   *
+   * - เรียก supabase.auth.signOut() — onAuthStateChange จะ fire แล้ว reset state อัตโนมัติ
+   * - ลบ localStorage dev credential keys ด้วย (สำหรับ admin/user hardcoded path)
+   * - Reset React state ทันทีโดยไม่รอ callback เพื่อให้ UI ตอบสนองเร็ว
    */
   const logout = () => {
+    supabase.auth.signOut(); // fire-and-forget
     setIsLoggedIn(false);
     setRole(null);
     setUserName("ผู้ใช้งาน");
