@@ -4,7 +4,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Apple,
   Upload,
@@ -61,9 +61,18 @@ export default function AIPlannerPage() {
   // Populated once the API responds; null until then so the success panel never renders stale data.
   const [analysisResult, setAnalysisResult] = useState<SampleResult | null>(null);
 
+  // Revoke the previous object URL whenever preview changes or the component unmounts.
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview); };
+  }, [preview]);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Reset the input so the same file can be re-selected — browser won't fire onChange
+    // again for an identical path unless the value is cleared first.
+    e.target.value = "";
 
     // Switch to "analyzing" immediately so the UI responds before the async chain begins.
     setPreview(URL.createObjectURL(file));
@@ -78,13 +87,13 @@ export default function AIPlannerPage() {
 
     reader.onload = async () => {
       try {
-        // Strip the "data:image/jpeg;base64," prefix added by readAsDataURL — API expects raw base64.
+        // Strip the "data:<mimeType>;base64," prefix added by readAsDataURL — API expects raw base64.
         const base64 = (reader.result as string).split(",")[1];
 
         const res = await fetch("/api/analyze-blood", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageBase64: base64 }),
+          body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
         });
 
         const data = await res.json();

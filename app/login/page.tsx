@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Stethoscope, Mail, Lock, AlertCircle } from "lucide-react";
-import { useAuth, type Role } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function LoginPage() {
@@ -13,8 +13,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isLoggedIn, role } = useAuth();
+
+  // Navigate only after onAuthStateChange has updated isLoggedIn — avoids the race
+  // where AuthGuard sees isLoggedIn=false on the first render of the destination page.
+  useEffect(() => {
+    if (pendingRedirect && isLoggedIn) {
+      setPendingRedirect(false);
+      router.push(role === "caregiver" ? "/caregiver/dashboard" : "/dashboard");
+    }
+  }, [pendingRedirect, isLoggedIn, role, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,10 +59,9 @@ export default function LoginPage() {
       return;
     }
 
-    // ไม่เรียก login() — onAuthStateChange จะ update React state อัตโนมัติจาก Supabase session
-    // การเรียก login() จะเขียน isLoggedIn ลง localStorage ซึ่ง conflict กับ session expiry
-    const userRole = (data.session.user.user_metadata?.role as Role) || "patient";
-    router.push(userRole === "caregiver" ? "/caregiver/dashboard" : "/dashboard");
+    // ไม่เรียก router.push ทันที — รอให้ onAuthStateChange อัปเดต isLoggedIn ก่อน
+    // แล้ว useEffect ด้านบนจะ navigate ให้อัตโนมัติ ป้องกัน AuthGuard เตะกลับ /login
+    setPendingRedirect(true);
   };
 
   return (

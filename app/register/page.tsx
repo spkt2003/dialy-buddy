@@ -1,9 +1,26 @@
 "use client";
 import Link from "next/link";
 import { ArrowLeft, Stethoscope, User, Lock, Phone, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/context/AuthContext";
+
+function toThaiRegisterError(message: string): string {
+  if (message.includes("already registered") || message.includes("already been registered")) {
+    return "เบอร์โทรศัพท์นี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบแทน";
+  }
+  if (message.includes("Password should be at least")) {
+    return "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+  }
+  if (message.includes("rate limit") || message.includes("too many requests")) {
+    return "พยายามบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่";
+  }
+  if (message.includes("disabled") || message.includes("not allowed") || message.includes("signup_disabled")) {
+    return "ระบบลงทะเบียนปิดชั่วคราว กรุณาลองใหม่ในภายหลัง";
+  }
+  return "ไม่สามารถสร้างบัญชีได้ กรุณาตรวจสอบข้อมูลแล้วลองใหม่อีกครั้ง";
+}
 
 export default function RegisterPage() {
   const [role, setRole] = useState<'patient' | 'buddy'>('patient');
@@ -12,7 +29,17 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [registerError, setRegisterError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState(false);
   const router = useRouter();
+  const { isLoggedIn, role: authRole } = useAuth();
+
+  // Navigate only after onAuthStateChange has confirmed isLoggedIn — same race as login page Bug A.
+  useEffect(() => {
+    if (pendingRedirect && isLoggedIn) {
+      setPendingRedirect(false);
+      router.push(authRole === "caregiver" ? "/caregiver/dashboard" : "/dashboard");
+    }
+  }, [pendingRedirect, isLoggedIn, authRole, router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,13 +59,13 @@ export default function RegisterPage() {
     setIsSubmitting(false);
 
     if (error) {
-      setRegisterError(error.message);
+      setRegisterError(toThaiRegisterError(error.message));
       return;
     }
 
-    // ไม่เรียก login() — onAuthStateChange จะ update React state อัตโนมัติจาก Supabase session
-    // (การเรียก login() จะเขียน isLoggedIn ลง localStorage ซึ่ง conflict กับ session expiry)
-    router.push(mappedRole === 'caregiver' ? "/caregiver/dashboard" : "/dashboard");
+    // ไม่เรียก router.push ทันที — รอให้ onAuthStateChange อัปเดต isLoggedIn ก่อน
+    // แล้ว useEffect ด้านบนจะ navigate ให้อัตโนมัติ ป้องกัน AuthGuard เตะกลับ /login
+    setPendingRedirect(true);
   };
 
   return (

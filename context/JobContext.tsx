@@ -25,7 +25,7 @@ interface JobContextType {
   completedJobs: Job[];
   acceptJob: (jobId: string) => void;
   updateJobStep: (stepIndex: number) => void;
-  completeJob: () => void;
+  completeJob: () => Promise<boolean>;
 }
 
 // Row shape returned by Supabase for the pending_jobs table
@@ -149,6 +149,18 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("pendingJobs");     // Supabase เป็น source of truth แล้ว
 
     const loadData = async () => {
+      // ลบ orphaned active_jobs rows ที่ DELETE ล้มเหลวตอน completeJob ครั้งก่อน
+      const pendingDeletes = JSON.parse(localStorage.getItem("pendingActiveJobDeletes") || "[]") as string[];
+      if (pendingDeletes.length > 0) {
+        localStorage.removeItem("pendingActiveJobDeletes");
+        pendingDeletes.forEach(id => {
+          supabase.from("active_jobs").delete().eq("id", id)
+            .then(({ error }) => {
+              if (error) console.error("Supabase cleanup orphan active_jobs:", error.message);
+            });
+        });
+      }
+
       // โหลด activeJob จาก Supabase ด้วย ID ที่เก็บไว้
       if (activeJobId) {
         const { data, error } = await supabase
@@ -291,34 +303,45 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
    * - ย้ายงานนั้นไปเรียงไว้บนสุดของคิวงานที่ทำเสร็จแล้ว (completedJobs)
    * - เคลียร์ค่า activeJob ให้กลับมาเป็น null ว่างเปล่า เพื่อเตรียมรับงานใหม่
    */
-  const completeJob = () => {
-    if (activeJob) {
-      const completed = { ...activeJob, status: "completed" as JobStatus };
-      setCompletedJobs(prev => [completed, ...prev]);
-      setActiveJob(null);
+  const completeJob = async (): Promise<boolean> => {
+    if (!activeJob) return false;
 
-      // บันทึกลง completed_jobs
-      supabase.from("completed_jobs").insert({
-        id: completed.id,
-        patient_name: completed.patientName,
-        patient_image: completed.patientImage,
-        destination: completed.destination,
-        time_slot: completed.time,
-        date: completed.date,
-        type: completed.type,
-        earning: completed.earning ?? 500,
-      }).then(({ error }) => {
-        if (error) console.error("Supabase insert completed_jobs:", error.message);
+    const completed = { ...activeJob, status: "completed" as JobStatus };
+
+    // บันทึกลง completed_jobs ก่อน — ถ้าล้มเหลวต้องไม่ล้าง state เพราะจะสูญเสียข้อมูลรายได้
+    const { error } = await supabase.from("completed_jobs").insert({
+      id: completed.id,
+      patient_name: completed.patientName,
+      patient_image: completed.patientImage,
+      destination: completed.destination,
+      time_slot: completed.time,
+      date: completed.date,
+      type: completed.type,
+      earning: completed.earning ?? 500,
+    });
+
+    if (error) {
+      console.error("Supabase insert completed_jobs:", error.message);
+      return false;
+    }
+
+    setCompletedJobs(prev => [completed, ...prev]);
+    setActiveJob(null);
+
+    // ลบออกจาก active_jobs — non-blocking เพื่อไม่ให้ UI ค้าง
+    // ถ้าล้มเหลว: queue ไว้ใน localStorage สำหรับ cleanup ตอน mount ครั้งถัดไป
+    supabase.from("active_jobs")
+      .delete()
+      .eq("id", completed.id)
+      .then(({ error: delError }) => {
+        if (delError) {
+          console.error("Supabase delete active_jobs:", delError.message);
+          const pending = JSON.parse(localStorage.getItem("pendingActiveJobDeletes") || "[]") as string[];
+          localStorage.setItem("pendingActiveJobDeletes", JSON.stringify([...pending, completed.id]));
+        }
       });
 
-      // ลบออกจาก active_jobs — patient tracking page จะเห็น empty state
-      supabase.from("active_jobs")
-        .delete()
-        .eq("id", completed.id)
-        .then(({ error }) => {
-          if (error) console.error("Supabase delete active_jobs:", error.message);
-        });
-    }
+    return true;
   };
 
   if (!isInitialized) return null;

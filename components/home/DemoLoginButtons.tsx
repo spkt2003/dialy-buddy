@@ -6,20 +6,21 @@
 import { useRouter } from "next/navigation";
 import { UserCircle, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function DemoLoginButtons() {
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
   const router = useRouter();
 
-  const loginAsPatient = () => {
-    logout();
-    login("patient", "user");
+  const loginAsPatient = async () => {
+    await supabase.auth.signOut(); // ล้าง Supabase session ก่อน ป้องกัน onAuthStateChange override
+    login("patient", "สมหมาย");
     router.push("/ai-planner");
   };
 
-  const loginAsCaregiver = () => {
-    logout();
-    login("caregiver", "admin");
+  const loginAsCaregiver = async () => {
+    await supabase.auth.signOut(); // ล้าง Supabase session ก่อน ป้องกัน onAuthStateChange override
+    login("caregiver", "ผู้ดูแลระบบ");
     router.push("/caregiver/dashboard");
   };
 

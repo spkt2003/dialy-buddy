@@ -1,6 +1,7 @@
 // app/caregiver/dashboard/page.tsx
 "use client";
 
+import { useState, useEffect } from "react";
 import { Star, CheckCircle2, Clock, MapPin, Activity, AlertCircle, ArrowRight } from "lucide-react";
 import { ChatColumn } from "@/components/caregiver/ChatColumn";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -11,11 +12,20 @@ export default function CaregiverDashboard() {
   // All job state lives in JobContext — this page is purely presentational.
   const { pendingJobs, activeJob, completedJobs, acceptJob } = useJobContext();
   const router = useRouter();
+  const [acceptingJobId, setAcceptingJobId] = useState<string | null>(null);
 
-  // Accepts the job then immediately navigates to tracking — prevents a second accept before the UI updates.
+  // Navigate only after context confirms activeJob is set — avoids the race where
+  // tracking page mounts before setActiveJob commits and immediately redirects back.
+  useEffect(() => {
+    if (acceptingJobId && activeJob?.id === acceptingJobId) {
+      setAcceptingJobId(null);
+      router.push("/caregiver/tracking");
+    }
+  }, [acceptingJobId, activeJob, router]);
+
   const handleAcceptJob = (jobId: string) => {
     acceptJob(jobId);
-    router.push("/caregiver/tracking");
+    setAcceptingJobId(jobId);
   };
 
   return (

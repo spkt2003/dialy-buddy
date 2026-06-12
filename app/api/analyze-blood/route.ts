@@ -12,7 +12,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageBase64 } = await request.json();
+    const { imageBase64, mimeType } = await request.json();
     if (!imageBase64) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         {
           inlineData: {
             // Caller already strips the data-URL prefix, so this is raw base64.
-            mimeType: "image/jpeg",
+            mimeType: mimeType || "image/jpeg",
             data: imageBase64,
           },
         },

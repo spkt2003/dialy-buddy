@@ -56,25 +56,25 @@ export default function TrackingPage() {
   const [chatInput, setChatInput] = useState("");
 
   useEffect(() => {
-    // Check whether a caregiver has already accepted this patient's job.
-    supabase
-      .from("active_jobs")
-      .select("id, patient_name, patient_image, destination, time_slot, date, type, current_step")
-      .eq("patient_name", userName)
-      .maybeSingle()
-      .then(({ data }) => setLiveJob(data ?? null));
-
-    // Check whether this patient has a booking waiting for a caregiver to accept.
-    supabase
-      .from("pending_jobs")
-      .select("id")
-      .eq("patient_name", userName)
-      .eq("status", "pending")
-      .maybeSingle()
-      .then(({ data }) => {
-        setHasPendingBooking(!!data);
-        setLoading(false);
-      });
+    // Run both queries in parallel — setLoading(false) only after both resolve so we
+    // never briefly render the wrong empty state while one result is still in-flight.
+    Promise.all([
+      supabase
+        .from("active_jobs")
+        .select("id, patient_name, patient_image, destination, time_slot, date, type, current_step")
+        .eq("patient_name", userName)
+        .maybeSingle(),
+      supabase
+        .from("pending_jobs")
+        .select("id")
+        .eq("patient_name", userName)
+        .eq("status", "pending")
+        .maybeSingle(),
+    ]).then(([{ data: activeData }, { data: pendingData }]) => {
+      setLiveJob(activeData ?? null);
+      setHasPendingBooking(!!pendingData);
+      setLoading(false);
+    });
 
     // Realtime: active_jobs — INSERT/UPDATE means caregiver accepted and is tracking steps.
     const activeChannel = supabase

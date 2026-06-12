@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useJobContext } from "../../../context/JobContext";
 import { ArrowLeft, MapPin, Clock, CheckCircle2, User, Phone, Check } from "lucide-react";
@@ -17,6 +17,7 @@ const trackingSteps = [
 export default function TrackingPage() {
   const { isInitialized, activeJob, updateJobStep, completeJob } = useJobContext();
   const router = useRouter();
+  const [isCompleting, setIsCompleting] = useState(false);
 
   // Wait for localStorage hydration before redirecting — avoids bouncing the user back
   // to dashboard on the first render when acceptJob state hasn't committed yet.
@@ -37,9 +38,15 @@ export default function TrackingPage() {
     }
   };
 
-  const handleComplete = () => {
-    completeJob();
-    router.push("/caregiver/dashboard");
+  const handleComplete = async () => {
+    setIsCompleting(true);
+    const ok = await completeJob();
+    setIsCompleting(false);
+    if (ok) {
+      router.push("/caregiver/dashboard");
+    } else {
+      alert("บันทึกงานไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+    }
   };
 
   return (
@@ -149,10 +156,11 @@ export default function TrackingPage() {
             ) : (
               <button
                 onClick={handleComplete}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-md active:scale-95 text-lg"
+                disabled={isCompleting}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-md active:scale-95 text-lg disabled:opacity-60"
               >
                 <CheckCircle2 className="w-6 h-6" />
-                จบงานและบันทึกประวัติ
+                {isCompleting ? "กำลังบันทึก..." : "จบงานและบันทึกประวัติ"}
               </button>
             )}
           </div>
