@@ -1,3 +1,21 @@
+## [2026-06-13] (session 22)
+
+### ทำเสร็จวันนี้
+- **Push 3 commits ขึ้น origin สำเร็จ** (`4b2ca37`) — standup ยืนยัน branch ahead 2 commits → commit `.claude/commands/` + `PROGRESS.md` เพิ่ม 1 → push ทั้ง 3 commits ขึ้น origin/main แล้ว branch ตรงกับ remote ✅
+- **`.claude/commands/` committed** — standup, wrap, findbugs, qatest skills ถูก commit เป็นครั้งแรก
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- Blood test sample cards (print + QR) — ยังไม่ทำ (ค้างมานานที่สุด)
+- Realtime live-INSERT booth end-to-end test — ยังไม่ทดสอบ
+
+### ตัดสินใจ / โน้ตสำคัญ
+- session สั้นมาก — standup + push อย่างเดียว ไม่มี code change
+
+### พรุ่งนี้เริ่มจาก
+- **Blood test sample cards** feature (print + QR) — ค้างมานานที่สุด เริ่มจากนี้ก่อน
+
+---
+
 ## [2026-06-13] (session 21)
 
 ### ทำเสร็จวันนี้
