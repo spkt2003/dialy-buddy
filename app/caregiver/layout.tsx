@@ -14,7 +14,9 @@ export default function CaregiverLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, isLoggedIn, role } = useAuth();
+
+  if (!isLoggedIn || role !== "caregiver") return null;
 
   const handleLogout = () => {
     logout();
