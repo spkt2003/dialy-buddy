@@ -231,8 +231,9 @@ export default function AIPlannerPage() {
                     {/* Resets to idle so the user can scan another blood test without a full page reload. */}
                     <button
                       onClick={() => setStatus("idle")}
-                      className="text-sm font-bold text-primary hover:underline whitespace-nowrap ml-2"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-primary text-primary text-sm font-bold hover:bg-primary/10 active:scale-95 transition-all whitespace-nowrap shrink-0"
                     >
+                      <Upload className="w-4 h-4" />
                       วิเคราะห์ใหม่
                     </button>
                   </div>
