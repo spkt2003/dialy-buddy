@@ -15,14 +15,6 @@ type Caregiver = {
   location: string;
 };
 
-const DEFAULT_CAREGIVER: Caregiver = {
-  name: "สมศรี ใจดี (พยาบาลวิชาชีพ)",
-  rating: 4.9,
-  reviews: 124,
-  rate: "350 บาท/ชม.",
-  location: "เขตบางกอกน้อย (ใกล้ รพ. ศิริราช)",
-};
-
 const TIME_SLOTS = [
   "08:00 - 12:00 น.",
   "09:00 - 13:00 น.",
@@ -54,7 +46,7 @@ function formatThaiDate(dateStr: string): string {
 export default function BookingPage() {
   const router = useRouter();
   const { userName } = useAuth();
-  const [caregiver, setCaregiver] = useState<Caregiver>(DEFAULT_CAREGIVER);
+  const [caregiver, setCaregiver] = useState<Caregiver | null>(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
   const [selectedHospital, setSelectedHospital] = useState("");
@@ -64,17 +56,21 @@ export default function BookingPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name");
-    if (name) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setCaregiver({
-        name,
-        rating: parseFloat(params.get("rating") ?? "4.9"),
-        reviews: parseInt(params.get("reviews") ?? "0"),
-        rate: params.get("rate") ?? DEFAULT_CAREGIVER.rate,
-        location: params.get("location") ?? DEFAULT_CAREGIVER.location,
-      });
+    if (!name) {
+      router.replace("/find-buddy");
+      return;
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCaregiver({
+      name,
+      rating: parseFloat(params.get("rating") ?? "4.9"),
+      reviews: parseInt(params.get("reviews") ?? "0"),
+      rate: params.get("rate") ?? "350 บาท/ชม.",
+      location: params.get("location") ?? "",
+    });
+  }, [router]);
+
+  if (!caregiver) return null;
 
   const today = new Date().toISOString().split("T")[0];
   const ratePerHour = parseRatePerHour(caregiver.rate);
