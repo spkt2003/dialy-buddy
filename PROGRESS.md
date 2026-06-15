@@ -1,3 +1,31 @@
+## [2026-06-15] (session 25)
+
+### ทำเสร็จวันนี้
+- **Login redirect → `/find-buddy`** (`app/login/page.tsx`) — patient login (ทั้ง `user/user123` และ Supabase registered) redirect ไป `/find-buddy` แทน `/dashboard` ✅
+- **Dashboard dynamic** (`app/dashboard/page.tsx`) — rewrite เป็น client component:
+  - ชื่อทักทายใช้ `userName` จาก auth context จริง ไม่ hardcode
+  - blood test card (right column) ซ่อนสำหรับ new user — แสดง CTA "อัปโหลดผลตรวจเลือด" → link ไป `/ai-planner` แทน
+  - หลังอัปผลตรวจ: blood test card โชว์ค่าจริงจาก `localStorage.lastBloodTest` (dynamic สีตาม status)
+- **AI planner save result** (`app/ai-planner/page.tsx`) — หลัง analyze สำเร็จ save `SampleResult` ลง `localStorage.lastBloodTest` เพื่อให้ dashboard อ่านได้
+- **Find-buddy booking mini-form** (`app/find-buddy/page.tsx`) — ปุ่ม "เลือกวันและเวลา" expand card แสดง date picker + time slot + hospital dropdown; hospital pre-select จาก caregiver location อัตโนมัติ; ปุ่ม "ยืนยันและดำเนินการต่อ" ส่ง `date`, `slot`, `hospital` ไปกับ query params
+- **Booking pre-fill** (`app/booking/page.tsx`) — อ่าน `date`, `slot`, `hospital` จาก query params แล้ว pre-fill ฟอร์ม ปุ่ม "ชำระเงิน" active ทันทีถ้าครบ
+- TypeScript ผ่าน 0 errors ทั้งสองรอบ
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ commit** — 5 files modified ยังไม่ stage
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `localStorage.lastBloodTest` เป็น key ใหม่ — เก็บ full `SampleResult` JSON; dashboard อ่านครั้งเดียวตอน mount ด้วย `isInitialized` guard ป้องกัน hydration mismatch
+- Dashboard return `null` จนกว่า `initialized = true` (เหมือน pattern context) ป้องกัน SSR/CSR mismatch
+- Hospital pre-select ใช้ `HOSPITAL_FROM_LOCATION` map ที่ match กับ caregiver location string — ถ้า location ไม่ match จะ default เป็น "" (user เลือกเอง)
+- Booking ยังให้แก้ date/slot/hospital ได้หลัง pre-fill — form ไม่ lock
+
+### พรุ่งนี้เริ่มจาก
+- **Commit** 5 files ทั้งหมด แล้ว push ขึ้น origin
+- ทดสอบ flow จริง: login → find-buddy → เลือก caregiver + กรอก date/time/hospital → booking pre-filled → ชำระเงิน → tracking
+
+---
+
 ## [2026-06-15] (session 24)
 
 ### ทำเสร็จวันนี้
