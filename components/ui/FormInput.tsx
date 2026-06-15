@@ -4,6 +4,8 @@ type FormInputProps = {
   label: string;
   type?: string;
   defaultValue?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   disabled?: boolean;
 };
@@ -13,15 +15,18 @@ export function FormInput({
   label,
   type = "text",
   defaultValue,
+  value,
+  onChange,
   placeholder,
   disabled = false,
 }: FormInputProps) {
+  const controlled = value !== undefined;
   return (
     <div className="space-y-2">
       {label && <label className="block text-sm font-semibold text-on-surface">{label}</label>}
       <input
         type={type}
-        defaultValue={defaultValue}
+        {...(controlled ? { value, onChange } : { defaultValue })}
         placeholder={placeholder}
         disabled={disabled}
         className={INPUT_CLS}

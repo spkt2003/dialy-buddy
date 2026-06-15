@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { User, Shield, Bell, Camera, Save, LogOut, WalletCards, BriefcaseMedical } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
@@ -16,6 +16,11 @@ export default function CaregiverSettingsPage() {
   const nameParts = userName.trim().split(" ");
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ");
+
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    setEmail(localStorage.getItem("userEmail") ?? "");
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -87,7 +92,7 @@ export default function CaregiverSettingsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormInput label="เบอร์โทรศัพท์" type="tel" defaultValue={userPhone} placeholder="เบอร์โทรศัพท์" />
-                  <FormInput label="อีเมล" type="email" placeholder="อีเมล" />
+                  <FormInput label="อีเมล" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="อีเมล (ไม่บังคับ)" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-base font-bold text-on-surface flex items-center gap-2">
@@ -99,7 +104,7 @@ export default function CaregiverSettingsPage() {
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
-                  <button type="button" className="flex items-center gap-2 px-8 py-4 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-md active:scale-95 text-lg">
+                  <button type="button" onClick={() => localStorage.setItem("userEmail", email)} className="flex items-center gap-2 px-8 py-4 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-md active:scale-95 text-lg">
                     <Save className="w-5 h-5" />
                     บันทึกข้อมูล
                   </button>

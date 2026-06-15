@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, User, Shield, Bell, Camera, Save, LogOut } from "lucide-react";
@@ -17,6 +17,11 @@ export default function SettingsPage() {
   const nameParts = userName.trim().split(" ");
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ");
+
+  const [email, setEmail] = useState("");
+  useEffect(() => {
+    setEmail(localStorage.getItem("userEmail") ?? "");
+  }, []);
 
   // Uses AuthContext logout() so React state and all localStorage keys are cleared atomically.
   const handleLogout = () => {
@@ -94,7 +99,7 @@ export default function SettingsPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-on-surface">อีเมล</label>
-                  <input type="email" placeholder="อีเมล" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="อีเมล (ไม่บังคับ)" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
                 <div className="space-y-2">
@@ -103,7 +108,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
-                  <button type="button" className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-ambient active:scale-95">
+                  <button type="button" onClick={() => localStorage.setItem("userEmail", email)} className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-ambient active:scale-95">
                     <Save className="w-4 h-4" />
                     บันทึกข้อมูล
                   </button>
