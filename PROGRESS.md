@@ -1,3 +1,22 @@
+## [2026-06-15] (session 24)
+
+### ทำเสร็จวันนี้
+- **Commit + push `7cc4aa5`** — งาน session 23 ทั้งหมด (sample cards + QR fix + AuthGuard + jsqr) ถูก commit และ push ขึ้น origin/main แล้ว branch ตรงกับ remote ✅
+- **Realtime live-INSERT booth end-to-end test ผ่าน** — ทดสอบบน Vercel จริง: อัปรูป sample card ใน `/ai-planner` (patient) → `/booth/operator` อัปเดต visit log live โดยไม่ refresh ✅
+- ทดสอบด้วย 2 tabs บน Vercel URL เดียวกัน (PIN `1234`)
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- `booking/page.tsx` — วันที่/เวลา/ปลายทาง ยังเป็น hardcode ยังไม่ผูกกับ find-buddy flow จริง
+
+### ตัดสินใจ / โน้ตสำคัญ
+- Realtime INSERT บน `demo_uploads` ทำงานถูกต้องบน Vercel — Supabase realtime config ไม่ต้องแก้เพิ่ม
+- PIN `/booth/operator` บน Vercel คือ `1234` (ยืนยันแล้ว)
+
+### พรุ่งนี้เริ่มจาก
+- **`booking/page.tsx`** — ผูก date/time/destination กับ query params จาก find-buddy flow แทน hardcode
+
+---
+
 ## [2026-06-15] (session 23)
 
 ### ทำเสร็จวันนี้
