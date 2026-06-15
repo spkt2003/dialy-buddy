@@ -1,6 +1,5 @@
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import DemoLoginButtons from "./DemoLoginButtons";
 
 export default function HeroSection() {
   return (
@@ -34,7 +33,6 @@ export default function HeroSection() {
               ทดลองใช้ AI จัดโภชนาการ
             </Link>
           </div>
-          <DemoLoginButtons />
         </div>
       </div>
     </section>

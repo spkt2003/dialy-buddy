@@ -1,7 +1,8 @@
 // app/tracking/page.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   MapPin,
   Navigation,
@@ -41,9 +42,17 @@ type ActiveJobRow = {
 
 export default function TrackingPage() {
   const { userName } = useAuth();
+  const router = useRouter();
   const [liveJob, setLiveJob] = useState<ActiveJobRow | null>(null);
   const [hasPendingBooking, setHasPendingBooking] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Ref tracks whether patient currently has an active job so the realtime DELETE
+  // handler (which closes over the initial value) can decide whether to redirect.
+  const hasActiveJobRef = useRef(false);
+  useEffect(() => {
+    hasActiveJobRef.current = liveJob !== null;
+  }, [liveJob]);
 
   const [isChatOpen, setChatOpen] = useState(false);
   const [isCallOpen, setCallOpen] = useState(false);
@@ -84,7 +93,9 @@ export default function TrackingPage() {
         { event: "*", schema: "public", table: "active_jobs" },
         (payload) => {
           if (payload.eventType === "DELETE") {
-            setLiveJob(null);
+            if (hasActiveJobRef.current) {
+              router.push("/dashboard");
+            }
           } else if ((payload.new as ActiveJobRow).patient_name === userName) {
             setLiveJob(payload.new as ActiveJobRow);
           }

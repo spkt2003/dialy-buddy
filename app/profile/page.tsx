@@ -12,7 +12,11 @@ import { FADE_IN_UP } from "@/lib/styles";
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, userName } = useAuth();
+
+  const nameParts = userName.trim().split(" ");
+  const firstName = nameParts[0] ?? "";
+  const lastName = nameParts.slice(1).join(" ");
 
   // Uses AuthContext logout() so React state and all localStorage keys are cleared atomically.
   const handleLogout = () => {
@@ -63,7 +67,7 @@ export default function SettingsPage() {
               <div className="flex items-center gap-6 mb-8 p-4 bg-surface-container-low rounded-2xl border border-outline-variant/10">
                 <div className="relative">
                   <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary text-3xl font-bold border-4 border-surface-container-lowest shadow-ambient">
-                    ส
+                    {userName.charAt(0)}
                   </div>
                   <button className="absolute bottom-0 right-0 p-2 bg-surface-container-lowest rounded-full border border-outline-variant/20 shadow-ambient hover:bg-surface-container-low text-on-surface-variant transition-colors">
                     <Camera className="w-4 h-4" />
@@ -80,22 +84,22 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-on-surface">ชื่อ</label>
-                    <input type="text" defaultValue="สมหมาย" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                    <input type="text" defaultValue={firstName} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-on-surface">นามสกุล</label>
-                    <input type="text" defaultValue="ใจดี" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                    <input type="text" defaultValue={lastName} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-on-surface">อีเมล</label>
-                  <input type="email" defaultValue="sommai@dialybuddy.com" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                  <input type="email" placeholder="อีเมล" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-on-surface">เบอร์โทรศัพท์</label>
-                  <input type="tel" defaultValue="081-234-5678" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                  <input type="tel" placeholder="เบอร์โทรศัพท์" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">

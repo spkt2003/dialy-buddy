@@ -6,11 +6,13 @@ import { Star, CheckCircle2, Clock, MapPin, Activity, AlertCircle, ArrowRight } 
 import { ChatColumn } from "@/components/caregiver/ChatColumn";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useJobContext } from "../../../context/JobContext";
+import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function CaregiverDashboard() {
   // All job state lives in JobContext — this page is purely presentational.
   const { pendingJobs, activeJob, completedJobs, acceptJob } = useJobContext();
+  const { userName } = useAuth();
   const router = useRouter();
   const [acceptingJobId, setAcceptingJobId] = useState<string | null>(null);
 
@@ -38,10 +40,10 @@ export default function CaregiverDashboard() {
         <section className="bg-surface-container-lowest rounded-[2rem] p-6 md:p-8 shadow-ambient ghost-border flex flex-col md:flex-row items-center gap-6">
           {/* shrink-0 keeps the avatar circle from collapsing if the caregiver name is long. */}
           <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-primary to-primary-dim flex items-center justify-center text-on-primary text-3xl font-bold shadow-md shrink-0">
-            ส
+            {userName.charAt(0)}
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-3xl font-bold font-headline text-on-background mb-2">ยินดีต้อนรับ, สมศรี</h1>
+            <h1 className="text-3xl font-bold font-headline text-on-background mb-2">ยินดีต้อนรับ, {userName}</h1>
             <p className="text-lg text-on-surface-variant font-body">พยาบาลวิชาชีพ • ผู้ดูแลระดับพรีเมียม</p>
 
             {/* flex-wrap lets rating/jobs badges stack on mobile, then align inline on md+. */}

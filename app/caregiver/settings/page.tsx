@@ -13,6 +13,10 @@ export default function CaregiverSettingsPage() {
   const router = useRouter();
   const { logout, userName } = useAuth();
 
+  const nameParts = userName.trim().split(" ");
+  const firstName = nameParts[0] ?? "";
+  const lastName = nameParts.slice(1).join(" ");
+
   const handleLogout = () => {
     logout();
     router.push("/");
@@ -78,12 +82,12 @@ export default function CaregiverSettingsPage() {
 
               <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormInput label="ชื่อ" defaultValue={userName} />
-                  <FormInput label="นามสกุล" defaultValue="ใจสู้" />
+                  <FormInput label="ชื่อ" defaultValue={firstName} />
+                  <FormInput label="นามสกุล" defaultValue={lastName} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormInput label="เบอร์โทรศัพท์" type="tel" defaultValue="089-123-4567" />
-                  <FormInput label="อีเมล" type="email" defaultValue="caregiver@dialybuddy.com" />
+                  <FormInput label="เบอร์โทรศัพท์" type="tel" placeholder="เบอร์โทรศัพท์" />
+                  <FormInput label="อีเมล" type="email" placeholder="อีเมล" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-base font-bold text-on-surface flex items-center gap-2">

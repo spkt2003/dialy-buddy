@@ -1,3 +1,82 @@
+## [2026-06-15] (session 28)
+
+### ทำเสร็จวันนี้
+- **ลบ Demo buttons** (`components/home/HeroSection.tsx`) — ลบ `<DemoLoginButtons />` + import ออกทั้งหมด ✅
+- **Flow H — per-card print** (`app/ai-planner/samples/page.tsx`) — เพิ่มปุ่ม "พิมพ์ card นี้" ใน SampleCard แต่ละใบ; inject CSS ซ่อน card อื่นใน `#print-area` ผ่าน `data-sample` attribute ก่อนเรียก `window.print()`; cleanup style ผ่าน `afterprint` event ✅
+- **Flow I — card expand fix** (`app/find-buddy/page.tsx`) — ลบ `animate-in fade-in slide-in-from-top-2 duration-300` ออกจาก expand form ที่ทำให้ element ซ่อน ✅
+- **Flow I — clear search button** (`app/find-buddy/page.tsx`) — เพิ่มปุ่ม "✕ ล้างการค้นหา" ใน search bar ขณะมี searchTerm ✅
+- **Flow K — patient redirect** (`app/tracking/page.tsx`) — เมื่อ caregiver จบงาน (DELETE event ยิง) → `router.push("/dashboard")` แทน `setLiveJob(null)` ใช้ `useRef` track ว่ามี active job จริงก่อน redirect ✅
+- **Patient profile name** (`app/profile/page.tsx`) — ใช้ `userName` จาก AuthContext; split by space → firstName/lastName; avatar `userName.charAt(0)`; ลบ hardcode email/phone ✅
+- **CG dashboard name** (`app/caregiver/dashboard/page.tsx`) — import `useAuth`; ใช้ `userName` แทน "สมศรี"; avatar `userName.charAt(0)` ✅
+- **CG settings name** (`app/caregiver/settings/page.tsx`) — split `userName` → `firstName`/`lastName` ใส่ช่องถูกต้อง; ลบ hardcode phone/email ✅
+- TypeScript ผ่าน 0 errors
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ commit** — 7 files modified ยังไม่ stage (+ PROGRESS.md)
+- Flow K ยังไม่ได้ทดสอบจริง — ต้องเทส caregiver กด "เสร็จสิ้น" แล้วดูว่า patient ถูก redirect ออกจาก tracking
+- phone number ยังไม่แสดงใน profile/settings ทั้ง patient/caregiver — เพราะ Supabase เก็บ phone เป็น `email` field (`{phone}@dialybuddy.local`) ไม่ได้อยู่ใน user_metadata → ต้องดึงมาแยก
+
+### ตัดสินใจ / โน้ตสำคัญ
+- per-card print ใช้ `data-sample` attribute บน wrapper ใน `#print-area` + inject `<style id="print-one-style">` ชั่วคราว; ไม่ใช้ React state
+- tracking redirect ใช้ `useRef` เพราะ realtime callback ปิดทับค่า `liveJob` ณ เวลา subscribe (ไม่ใช่ค่าปัจจุบัน)
+- `userName` จาก Supabase register เก็บ full name เป็น string เดียว → split ด้วย space ได้ถูกต้องถ้าชื่อ-นามสกุลไม่มีเว้นวรรคซ้อน
+- dev credentials (admin/user) ใน localStorage ไม่มี email/phone จริง → placeholder แสดงแทน
+
+### พรุ่งนี้เริ่มจาก
+- **Commit** 7 files + PROGRESS.md แล้ว push ขึ้น origin
+- ทดสอบ Flow K จริง: caregiver กด "เสร็จสิ้น" → patient tracking ต้อง redirect ไป `/dashboard`
+- ทดสอบ patient profile + CG settings แสดงชื่อที่ register ไว้ถูกต้อง
+
+---
+
+## [2026-06-15] (session 27)
+
+### ทำเสร็จวันนี้
+- ไม่มี commit ใหม่ — session นี้เป็นแค่ diagnosis อ่านโค้ดหลายไฟล์เพื่อเตรียม fix bug batch
+
+### ค้างอยู่ / ยังไม่เสร็จ
+ทั้งหมดยังไม่ได้แตะโค้ดเลย รอ implement:
+
+1. **Flow H — per-card print** (`app/ai-planner/samples/page.tsx`)
+   - ปัจจุบัน: มีแค่ปุ่ม "พิมพ์ทุก Card" เดียว
+   - Fix: inject temp `<style>` ก่อน `window.print()` เพื่อซ่อน card อื่น → ลบ style หลัง print
+   - ไม่ต้อง React state เพิ่ม, ใช้ `data-id` attribute บน card
+
+2. **Flow I — card ไม่ขยาย + ไม่มีปุ่มล้างการค้นหา** (`app/find-buddy/page.tsx`)
+   - โค้ด `expandedIdx` ถูกแล้ว แต่ `animate-in fade-in slide-in-from-top-2` อาจทำ element hidden ถ้า tailwindcss-animate ไม่ run ครบ → ลบ animation classes
+   - ปุ่ม "ล้างการค้นหา" มีแค่ใน EmptyState (filteredData.length===0) → เพิ่มปุ่มใน search bar ด้วย (ขณะมี searchTerm)
+
+3. **Flow K — tracking redirect** (`app/tracking/page.tsx`)
+   - ตอนนี้: DELETE event → `setLiveJob(null)` → แสดง empty state
+   - Fix: เพิ่ม `useRouter` → `router.push("/dashboard")` แทนการ setLiveJob(null)
+
+4. **Demo buttons** (`components/home/HeroSection.tsx` line 37)
+   - `<DemoLoginButtons />` อยู่ใน HeroSection → ลบบรรทัดนั้น + ลบ import
+
+5. **Patient profile name** (`app/profile/page.tsx`)
+   - Avatar hardcode "ส", ชื่อ hardcode "สมหมาย", นามสกุล hardcode "ใจดี", email hardcode "sommai@dialybuddy.com"
+   - Fix: import `useAuth`, ใช้ `userName` split ด้วย space → first/last
+
+6. **Caregiver dashboard name** (`app/caregiver/dashboard/page.tsx`)
+   - line 44: `<h1>ยินดีต้อนรับ, สมศรี</h1>` hardcode, avatar "ส" hardcode
+   - Fix: import `useAuth` → ใช้ `userName`
+
+7. **Caregiver settings name** (`app/caregiver/settings/page.tsx`)
+   - line 82: `defaultValue="ใจสู้"` hardcode surname, phone/email ก็ hardcode
+   - Fix: split `userName` → first/last, ลบ hardcode phone/email
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `DemoLoginButtons` อยู่ใน `components/home/HeroSection.tsx` (ไม่ได้อยู่ใน `app/page.tsx` โดยตรง)
+- find-buddy card expand logic ถูก 100% — ปัญหาน่าจะเป็น Tailwind animate classes ทำ opacity:0 ค้าง
+- patient profile = `app/profile/page.tsx` (ไม่ใช่ `app/profile/settings`) — ชื่อ component เป็น `SettingsPage` แต่ path คือ `/profile`
+- caregiver settings ใช้ `FormInput` component (`components/ui/FormInput.tsx`) — ต้องดูว่า accepts `defaultValue` หรือ `value`
+
+### พรุ่งนี้เริ่มจาก
+- เริ่ม fix 7 items ด้านบนตามลำดับ (H → I → K → Demo → Profile → CG Dashboard → CG Settings)
+- ทุก item ไม่มี dependency ต่อกัน → fix พร้อมกันได้ใน batch เดียว
+
+---
+
 ## [2026-06-15] (session 26)
 
 ### ทำเสร็จวันนี้

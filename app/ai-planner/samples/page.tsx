@@ -67,7 +67,7 @@ const MINERAL_LABELS: Record<string, string> = {
   phosphorus: "ฟอสฟอรัส",
 };
 
-function SampleCard({ sample }: { sample: SampleResult }) {
+function SampleCard({ sample, onPrint }: { sample: SampleResult; onPrint: () => void }) {
   const meta = getSampleMeta(sample.sampleId);
 
   return (
@@ -166,10 +166,21 @@ function SampleCard({ sample }: { sample: SampleResult }) {
       </div>
 
       {/* Disclaimer */}
-      <div className="px-6 pb-5">
+      <div className="px-6 pb-2">
         <p className="text-[10px] text-center text-on-surface-variant/60 italic">
           card นี้ใช้สำหรับทดสอบระบบเท่านั้น — ไม่ใช่ใบผลตรวจเลือดจริง
         </p>
+      </div>
+
+      {/* Per-card print button */}
+      <div className="px-6 pb-5 flex justify-end no-print">
+        <button
+          onClick={onPrint}
+          className="flex items-center gap-2 text-xs font-bold text-on-surface-variant hover:text-primary border border-outline-variant/20 hover:border-primary/30 px-3 py-2 rounded-xl transition-colors"
+        >
+          <Printer className="w-3.5 h-3.5" />
+          พิมพ์ card นี้
+        </button>
       </div>
     </div>
   );
@@ -177,6 +188,19 @@ function SampleCard({ sample }: { sample: SampleResult }) {
 
 export default function SamplesPage() {
   const samples = Object.values(SAMPLE_RESULTS);
+
+  const handlePrintOne = (sampleId: string) => {
+    const styleId = "print-one-style";
+    let style = document.getElementById(styleId) as HTMLStyleElement | null;
+    if (!style) {
+      style = document.createElement("style");
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+    style.textContent = `@media print { #print-area [data-sample]:not([data-sample="${sampleId}"]) { display: none !important; } }`;
+    window.print();
+    window.addEventListener("afterprint", () => { style?.remove(); }, { once: true });
+  };
 
   return (
     <>
@@ -229,7 +253,7 @@ export default function SamplesPage() {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {samples.map((sample) => (
-            <SampleCard key={sample.sampleId} sample={sample} />
+            <SampleCard key={sample.sampleId} sample={sample} onPrint={() => handlePrintOne(sample.sampleId)} />
           ))}
         </div>
 
@@ -246,6 +270,7 @@ export default function SamplesPage() {
             return (
               <div
                 key={sample.sampleId}
+                data-sample={sample.sampleId}
                 className="border-2 border-gray-300 rounded-2xl p-4 break-inside-avoid"
               >
                 <div className="flex items-center justify-between mb-3">

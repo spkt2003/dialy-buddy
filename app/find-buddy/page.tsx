@@ -143,9 +143,17 @@ export default function FindBuddyPage() {
           </button>
         </div>
         {searchTerm && (
-          <p className="mt-3 text-sm text-on-surface-variant">
-            กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-primary">&quot;{searchTerm}&quot;</span>
-          </p>
+          <div className="mt-3 flex items-center justify-between">
+            <p className="text-sm text-on-surface-variant">
+              กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-primary">&quot;{searchTerm}&quot;</span>
+            </p>
+            <button
+              onClick={() => { setSearchTerm(""); setFilteredData(caregivers); setExpandedIdx(null); }}
+              className="text-sm font-bold text-on-surface-variant hover:text-error flex items-center gap-1 transition-colors"
+            >
+              ✕ ล้างการค้นหา
+            </button>
+          </div>
         )}
       </div>
 
@@ -199,7 +207,7 @@ export default function FindBuddyPage() {
 
               {/* Booking mini-form — expands inline when the user clicks the button */}
               {expandedIdx === i && (
-                <div className="px-5 sm:px-8 pb-8 border-t border-outline-variant/15 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="px-5 sm:px-8 pb-8 border-t border-outline-variant/15">
                   <p className="text-base font-bold text-on-surface-variant pt-6 mb-4">เลือกวันที่ เวลา และโรงพยาบาลที่ต้องการ</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
 
