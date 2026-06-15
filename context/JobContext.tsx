@@ -23,7 +23,7 @@ interface JobContextType {
   pendingJobs: Job[];
   activeJob: Job | null;
   completedJobs: Job[];
-  acceptJob: (jobId: string) => void;
+  acceptJob: (jobId: string) => Promise<void>;
   updateJobStep: (stepIndex: number) => void;
   completeJob: () => Promise<boolean>;
 }
@@ -243,7 +243,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
    * - เปลี่ยนสถานะให้เป็น "active" และเริ่มสเต็ปที่ 0
    * - Upsert ไปที่ active_jobs เพื่อให้ patient tracking page เห็น realtime
    */
-  const acceptJob = (jobId: string) => {
+  const acceptJob = async (jobId: string) => {
     if (activeJob) return; // ไม่สามารถรับซ้อนได้
 
     const jobToAccept = pendingJobs.find(j => j.id === jobId);
@@ -251,6 +251,10 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
       const newActive = { ...jobToAccept, status: "active" as JobStatus, currentStep: 0 };
       setActiveJob(newActive);
       setPendingJobs(prev => prev.filter(j => j.id !== jobId));
+
+      // ดึง caregiver_id จาก Supabase session (null สำหรับ dev credentials)
+      const { data: { user } } = await supabase.auth.getUser();
+      const caregiverId = user?.id ?? null;
 
       // ลบออกจาก pending_jobs — realtime DELETE จะส่งไปยัง caregiver คนอื่นให้ซ่อนงานนี้ด้วย
       supabase.from("pending_jobs")
@@ -261,6 +265,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
       // Sync to active_jobs so patient tracking page can see this job live
+      // caregiver_id ใช้สำหรับ patient rating หลังจบงาน
       supabase.from("active_jobs").upsert({
         id: newActive.id,
         patient_name: newActive.patientName,
@@ -270,6 +275,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
         date: newActive.date,
         type: newActive.type,
         current_step: 0,
+        caregiver_id: caregiverId,
         updated_at: new Date().toISOString(),
       }).then(({ error }) => {
         if (error) console.error("Supabase acceptJob:", error.message);

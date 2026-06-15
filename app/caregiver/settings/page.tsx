@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Shield, Bell, Camera, Save, LogOut, WalletCards, BriefcaseMedical } from "lucide-react";
+import { User, Shield, Bell, Camera, Save, LogOut, WalletCards, BriefcaseMedical, Star } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 import { SettingsTabButton } from "@/components/ui/SettingsTabButton";
 import { NotifRow } from "@/components/ui/ToggleSwitch";
 import { FormInput } from "@/components/ui/FormInput";
@@ -21,12 +22,32 @@ export default function CaregiverSettingsPage() {
   const [lastNameInput, setLastNameInput] = useState(lastName);
   const [email, setEmail] = useState("");
   const [saved, setSaved] = useState(false);
+  const [myRating, setMyRating] = useState<number | null>(null);
+  const [myReviews, setMyReviews] = useState<number | null>(null);
 
   const emailKey = `userEmail_${userPhone || userName}`;
 
   useEffect(() => {
     setEmail(localStorage.getItem(emailKey) ?? "");
   }, [emailKey]);
+
+  useEffect(() => {
+    // ดึงคะแนนของตัวเองจาก caregiver_profiles (null สำหรับ dev credentials ที่ไม่มี session)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase
+        .from("caregiver_profiles")
+        .select("rating, reviews")
+        .eq("id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) {
+            setMyRating(data.rating);
+            setMyReviews(data.reviews);
+          }
+        });
+    });
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -98,6 +119,30 @@ export default function CaregiverSettingsPage() {
                   </button>
                 </div>
               </div>
+
+              {/* Rating summary — แสดงเฉพาะ Supabase caregivers ที่มีข้อมูลใน caregiver_profiles */}
+              {myRating !== null && (
+                <div className="flex items-center gap-5 p-5 bg-surface-container-low rounded-2xl border border-outline-variant/15 mb-8">
+                  <div className="w-14 h-14 bg-[#FBBF24]/15 rounded-2xl flex items-center justify-center shrink-0">
+                    <Star className="w-7 h-7 fill-[#FBBF24] text-[#FBBF24]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-bold text-on-surface-variant mb-1">คะแนนจากผู้ป่วย</p>
+                    <div className="flex items-end gap-2">
+                      <span className="text-3xl font-extrabold text-on-background">{myRating.toFixed(1)}</span>
+                      <span className="text-sm text-on-surface-variant mb-1">/ 5.0 • {myReviews} รีวิว</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[1,2,3,4,5].map(s => (
+                      <Star
+                        key={s}
+                        className={`w-5 h-5 ${s <= Math.round(myRating) ? "fill-[#FBBF24] text-[#FBBF24]" : "text-outline-variant"}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

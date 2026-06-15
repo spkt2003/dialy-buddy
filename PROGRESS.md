@@ -1,3 +1,32 @@
+## [2026-06-15] (session 32)
+
+### ทำเสร็จวันนี้
+- **E2E test ผ่าน** — register caregiver ใหม่ → login patient → find-buddy แสดง real caregiver จาก Supabase ✅
+- **Feature B: Rating/Review หลังจบงาน** ✅
+  - **SQL migration** — `ALTER TABLE active_jobs ADD COLUMN IF NOT EXISTS caregiver_id uuid;`
+  - **`context/JobContext.tsx`** — `acceptJob` เปลี่ยนเป็น async; ดึง `caregiver_id` จาก `supabase.auth.getUser()` แล้ว upsert ลง `active_jobs` (null สำหรับ dev credentials)
+  - **`app/tracking/page.tsx`** — เมื่อ DELETE event ยิง แทน redirect ทันที → แสดง rating modal; patient ให้ 1–5 ดาว + ความคิดเห็น (ไม่บังคับ); submit → คำนวณ weighted average → update `caregiver_profiles.rating` + `reviews`; ปุ่ม "ข้าม" → redirect `/dashboard` โดยไม่บันทึก
+  - **`app/caregiver/settings/page.tsx`** — fetch `rating`/`reviews` จาก `caregiver_profiles` ด้วย `supabase.auth.getUser()` → แสดง card ดาวใน profile tab (ซ่อนสำหรับ dev credentials)
+  - **`app/find-buddy/page.tsx`** — ไม่ต้องแก้ อ่าน rating จาก Supabase อยู่แล้ว อัปเดตอัตโนมัติ
+- **ai-planner/samples disclaimer** — ย้าย "card นี้ใช้สำหรับทดสอบระบบเท่านั้น" เข้าไปในทุก card แทนที่จะอยู่ footer ✅
+- TypeScript ผ่าน 0 errors ใหม่
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **Feature C (in-app chat)** — chat realtime ระหว่าง patient กับ caregiver ยังไม่ได้ทำ
+- **ยังไม่ commit/push** — งาน session นี้ยังไม่ stage
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `caregiver_id` ใน `active_jobs` เป็น `uuid` ไม่มี foreign key constraint (ไม่ references caregiver_profiles) เพื่อรองรับ dev credentials ที่ไม่มีแถวใน caregiver_profiles
+- DELETE realtime payload มี `payload.old` แค่ primary key โดย default — ถ้า Supabase table ไม่ได้ตั้ง `REPLICA IDENTITY FULL` จะได้ `caregiver_id` จาก `payload.old` ไม่ได้; แก้โดยเก็บ `caregiverId` จาก `liveJob` state ผ่าน ref แทน (liveJob ยังอยู่ใน state ตอน DELETE fire)
+- weighted average: `new_rating = (old_rating * old_reviews + stars) / (old_reviews + 1)` — race condition เป็นไปได้ถ้า 2 patient rate พร้อมกัน แต่ยอมรับได้สำหรับ prototype
+- `acceptJob` type signature เปลี่ยนเป็น `Promise<void>` — caller ใน caregiver dashboard ไม่ได้ await (fire-and-forget) ซึ่งถูกต้อง
+
+### พรุ่งนี้เริ่มจาก
+- `git commit` + `git push` งาน session นี้
+- ตัดสินใจว่าจะทำ Feature C (in-app chat) หรือ polish อื่น
+
+---
+
 ## [2026-06-15] (session 31)
 
 ### ทำเสร็จวันนี้

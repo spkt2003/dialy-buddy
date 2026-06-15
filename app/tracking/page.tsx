@@ -14,6 +14,7 @@ import {
   Car,
   AlertTriangle,
   CheckCircle2,
+  Star,
 } from "lucide-react";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { supabase } from "@/lib/supabaseClient";
@@ -38,6 +39,7 @@ type ActiveJobRow = {
   date: string;
   type: string;
   current_step: number;
+  caregiver_id: string | null;
 };
 
 export default function TrackingPage() {
@@ -53,6 +55,14 @@ export default function TrackingPage() {
   useEffect(() => {
     hasActiveJobRef.current = liveJob !== null;
   }, [liveJob]);
+
+  // Rating modal — แสดงหลังจาก caregiver จบงาน (DELETE event) แทนการ redirect ทันที
+  const [ratingCaregiverId, setRatingCaregiverId] = useState<string | null>(null);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [starHover, setStarHover] = useState(0);
+  const [starSelected, setStarSelected] = useState(0);
+  const [ratingComment, setRatingComment] = useState("");
+  const [ratingSubmitting, setRatingSubmitting] = useState(false);
 
   const [isChatOpen, setChatOpen] = useState(false);
   const [isCallOpen, setCallOpen] = useState(false);
@@ -70,7 +80,7 @@ export default function TrackingPage() {
     Promise.all([
       supabase
         .from("active_jobs")
-        .select("id, patient_name, patient_image, destination, time_slot, date, type, current_step")
+        .select("id, patient_name, patient_image, destination, time_slot, date, type, current_step, caregiver_id")
         .eq("patient_name", userName)
         .maybeSingle(),
       supabase
@@ -94,7 +104,10 @@ export default function TrackingPage() {
         (payload) => {
           if (payload.eventType === "DELETE") {
             if (hasActiveJobRef.current) {
-              router.push("/dashboard");
+              // ดึง caregiver_id จาก liveJob ที่ยังอยู่ใน ref ก่อน liveJob ถูก clear
+              const cgId = (payload.old as Partial<ActiveJobRow>).caregiver_id ?? null;
+              setRatingCaregiverId(cgId);
+              setShowRatingModal(true);
             }
           } else if ((payload.new as ActiveJobRow).patient_name === userName) {
             setLiveJob(payload.new as ActiveJobRow);
@@ -124,6 +137,29 @@ export default function TrackingPage() {
     const newMsg: Message = { id: Date.now(), sender: "patient", text: chatInput.trim() };
     setMessages((prev) => [...prev, newMsg]);
     setChatInput("");
+  };
+
+  const handleSubmitRating = async (skip = false) => {
+    if (!skip && starSelected > 0 && ratingCaregiverId) {
+      setRatingSubmitting(true);
+      // ดึง rating/reviews ปัจจุบันจาก caregiver_profiles แล้วคำนวณ weighted average
+      const { data } = await supabase
+        .from("caregiver_profiles")
+        .select("rating, reviews")
+        .eq("id", ratingCaregiverId)
+        .maybeSingle();
+      if (data) {
+        const newReviews = data.reviews + 1;
+        const newRating = ((data.rating * data.reviews) + starSelected) / newReviews;
+        await supabase
+          .from("caregiver_profiles")
+          .update({ rating: Math.round(newRating * 100) / 100, reviews: newReviews })
+          .eq("id", ratingCaregiverId);
+      }
+      setRatingSubmitting(false);
+    }
+    setShowRatingModal(false);
+    router.push("/dashboard");
   };
 
   const handleEndCall = () => setCallOpen(false);
@@ -383,6 +419,74 @@ export default function TrackingPage() {
             <h3 className="text-xl font-semibold text-on-background mb-2">สมศรี สมหมาย</h3>
             <p className="text-on-surface-variant mb-4 animate-pulse">กำลังโทร...</p>
             <button className="px-4 py-2 bg-error text-on-error rounded-md hover:brightness-110" onClick={handleEndCall}>วางสาย</button>
+          </div>
+        </div>
+      )}
+
+      {/* Rating Modal — แสดงเมื่อ caregiver จบงานแล้ว (DELETE event บน active_jobs) */}
+      {showRatingModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-container-lowest rounded-[2rem] shadow-ambient p-8 w-full max-w-sm text-center">
+            <div className="w-16 h-16 bg-tertiary/15 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-tertiary" />
+            </div>
+            <h3 className="text-xl font-extrabold text-on-background mb-1">เดินทางเสร็จสิ้น!</h3>
+            <p className="text-on-surface-variant text-sm mb-6">
+              คุณพอใจกับผู้ดูแลครั้งนี้แค่ไหน?
+            </p>
+
+            {/* Star selector */}
+            <div className="flex justify-center gap-2 mb-4">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  className="transition-transform active:scale-90"
+                  onMouseEnter={() => setStarHover(star)}
+                  onMouseLeave={() => setStarHover(0)}
+                  onClick={() => setStarSelected(star)}
+                >
+                  <Star
+                    className={`w-10 h-10 transition-colors ${
+                      star <= (starHover || starSelected)
+                        ? "fill-[#FBBF24] text-[#FBBF24]"
+                        : "text-outline-variant"
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Star label */}
+            {starSelected > 0 && (
+              <p className="text-sm font-bold text-primary mb-4">
+                {["", "ไม่ดีเลย", "พอใช้", "ดี", "ดีมาก", "ยอดเยี่ยม!"][starSelected]}
+              </p>
+            )}
+
+            {/* Optional comment */}
+            <textarea
+              className="w-full rounded-2xl border border-outline-variant/30 bg-surface-container-low px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 mb-6"
+              rows={2}
+              placeholder="ความคิดเห็นเพิ่มเติม (ไม่บังคับ)"
+              value={ratingComment}
+              onChange={(e) => setRatingComment(e.target.value)}
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleSubmitRating(true)}
+                className="flex-1 py-3 rounded-2xl border border-outline-variant/30 text-on-surface-variant text-sm font-bold hover:bg-surface-container transition-colors"
+              >
+                ข้าม
+              </button>
+              <button
+                onClick={() => handleSubmitRating(false)}
+                disabled={starSelected === 0 || ratingSubmitting}
+                className="flex-[2] py-3 rounded-2xl bg-primary text-on-primary text-sm font-bold shadow-ambient hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {ratingSubmitting ? "กำลังบันทึก..." : "ส่งคะแนน"}
+              </button>
+            </div>
           </div>
         </div>
       )}
