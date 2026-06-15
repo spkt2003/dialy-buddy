@@ -11,7 +11,7 @@ import { FADE_IN_UP, INPUT_CLS } from "@/lib/styles";
 export default function CaregiverSettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
-  const { logout, userName } = useAuth();
+  const { logout, userName, userPhone } = useAuth();
 
   const nameParts = userName.trim().split(" ");
   const firstName = nameParts[0] ?? "";
@@ -86,7 +86,7 @@ export default function CaregiverSettingsPage() {
                   <FormInput label="นามสกุล" defaultValue={lastName} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormInput label="เบอร์โทรศัพท์" type="tel" placeholder="เบอร์โทรศัพท์" />
+                  <FormInput label="เบอร์โทรศัพท์" type="tel" defaultValue={userPhone} placeholder="เบอร์โทรศัพท์" />
                   <FormInput label="อีเมล" type="email" placeholder="อีเมล" />
                 </div>
                 <div className="space-y-2">

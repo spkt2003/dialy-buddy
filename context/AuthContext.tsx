@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoggedIn: boolean;
   role: Role;
   userName: string;
+  userPhone: string;
   login: (role: Role, userName: string) => void;
   logout: () => void;
 }
@@ -27,6 +28,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState<Role>(null);
   const [userName, setUserName] = useState("ผู้ใช้งาน");
+  const [userPhone, setUserPhone] = useState("");
   const [isInitialized, setIsInitialized] = useState(false);
 
   /**
@@ -39,9 +41,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         // Supabase session — role และ userName เก็บไว้ใน user_metadata ตอน signUp
+        // phone เก็บเป็น {phone}@dialybuddy.local ใน email field → parse ออกมาแสดงผล
         setIsLoggedIn(true);
         setRole((session.user.user_metadata?.role as Role) || "patient");
         setUserName(session.user.user_metadata?.userName || "ผู้ใช้งาน");
+        const rawEmail = session.user.email ?? "";
+        setUserPhone(rawEmail.endsWith("@dialybuddy.local") ? rawEmail.split("@")[0] : "");
       } else {
         // ไม่มี Supabase session — fallback ไปเช็ค localStorage สำหรับ dev credentials (admin/user)
         const storedLoginStatus = localStorage.getItem("isLoggedIn");
@@ -49,10 +54,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setIsLoggedIn(true);
           setRole((localStorage.getItem("role") as Role) || "patient");
           setUserName(localStorage.getItem("userName") || "ผู้ใช้งาน");
+          setUserPhone("");
         } else {
           setIsLoggedIn(false);
           setRole(null);
           setUserName("ผู้ใช้งาน");
+          setUserPhone("");
         }
       }
       setIsInitialized(true);
@@ -88,6 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoggedIn(false);
     setRole(null);
     setUserName("ผู้ใช้งาน");
+    setUserPhone("");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("role");
     localStorage.removeItem("userName");
@@ -97,7 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   if (!isInitialized) return null;
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, role, userName, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, role, userName, userPhone, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

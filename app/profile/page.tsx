@@ -12,7 +12,7 @@ import { FADE_IN_UP } from "@/lib/styles";
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
-  const { logout, userName } = useAuth();
+  const { logout, userName, userPhone } = useAuth();
 
   const nameParts = userName.trim().split(" ");
   const firstName = nameParts[0] ?? "";
@@ -99,7 +99,7 @@ export default function SettingsPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-on-surface">เบอร์โทรศัพท์</label>
-                  <input type="tel" placeholder="เบอร์โทรศัพท์" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                  <input type="tel" defaultValue={userPhone} placeholder="เบอร์โทรศัพท์" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
