@@ -47,6 +47,41 @@
 
 ---
 
+## [2026-06-15] (session 35)
+
+### ทำเสร็จวันนี้
+- **แก้ bug rating ไม่อัปเดตใน caregiver/settings** ✅
+  - Root cause: Supabase DELETE event ส่งแค่ PK ใน `payload.old` (ไม่มี `caregiver_id` เว้นแต่ตั้ง `REPLICA IDENTITY FULL`)
+  - Fix: เพิ่ม `caregiverIdRef` track `liveJob.caregiver_id` realtime → ตอน DELETE fire ใช้ค่าจาก ref แทน `payload.old`
+- **แก้ไฟล์ truncation ซ้ำ** (Windows→Linux mount) — เขียนใหม่ผ่าน Python write ทั้ง 3 ไฟล์:
+  - `app/tracking/page.tsx` (600 lines)
+  - `app/caregiver/settings/page.tsx` (274 lines)
+  - `components/caregiver/ChatBox.tsx` (155 lines) + `types/index.ts`
+- **`types/index.ts`** — เพิ่ม `readAt?: number` ใน `Message` interface (user เพิ่ม read receipt feature)
+- **ChatBox.tsx** — เพิ่ม optimistic ID → real timestamp fix (เหมือน patient side)
+- TypeScript 0 errors ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **SQL ที่ต้องรันใน Supabase** (ยังไม่ confirm):
+  ```sql
+  ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages;
+  CREATE POLICY "chat_insert" ON chat_messages FOR INSERT WITH CHECK (true);
+  CREATE POLICY "chat_select" ON chat_messages FOR SELECT USING (true);
+  ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS read_at timestamptz;
+  ```
+- E2E test chat + rating flow หลัง SQL fix
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `REPLICA IDENTITY FULL` บน `active_jobs` จะแก้ปัญหา `payload.old` แต่เปลี่ยน WAL overhead — ref pattern ปลอดภัยกว่า
+- `read_at` column: ถ้า insert ไปยัง column ที่ไม่มีใน table Supabase จะ return error silently (ไม่ crash app) แต่ read receipt จะไม่ทำงาน
+
+### พรุ่งนี้เริ่มจาก
+- รัน SQL ทั้ง 4 คำสั่งข้างต้น
+- ทดสอบ: patient ให้ rating → refresh caregiver/settings → คะแนนต้องขึ้น
+- ทดสอบ: แชท 2 หน้าต่าง → ไม่ซ้ำ → "อ่านแล้ว" ขึ้นฝั่ง patient
+
+---
+
 ## [2026-06-15] (session 34)
 
 ### ทำเสร็จวันนี้

@@ -40,11 +40,11 @@ export default function TrackingPage() {
   const [loading, setLoading] = useState(true);
 
   const hasActiveJobRef = useRef(false);
-  useEffect(() => { hasActiveJobRef.current = liveJob !== null; }, [liveJob]);
-
-  // เก็บ caregiver_id ผ่าน ref เพราะ payload.old ของ DELETE event ไม่มี column นี้ (ไม่มี REPLICA IDENTITY FULL)
   const caregiverIdRef = useRef<string | null>(null);
-  useEffect(() => { caregiverIdRef.current = liveJob?.caregiver_id ?? null; }, [liveJob]);
+  useEffect(() => {
+    hasActiveJobRef.current = liveJob !== null;
+    caregiverIdRef.current = liveJob?.caregiver_id ?? null;
+  }, [liveJob]);
 
   const [ratingCaregiverId, setRatingCaregiverId] = useState<string | null>(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -88,6 +88,7 @@ export default function TrackingPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "active_jobs" }, (payload) => {
         if (payload.eventType === "DELETE") {
           if (hasActiveJobRef.current) {
+            // payload.old มีแค่ primary key — ใช้ ref ที่เก็บไว้ก่อนหน้าแทน
             setRatingCaregiverId(caregiverIdRef.current);
             setShowRatingModal(true);
           }
@@ -155,7 +156,7 @@ export default function TrackingPage() {
             }
             return [...prev, msg];
           });
-          // patient เปิดแชทอยู่ → mark ข้อความ caregiver เป็นอ่านแล้วทันที
+          // patient เปิดแชทอยู่ -> mark ข้อความ caregiver เป็นอ่านแล้วทันที
           if (row.sender === "caregiver" && isChatOpenRef.current) {
             supabase
               .from("chat_messages")
@@ -166,7 +167,6 @@ export default function TrackingPage() {
       )
       .on(
         "postgres_changes",
-        // ไม่ใช้ filter เพราะ Supabase ต้องการ REPLICA IDENTITY FULL สำหรับ UPDATE+filter → ใช้ client-side check แทน
         { event: "UPDATE", schema: "public", table: "chat_messages" },
         (payload) => {
           const row = payload.new as { id: string; job_id: string; sender: string; text: string; created_at: string; read_at: string | null };
@@ -219,7 +219,6 @@ export default function TrackingPage() {
       console.error("patient chat send:", error.message);
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
     } else if (data) {
-      // อัป optimistic ID -> real timestamp เพื่อให้ realtime dedup ถูกต้อง
       const realId = new Date((data as { created_at: string }).created_at).getTime();
       setMessages((prev) =>
         prev.map((m) => (m.id === optimisticId ? { ...m, id: realId } : m))
@@ -391,7 +390,7 @@ export default function TrackingPage() {
                   <p className="text-primary font-medium text-sm md:text-base mb-2">ผู้ดูแล (พยาบาลวิชาชีพ)</p>
                   <div className="flex items-center gap-2 text-on-surface-variant text-sm bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/10 w-fit">
                     <Car className="w-4 h-4 text-on-surface-variant" />
-                    <span>ฮอนด้า ซิตี้ สีขาว • <span className="font-bold">กท 1234 กรุงเทพมหานคร</span></span>
+                    <span>ฮอนด้า ซิตี้ สีขาว <span className="font-bold">กท 1234 กรุงเทพมหานคร</span></span>
                   </div>
                 </div>
               </div>

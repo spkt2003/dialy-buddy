@@ -34,7 +34,6 @@ export default function CaregiverSettingsPage() {
   useEffect(() => {
     let isMounted = true;
     let channel: ReturnType<typeof supabase.channel> | null = null;
-    // ดึงคะแนนของตัวเองจาก caregiver_profiles + subscribe realtime เมื่อ patient ให้คะแนน
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user || !isMounted) return;
       supabase
@@ -47,7 +46,6 @@ export default function CaregiverSettingsPage() {
           setMyRating(data.rating);
           setMyReviews(data.reviews);
         });
-      // ใช้ user.id ใน channel name เพื่อหลีกเลี่ยง duplicate channel error ใน React StrictMode
       channel = supabase
         .channel(`caregiver_profile_${user.id}`)
         .on(
@@ -89,7 +87,6 @@ export default function CaregiverSettingsPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Tabs */}
         <div className="w-full md:w-72 space-y-2 shrink-0">
           <SettingsTabButton active={activeTab === "profile"} onClick={() => setActiveTab("profile")} icon={<User className="w-5 h-5" />}>
             ข้อมูลส่วนตัว
@@ -115,7 +112,6 @@ export default function CaregiverSettingsPage() {
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border p-6 md:p-10 min-h-[500px]">
           {activeTab === "profile" && (
             <div className={FADE_IN_UP}>
@@ -139,7 +135,6 @@ export default function CaregiverSettingsPage() {
                 </div>
               </div>
 
-              {/* Rating summary — แสดงเฉพาะ Supabase caregivers ที่มีข้อมูลใน caregiver_profiles */}
               {myRating !== null && myReviews !== null && (
                 <div className="flex items-center gap-5 p-5 bg-surface-container-low rounded-2xl border border-outline-variant/15 mb-8">
                   <div className="w-14 h-14 bg-[#FBBF24]/15 rounded-2xl flex items-center justify-center shrink-0">
@@ -152,7 +147,7 @@ export default function CaregiverSettingsPage() {
                     ) : (
                       <div className="flex items-end gap-2">
                         <span className="text-3xl font-extrabold text-on-background">{myRating.toFixed(2)}</span>
-                        <span className="text-sm text-on-surface-variant mb-1">/ 5.00 • จาก {myReviews} คน</span>
+                        <span className="text-sm text-on-surface-variant mb-1">/ 5.00 จาก {myReviews} คน</span>
                       </div>
                     )}
                   </div>
@@ -189,7 +184,7 @@ export default function CaregiverSettingsPage() {
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
                   <button type="button" onClick={handleSave} className="flex items-center gap-2 px-8 py-4 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-md active:scale-95 text-lg">
                     <Save className="w-5 h-5" />
-                    {saved ? "บันทึกแล้ว ✓" : "บันทึกข้อมูล"}
+                    {saved ? "บันทึกแล้ว" : "บันทึกข้อมูล"}
                   </button>
                 </div>
               </form>
@@ -219,7 +214,6 @@ export default function CaregiverSettingsPage() {
               <form className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-base font-bold text-on-surface">เปลี่ยนบัญชีธนาคาร</label>
-                  {/* appearance-none removes the native arrow so it looks consistent cross-browser. */}
                   <select className={`${INPUT_CLS} appearance-none`}>
                     <option>ธนาคารกสิกรไทย</option>
                     <option>ธนาคารไทยพาณิชย์</option>
