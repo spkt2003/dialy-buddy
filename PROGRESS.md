@@ -1,3 +1,27 @@
+## [2026-06-15] (session 26)
+
+### ทำเสร็จวันนี้
+- **Login label/icon** (`app/login/page.tsx`) — เปลี่ยน "เบอร์โทรศัพท์ หรือ อีเมล" → "เบอร์โทรศัพท์", icon Mail → Phone, input type → tel ✅
+- **Register overhaul** (`app/register/page.tsx`) — form แยก field ตาม role (`45d5438`) ✅
+  - Patient: ชื่อ + ความสัมพันธ์กับผู้ป่วย (dropdown) + เบอร์ + รหัสผ่าน
+  - Caregiver: ชื่อ + เลขบัตรฯ (validate 13 หลัก client-side เท่านั้น ไม่เก็บ) + เขตที่ให้บริการ (34 เขต) + ประสบการณ์/ใบรับรอง (pill toggle 10 ตัวเลือก เลือกได้หลายอัน) + เบอร์ + รหัสผ่าน
+  - redirect หลัง register → `/find-buddy` (patient) / `/caregiver/dashboard` (caregiver)
+- **Security decision** — เลขบัตรประชาชนไม่เก็บใน Supabase เลย (ใช้แค่ client-side validation) เพราะ sensitive + ไม่มี background check จริง
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ทดสอบ register flow จริงบน Vercel ยังไม่ได้ทำ
+- find-buddy ยังใช้ hardcoded caregivers — ยังไม่ดึงจาก Supabase profiles
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `idCard` validate client-side (13 หลัก) แต่ **ไม่ส่งไปใน metadata** — ถ้า production จริงต้อง encrypt ด้วย KMS ก่อนเก็บ + อยู่ภายใต้ PDPA
+- `certifications` เก็บเป็น array ใน `user_metadata` — ยังไม่ได้ connect กับ find-buddy card (ยังเป็น hardcode)
+- `serviceArea` เก็บใน `user_metadata` — format: "เขตบางกอกน้อย" (ไม่มี รพ. suffix)
+
+### พรุ่งนี้เริ่มจาก
+- ทดสอบ register flow บน Vercel: สมัคร caregiver → ดู certifications/serviceArea ใน Supabase dashboard → login → เข้า `/caregiver/dashboard`
+
+---
+
 ## [2026-06-15] (session 25)
 
 ### ทำเสร็จวันนี้
