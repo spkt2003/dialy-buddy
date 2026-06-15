@@ -1,3 +1,20 @@
+## [2026-06-15] (session 35) — wrap
+
+### ทำเสร็จวันนี้
+- **Enable Supabase realtime บน `chat_messages`** ✅ — user รัน `ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages` ใน Supabase dashboard แล้ว
+- **Commit + push session 34** (`c832010`) — chat dedup fix ขึ้น origin/main แล้ว branch ตรงกับ remote ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **E2E test chat ยังไม่ได้ทดสอบ** — Supabase realtime เปิดแล้ว แต่ยังไม่ได้นั่งทดสอบ 2 tab จริง
+
+### ตัดสินใจ / โน้ตสำคัญ
+- session สั้น — standup + commit/push + enable realtime เท่านั้น ไม่มี code change
+
+### พรุ่งนี้เริ่มจาก
+- E2E test chat: login caregiver tab 1, login patient tab 2 → caregiver รับงาน → patient ส่งแชท → caregiver เห็น realtime → ตอบกลับ → patient เห็น unread badge
+
+---
+
 ## [2026-06-15] (session 34)
 
 ### ทำเสร็จวันนี้
