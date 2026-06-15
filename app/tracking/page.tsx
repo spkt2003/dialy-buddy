@@ -107,6 +107,27 @@ export default function TrackingPage() {
     };
   }, [userName]);
 
+  // โหลดข้อความเก่าเมื่อมี active job
+  useEffect(() => {
+    if (!liveJob?.id) return;
+    supabase
+      .from("chat_messages")
+      .select("id, sender, text, created_at, read_at")
+      .eq("job_id", liveJob.id)
+      .order("created_at", { ascending: true })
+      .then(({ data }) => {
+        if (!data) return;
+        setMessages(
+          data.map((row) => ({
+            id: new Date(row.created_at).getTime(),
+            sender: row.sender as Message["sender"],
+            text: row.text,
+            readAt: row.read_at ? new Date(row.read_at).getTime() : undefined,
+          }))
+        );
+      });
+  }, [liveJob?.id]);
+
   useEffect(() => {
     if (!liveJob?.id) return;
     const jobId = liveJob.id;
@@ -116,16 +137,40 @@ export default function TrackingPage() {
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "chat_messages", filter: `job_id=eq.${jobId}` },
         (payload) => {
-          const row = payload.new as { id: string; sender: string; text: string; created_at: string };
+          const row = payload.new as { id: string; sender: string; text: string; created_at: string; read_at: string | null };
+          const ts = new Date(row.created_at).getTime();
           setMessages((prev) => {
-            const ts = new Date(row.created_at).getTime();
             if (prev.some((m) => m.id === ts)) return prev;
-            const msg: Message = { id: ts, sender: row.sender as Message["sender"], text: row.text };
+            const msg: Message = {
+              id: ts,
+              sender: row.sender as Message["sender"],
+              text: row.text,
+              readAt: (row.sender === "caregiver" && isChatOpenRef.current) ? Date.now() : undefined,
+            };
             if (row.sender === "caregiver" && !isChatOpenRef.current) {
               setChatUnread((u) => u + 1);
             }
             return [...prev, msg];
           });
+          // patient เปิดแชทอยู่ → mark ข้อความ caregiver เป็นอ่านแล้วทันที
+          if (row.sender === "caregiver" && isChatOpenRef.current) {
+            supabase
+              .from("chat_messages")
+              .update({ read_at: new Date().toISOString() })
+              .eq("id", row.id);
+          }
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "chat_messages", filter: `job_id=eq.${jobId}` },
+        (payload) => {
+          const row = payload.new as { id: string; sender: string; text: string; created_at: string; read_at: string | null };
+          if (!row.read_at) return;
+          const ts = new Date(row.created_at).getTime();
+          setMessages((prev) =>
+            prev.map((m) => (m.id === ts ? { ...m, readAt: new Date(row.read_at!).getTime() } : m))
+          );
         }
       )
       .subscribe();
@@ -139,6 +184,20 @@ export default function TrackingPage() {
   const handleChatOpen = () => {
     setChatOpen(true);
     setChatUnread(0);
+    if (liveJob?.id) {
+      // mark ข้อความ caregiver ทั้งหมดที่ยังไม่ได้อ่านเป็นอ่านแล้ว
+      supabase
+        .from("chat_messages")
+        .update({ read_at: new Date().toISOString() })
+        .eq("job_id", liveJob.id)
+        .eq("sender", "caregiver")
+        .is("read_at", null);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.sender === "caregiver" && !m.readAt ? { ...m, readAt: Date.now() } : m
+        )
+      );
+    }
   };
 
   const handleSend = async () => {
@@ -193,6 +252,10 @@ export default function TrackingPage() {
   };
 
   const currentStep = liveJob?.current_step ?? 0;
+  const chatLastReadIdx = messages.reduce(
+    (acc, m, i) => (m.sender === "patient" && m.readAt !== undefined ? i : acc),
+    -1
+  );
 
   if (loading) {
     return (
@@ -400,19 +463,24 @@ export default function TrackingPage() {
               <button onClick={() => setChatOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-colors">X</button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-3 p-5 bg-surface-container-low/40">
+            <div className="flex-1 overflow-y-auto space-y-1 p-5 bg-surface-container-low/40">
               {messages.length === 0 && (
                 <p className="text-center text-sm text-on-surface-variant/60 mt-8">ยังไม่มีข้อความ — เริ่มแชทได้เลย</p>
               )}
-              {messages.map((msg) => (
-                <div key={msg.id} className={`flex ${msg.sender === "patient" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
-                    msg.sender === "patient"
-                      ? "bg-primary text-on-primary rounded-br-sm"
-                      : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
-                  }`}>
-                    {msg.text}
+              {messages.map((msg, idx) => (
+                <div key={msg.id} className={`flex flex-col ${msg.sender === "patient" ? "items-end" : "items-start"} mb-3`}>
+                  <div className={`flex ${msg.sender === "patient" ? "justify-end" : "justify-start"}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
+                      msg.sender === "patient"
+                        ? "bg-primary text-on-primary rounded-br-sm"
+                        : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
+                    }`}>
+                      {msg.text}
+                    </div>
                   </div>
+                  {msg.sender === "patient" && idx === chatLastReadIdx && (
+                    <span className="text-[11px] text-on-surface-variant/60 mt-0.5 mr-1">อ่านแล้ว</span>
+                  )}
                 </div>
               ))}
               <div ref={chatBottomRef} />

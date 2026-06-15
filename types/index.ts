@@ -4,4 +4,5 @@ export interface Message {
   id: number;
   sender: "caregiver" | "patient";
   text: string;
+  readAt?: number;
 }

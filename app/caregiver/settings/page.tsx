@@ -121,26 +121,32 @@ export default function CaregiverSettingsPage() {
               </div>
 
               {/* Rating summary — แสดงเฉพาะ Supabase caregivers ที่มีข้อมูลใน caregiver_profiles */}
-              {myRating !== null && (
+              {myRating !== null && myReviews !== null && (
                 <div className="flex items-center gap-5 p-5 bg-surface-container-low rounded-2xl border border-outline-variant/15 mb-8">
                   <div className="w-14 h-14 bg-[#FBBF24]/15 rounded-2xl flex items-center justify-center shrink-0">
-                    <Star className="w-7 h-7 fill-[#FBBF24] text-[#FBBF24]" />
+                    <Star className={`w-7 h-7 ${myReviews > 0 ? "fill-[#FBBF24] text-[#FBBF24]" : "text-outline-variant"}`} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-bold text-on-surface-variant mb-1">คะแนนจากผู้ป่วย</p>
-                    <div className="flex items-end gap-2">
-                      <span className="text-3xl font-extrabold text-on-background">{myRating.toFixed(1)}</span>
-                      <span className="text-sm text-on-surface-variant mb-1">/ 5.0 • {myReviews} รีวิว</span>
+                    <p className="text-xs font-bold text-on-surface-variant mb-1">คะแนนเฉลี่ยจากผู้ป่วย</p>
+                    {myReviews === 0 ? (
+                      <p className="text-sm text-on-surface-variant">ยังไม่มีการให้คะแนน</p>
+                    ) : (
+                      <div className="flex items-end gap-2">
+                        <span className="text-3xl font-extrabold text-on-background">{myRating.toFixed(2)}</span>
+                        <span className="text-sm text-on-surface-variant mb-1">/ 5.00 • จาก {myReviews} คน</span>
+                      </div>
+                    )}
+                  </div>
+                  {myReviews > 0 && (
+                    <div className="flex gap-0.5">
+                      {[1,2,3,4,5].map(s => (
+                        <Star
+                          key={s}
+                          className={`w-5 h-5 ${s <= Math.round(myRating) ? "fill-[#FBBF24] text-[#FBBF24]" : "text-outline-variant"}`}
+                        />
+                      ))}
                     </div>
-                  </div>
-                  <div className="flex gap-0.5">
-                    {[1,2,3,4,5].map(s => (
-                      <Star
-                        key={s}
-                        className={`w-5 h-5 ${s <= Math.round(myRating) ? "fill-[#FBBF24] text-[#FBBF24]" : "text-outline-variant"}`}
-                      />
-                    ))}
-                  </div>
+                  )}
                 </div>
               )}
 
