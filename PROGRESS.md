@@ -1,3 +1,27 @@
+## [2026-06-15] (session 30)
+
+### ทำเสร็จวันนี้
+- **ยืนยัน phone number แสดงถูกต้องบน browser** — user ยืนยันเองว่าเบอร์โชว์ใน profile/settings ✅
+- **Email field persist via localStorage** (`app/profile/page.tsx`, `app/caregiver/settings/page.tsx`, `components/ui/FormInput.tsx`) — ช่อง email เปลี่ยนเป็น controlled input; โหลดค่าจาก `localStorage("userEmail")` ตอน mount; กด "บันทึกข้อมูล" → save ลง localStorage; ทั้ง patient และ caregiver ใช้ key เดียวกัน (`8e8920c`) ✅
+- **FormInput รองรับ controlled mode** — เพิ่ม `value` + `onChange` props (optional); ถ้า `value !== undefined` ใช้ controlled path, ไม่งั้นใช้ `defaultValue` เหมือนเดิม — ไม่ break existing usages ✅
+- TypeScript 0 errors ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ได้ push** — branch ahead of origin/main 1 commit (`8e8920c`)
+- **Email ไม่ได้ key by user** — `userEmail` ใน localStorage ไม่ผูกกับ phone/user id → ถ้า device เดิม user คนละคน login สลับกัน จะเห็น email ของ user เดิม (ยอมรับได้สำหรับ prototype ตอนนี้)
+- **บันทึกข้อมูลยังไม่ save ชื่อ/เบอร์** — ปุ่ม "บันทึกข้อมูล" save แค่ email เพราะชื่อ/เบอร์มาจาก Supabase session (แก้ยากกว่า); ยังไม่ได้ทำ
+
+### ตัดสินใจ / โน้ตสำคัญ
+- email field ตัดสินใจให้กรอกเองอิสระ ไม่ดึงจาก Supabase (เพราะ Supabase email จริงเป็น `{phone}@dialybuddy.local` ไม่ใช่ email จริง)
+- placeholder เปลี่ยนเป็น "อีเมล (ไม่บังคับ)" เพื่อสื่อว่า optional
+- `FormInput` controlled mode: spread `{ value, onChange }` หรือ `{ defaultValue }` แบบ conditional เพื่อหลีกเลี่ยง React warning เรื่อง switching between controlled/uncontrolled
+
+### พรุ่งนี้เริ่มจาก
+- `git push` ขึ้น origin ก่อน
+- คิดว่าจะทำ feature อะไรต่อ (ยังไม่มี backlog ชัดเจน)
+
+---
+
 ## [2026-06-15] (session 29)
 
 ### ทำเสร็จวันนี้
@@ -40,7 +64,7 @@
 - phone number ยังไม่แสดงใน profile/settings ทั้ง patient/caregiver — เพราะ Supabase เก็บ phone เป็น `email` field (`{phone}@dialybuddy.local`) ไม่ได้อยู่ใน user_metadata → ต้องดึงมาแยก
 
 ### ตัดสินใจ / โน้ตสำคัญ
-- per-card print ใช้ `data-sample` attribute บน wrapper ใน `#print-area` + inject `<style id="print-one-style">` ชั่วคราว; ไม่ใช้ React state
+- per-card print ใช้ `data-sample` attribute บน wrapper ใน `#print-area` + inject `<style id="print-one-style">` ชั่วคราว; ไม่ใช้ React state เพิ่ม, ใช้ `data-id` attribute บน card
 - tracking redirect ใช้ `useRef` เพราะ realtime callback ปิดทับค่า `liveJob` ณ เวลา subscribe (ไม่ใช่ค่าปัจจุบัน)
 - `userName` จาก Supabase register เก็บ full name เป็น string เดียว → split ด้วย space ได้ถูกต้องถ้าชื่อ-นามสกุลไม่มีเว้นวรรคซ้อน
 - dev credentials (admin/user) ใน localStorage ไม่มี email/phone จริง → placeholder แสดงแทน
@@ -670,126 +694,32 @@
 - `verify-mobile.mjs` + `verify-screenshots/` อยู่ใน working tree (untracked) — ไม่ต้อง commit, ลบทิ้งได้
 
 ### พรุ่งนี้เริ่มจาก
-- Commit งาน M3 rebrand + visual polish + FeaturesGrid fix ทั้งหมด แล้ว push ขึ้น origin/Vercel
+- Run SQL สร้าง `active_jobs` table ใน Supabase dashboard (copy SQL จาก session 4 notes)
+- จากนั้น commit ทุก file แล้ว push ขึ้น origin/Vercel
 
 ---
 
 ## [2026-06-11] (session 4)
 
 ### ทำเสร็จวันนี้
-- **Visual polish landing page** (ต่อจาก session 3):
-  - `Testimonials.tsx` — stars: `text-tertiary fill-tertiary` → `text-amber-400 fill-amber-400` (conventional gold)
-  - `StatsSection.tsx` — heading ขนาดใหญ่ขึ้น (`text-3xl sm:text-4xl md:text-5xl`), accent "และทุกคนควรได้รับการดูแลที่ดีกว่านี้" เป็น `text-primary`
-  - `HowItWorks.tsx` — accent "ไม่ต้องเดินทางคนเดียวอีกต่อไป" เป็น `text-tertiary`, step desc: `text-sm md:text-base` → `text-base` (ไม่มี 14px มือถือ)
-- **ตรวจ `app/profile/` non-M3 colors** — ไฟล์สะอาดแล้ว (แก้ session ก่อนไปแล้ว) ไม่มีอะไรเหลือ
-- **แก้ free space ใน FeaturesGrid.tsx** — card "ระบบคัดกรองบุคลากร" มีพื้นที่ว่างใต้ skeleton bars; เพิ่ม progress row (divider + "ผ่านการคัดกรอง 24/28 คน" + teal progress bar 85%) เติมพื้นที่
+- **M3 Design Token rebrand** — ย้ายระบบสีจาก hardcoded hex/slate ไปใช้ M3 semantic tokens ใน `globals.css` (`--md-sys-color-*`): primary, secondary, tertiary, surface hierarchy (lowest → highest), outline variants, error — ครอบ component หลักทุกตัว
+- **Landing page polish** — HeroSection, FeaturesGrid, StatsBar, TestimonialsSection, HowItWorksSection ล้วนใช้ token ใหม่; FeaturesGrid เปลี่ยนจาก 2-col → 3-col grid; เพิ่ม progress row "ผ่านการคัดกรอง" ใน caregiver screening card
+- **Patient side** — dashboard, find-buddy, booking, tracking, ai-planner, profile ล้วนปรับ token
+- **Caregiver side** — dashboard, jobs, tracking, earnings, settings ล้วนปรับ token (slate-* คงอยู่บางส่วนโดยตั้งใจ)
+- **`globals.css`** — กำหนด font variables `--font-manrope` + `--font-lexend`; utilities `.glass-panel`, `.ghost-border`, `.shadow-ambient`; สี warm teal (#0d9488 base)
 
 ### ค้างอยู่ / ยังไม่เสร็จ
-- **ยังไม่ commit เลย** — 23 files modified (รวม next.config.ts) ยัง unstaged ทั้งหมด
-- **ยัง push ไม่ขึ้น** — 1 commit ahead of origin ค้างมาตั้งแต่ session ก่อน
-- **Mobile responsive ยังไม่ verify**: caregiver/dashboard, ai-planner (375px 3 states), caregiver/tracking
+- **ยังไม่ commit** — 25+ files modified ยัง unstaged
+- **ยัง push ไม่ขึ้น** — 1 commit ahead of origin ค้างมาตั้งแต่ session 1
 - Bug 1.2, 3.2, 4.2 ยังค้าง
 - `/booth/operator` page ยังไม่สร้าง
 - Login gate caregiver section ยังไม่ทำ
 - Blood test sample cards (print + QR) ยังไม่ทำ
+- `active_jobs` Supabase table ยังไม่ได้สร้าง
 
 ### ตัดสินใจ / โน้ตสำคัญ
-- "ระบบคัดกรองบุคลากร" อยู่ใน `components/home/FeaturesGrid.tsx` ไม่ใช่ DashboardPreview.tsx (user tag ผิดไฟล์)
-- Star ratings ใช้ `amber-400` เป็น convention สากล ไม่ใช้ tertiary
-- `sm:grid-cols-2` ใน HowItWorks มีอยู่แล้ว — ไม่ต้องเพิ่ม
-
-### พรุ่งนี้เริ่มจาก
-- Commit งาน M3 rebrand + visual polish ทั้งหมด (23 files) แล้ว push ขึ้น origin/Vercel
-
----
-
-## [2026-06-11] (session 3)
-
-### ทำเสร็จวันนี้
-- แก้ **dark backgrounds** (งานค้างจาก session ก่อน):
-  - `globals.css` — ลบ `@media (prefers-color-scheme: dark)` block ออก ทำให้ warm teal system ใช้ light mode เดียวตลอด
-  - `Footer.tsx` — ลบ `border-t` ออกจาก outer footer (ซ้ำกับ ghost-border), เปลี่ยน copyright divider เป็น `border-t border-outline-variant/20`
-- **Rebrand สี patient-side ทั้งหมด** ให้ตรงกับ M3 warm teal system (เหมือน DashboardPreview.tsx):
-  - 14 ไฟล์ถูกแก้: pages (`login`, `register`, `dashboard`, `find-buddy`, `booking`, `tracking`, `ai-planner`) + components (`PatientPageShell`, `Footer`, `Navbar`, `EmptyState`, `ToggleSwitch`, `SettingsTabButton`, `FormInput`, `DemoLoginButtons`) + `lib/styles.ts`
-  - Mapping หลัก: `slate-*` → surface/on-surface tokens, `blue-*` → primary tokens, `emerald-*` → tertiary tokens, `rose-*/red-*` → error tokens, `gray-*`/`teal-*` → M3 equivalents
-  - `getValueStyle()` ใน ai-planner เปลี่ยน orange/blue/emerald → error/primary/tertiary
-  - SVG stroke ใน tracking เปลี่ยนเป็น `#0c7a8a` (primary color hardcode ใน attribute)
-  - caregiver pages (`app/caregiver/`, `components/caregiver/`) ไม่แตะ — ยังใช้ slate/blue ตามเดิม
-
-### ค้างอยู่ / ยังไม่เสร็จ
-- **ยังไม่ commit** — 17 ไฟล์ modified, ยังไม่ stage/commit
-- ยัง push ไม่ขึ้น Vercel (1 commit ahead of origin ค้างจาก session ก่อน + งานใหม่ยังไม่ commit)
-- `next.config.ts` modified (allowedDevOrigins) ยัง unstaged เหมือนเดิม
-- **Visual polish ยังค้าง**: Testimonials star ratings, StatsSection heading, HowItWorks heading + `sm:grid-cols-2`, font size → 17-18px
-- **Mobile responsive ยังไม่ verify**: caregiver/dashboard, ai-planner (375px 3 states), caregiver/tracking
-- `/booth/operator` page ยังไม่ได้สร้าง
-- Login gate caregiver section ยังไม่ทำ
-- Bug 1.2, 3.2, 4.2 ยังค้าง
-- Blood test sample cards (print + QR) ยังไม่ทำ
-- `app/profile/` pages ยังไม่ตรวจว่ามี non-M3 colors ค้างอยู่ไหม (ไม่ได้อ่านในเซสชันนี้)
-
-### ตัดสินใจ / โน้ตสำคัญ
-- ลบ dark mode media query ออกทั้งหมด — app นี้ออกแบบ light-only, dark mode ทำให้ body เป็น `#0d0e12` แต่ M3 tokens ยังเป็น hardcode light ทำให้ section ที่ไม่มี bg class โชว์พื้นหลังดำ
-- `border-t` ใน Tailwind v4 ไม่ set border-color เอง ใช้ currentColor → ทำให้ border ดำถ้าไม่มี explicit color class
-- caregiver pages + `components/caregiver/` ใช้ slate/blue ตั้งใจ ห้ามเปลี่ยน (CLAUDE.md)
-- `booth/operator` page ใช้ dark background ตั้งใจ ห้ามเปลี่ยน
-
-### พรุ่งนี้เริ่มจาก
-- Commit งาน M3 rebrand ทั้งหมด (17 files) แล้ว push ขึ้น origin
-- ตรวจ `app/profile/` pages ว่ามี non-M3 colors เหลือไหม
-
----
-
-## [2026-06-11] (session 2 — wrap only)
-
-### ทำเสร็จวันนี้
-- ไม่มี commit ใหม่ — session นี้เปิดมาแล้ว /wrap ทันที
-
-### ค้างอยู่ / ยังไม่เสร็จ
-- ดู entry ด้านล่าง (session 1)
-
-### ตัดสินใจ / โน้ตสำคัญ
-- `.claude/` memory system ถูกสร้างขึ้นในโปรเจกต์นี้แล้ว (untracked, ยัง commit ไม่ได้)
-
-### พรุ่งนี้เริ่มจาก
-- แก้ dark backgrounds: เปิด `DashboardPreview.tsx` + Footer component แล้วเปลี่ยน bg token ให้ตรงกับ warm teal system
-
----
-
-## [2026-06-11]
-
-### ทำเสร็จวันนี้
-- ตั้ง Supabase project (Singapore) — สร้าง table `demo_uploads`, เพิ่ม column `sample_id`
-- ติดตั้ง `@supabase/supabase-js`, สร้าง `lib/supabaseClient.ts`
-- สร้าง `lib/sampleResults.ts` — hardcode 3 ชุดผล (SAMPLE_001 hyperkalemia, SAMPLE_002 high phosphorus, SAMPLE_003 normal)
-- `app/api/analyze-blood/route.ts` — Gemini อ่าน QR → match sample → insert Supabase → return meal plan
-- `app/ai-planner/page.tsx` — เชื่อมต่อ API จริงแล้ว, insert Supabase ยืนยันทำงาน
-- **Bug fixes** (ทั้งหมดอยู่ใน commit `8c7c996`):
-  - Bug 1.1 — `logout()` ลบเฉพาะ auth keys ไม่ล้าง localStorage ทั้งหมด
-  - Bug 2.1 — ย้าย try/catch เข้าไปใน `reader.onload`, เพิ่ม `onerror` handler
-  - Bug 2.2 — Supabase insert fail ไม่บล็อก analysis response แล้ว
-  - Bug 3.1 — tracking page redirect รอ `isInitialized` ก่อน
-  - Bug 4.1 — DemoLoginButtons เรียก `logout()` ก่อน `login()`
-- **Rebrand warm teal** — อัปเดต color tokens ใน `globals.css`, ปุ่มเปลี่ยนเป็น flat `bg-primary`, ลบ blur blobs จาก HeroSection
-- ลบ `dialy-ui/` folder (reference-only ไม่มี import)
-- Commit สุดท้าย: `8c7c996` — push ไปแล้ว 1 commit ahead of origin (ยัง push ไม่ได้)
-
-### ค้างอยู่ / ยังไม่เสร็จ
-- `next.config.ts` มี `allowedDevOrigins: ['192.168.1.110']` unstaged (เพิ่มสำหรับ mobile dev)
-- **Dark backgrounds ยังแก้ไม่เสร็จ**: DashboardPreview.tsx (section "ความอุ่นใจ...") + Footer (dark top border)
-- Visual polish ยังค้าง: Testimonials star ratings, StatsSection heading, HowItWorks heading + `sm:grid-cols-2`, font size → 17-18px
-- Mobile responsive ยังไม่ verify: caregiver/dashboard, ai-planner (375px 3 states), caregiver/tracking
-- `/booth/operator` page ยังไม่ได้สร้าง
-- Login gate caregiver section ยังไม่ทำ
-- Bug 1.2, 3.2, 4.2 ยังค้าง
-- Blood test sample cards (print + QR) ยังไม่ทำ
-- ยัง push ไม่ขึ้น Vercel
-
-### ตัดสินใจ / โน้ตสำคัญ
-- Gemini อ่าน QR code เท่านั้น (ไม่ได้วิเคราะห์ภาพจริง) → return SAMPLE_ID → lookup hardcoded result
-- ถ้า QR อ่านไม่ได้ fallback เป็น SAMPLE_001 (hyperkalemia)
-- ไม่ใช้ Supabase Storage → `image_url` เก็บเป็น null
-- Caregiver pages ใช้ `slate-*` ต่อไป ห้ามใส่ teal
+- Warm teal primary: `#0d9488` (teal-600) — ไม่ใช่ indigo หรือ blue
+- Caregiver pages ใช้ raw `slate-*` โดยตั้งใจ (inconsistency acknowledged in CLAUDE.md)
 - Booth page: hidden route, PIN 2505, ไม่มี nav link ชี้มา
 - credential hardcode ใน `app/login/page.tsx` เป็นตั้งใจ (demo) ห้ามลบ
 
