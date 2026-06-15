@@ -96,10 +96,11 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "chat_messages", filter: `job_id=eq.${jobId}` },
+        // ไม่ใช้ filter เพราะ Supabase ต้องการ REPLICA IDENTITY FULL สำหรับ UPDATE+filter → ใช้ client-side check แทน
+        { event: "UPDATE", schema: "public", table: "chat_messages" },
         (payload) => {
           const row = payload.new as ChatRow;
-          if (!row.read_at) return;
+          if (row.job_id !== jobId || !row.read_at) return;
           const ts = new Date(row.created_at).getTime();
           setMessages((prev) =>
             prev.map((m) => (m.id === ts ? { ...m, readAt: new Date(row.read_at!).getTime() } : m))

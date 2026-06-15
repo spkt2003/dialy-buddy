@@ -32,7 +32,8 @@ export default function CaregiverSettingsPage() {
   }, [emailKey]);
 
   useEffect(() => {
-    // ดึงคะแนนของตัวเองจาก caregiver_profiles (null สำหรับ dev credentials ที่ไม่มี session)
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    // ดึงคะแนนของตัวเองจาก caregiver_profiles + subscribe realtime เมื่อ patient ให้คะแนน
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
       supabase
@@ -46,7 +47,22 @@ export default function CaregiverSettingsPage() {
             setMyReviews(data.reviews);
           }
         });
+      // ไม่ใช้ filter (ต้องการ REPLICA IDENTITY FULL) → filter client-side ด้วย user.id
+      channel = supabase
+        .channel("caregiver_profile_rating")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "caregiver_profiles" },
+          (payload) => {
+            const row = payload.new as { id: string; rating: number; reviews: number };
+            if (row.id !== user.id) return;
+            setMyRating(row.rating);
+            setMyReviews(row.reviews);
+          }
+        )
+        .subscribe();
     });
+    return () => { if (channel) supabase.removeChannel(channel); };
   }, []);
 
   const handleLogout = () => {

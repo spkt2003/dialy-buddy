@@ -42,6 +42,10 @@ export default function TrackingPage() {
   const hasActiveJobRef = useRef(false);
   useEffect(() => { hasActiveJobRef.current = liveJob !== null; }, [liveJob]);
 
+  // เก็บ caregiver_id ผ่าน ref เพราะ payload.old ของ DELETE event ไม่มี column นี้ (ไม่มี REPLICA IDENTITY FULL)
+  const caregiverIdRef = useRef<string | null>(null);
+  useEffect(() => { caregiverIdRef.current = liveJob?.caregiver_id ?? null; }, [liveJob]);
+
   const [ratingCaregiverId, setRatingCaregiverId] = useState<string | null>(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [starHover, setStarHover] = useState(0);
@@ -84,8 +88,7 @@ export default function TrackingPage() {
       .on("postgres_changes", { event: "*", schema: "public", table: "active_jobs" }, (payload) => {
         if (payload.eventType === "DELETE") {
           if (hasActiveJobRef.current) {
-            const cgId = (payload.old as Partial<ActiveJobRow>).caregiver_id ?? null;
-            setRatingCaregiverId(cgId);
+            setRatingCaregiverId(caregiverIdRef.current);
             setShowRatingModal(true);
           }
         } else if ((payload.new as ActiveJobRow).patient_name === userName) {
@@ -163,10 +166,11 @@ export default function TrackingPage() {
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "chat_messages", filter: `job_id=eq.${jobId}` },
+        // ไม่ใช้ filter เพราะ Supabase ต้องการ REPLICA IDENTITY FULL สำหรับ UPDATE+filter → ใช้ client-side check แทน
+        { event: "UPDATE", schema: "public", table: "chat_messages" },
         (payload) => {
-          const row = payload.new as { id: string; sender: string; text: string; created_at: string; read_at: string | null };
-          if (!row.read_at) return;
+          const row = payload.new as { id: string; job_id: string; sender: string; text: string; created_at: string; read_at: string | null };
+          if (row.job_id !== jobId || !row.read_at) return;
           const ts = new Date(row.created_at).getTime();
           setMessages((prev) =>
             prev.map((m) => (m.id === ts ? { ...m, readAt: new Date(row.read_at!).getTime() } : m))
