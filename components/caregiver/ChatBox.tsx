@@ -35,7 +35,7 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
     onUnreadChange?.(0);
   }, [jobId, onUnreadChange]);
 
-  // โหลดข้อความเก่า
+  // โหลดข้อความเก่า และ mark ข้อความ patient ที่ยังไม่ได้อ่านเป็นอ่านแล้ว
   useEffect(() => {
     if (!jobId) return;
     supabase
@@ -53,6 +53,13 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
             readAt: row.read_at ? new Date(row.read_at).getTime() : undefined,
           }))
         );
+        // caregiver เห็นแชทตลอด — mark ข้อความ patient ทั้งหมดที่ยังไม่ได้อ่าน
+        supabase
+          .from("chat_messages")
+          .update({ read_at: new Date().toISOString() })
+          .eq("job_id", jobId)
+          .eq("sender", "patient")
+          .is("read_at", null);
       });
   }, [jobId]);
 
@@ -80,6 +87,11 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
                 onUnreadChange?.(next);
                 return next;
               });
+              // caregiver เห็นแชทตลอด — mark ข้อความใหม่จาก patient ทันที
+              supabase
+                .from("chat_messages")
+                .update({ read_at: new Date().toISOString() })
+                .eq("id", row.id);
             }
             return [...prev, msg];
           });
