@@ -1,3 +1,26 @@
+## [2026-06-15] (session 29)
+
+### ทำเสร็จวันนี้
+- **Commit + push งาน session 28** (`243af60`) — 8 files (7 code + PROGRESS.md) ถูก commit และ push ขึ้น origin/main ✅
+- **ทดสอบ Flow K ผ่าน** — caregiver กด "เสร็จสิ้น" → patient tracking redirect ไป `/dashboard` อัตโนมัติผ่าน Supabase realtime DELETE event ✅
+- **ทดสอบ patient profile + CG settings ชื่อ ผ่าน** — `userName` จาก AuthContext แสดงถูกต้องใน profile และ settings ✅
+- **Fix phone number** (`context/AuthContext.tsx`, `app/profile/page.tsx`, `app/caregiver/settings/page.tsx`) — เพิ่ม `userPhone` ใน AuthContext; parse จาก `session.user.email` (`{phone}@dialybuddy.local` → ตัด suffix); patient profile + CG settings แสดงเบอร์ใน phone field (`cf22fea`) ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **email field ว่างเปล่า** — ช่อง "อีเมล" ใน profile/settings แสดง placeholder ว่าง เพราะ email จริงใน Supabase เป็น fake domain (`{phone}@dialybuddy.local`) ไม่ถูกแสดง — รอตัดสินใจว่าจะทำอะไรกับ field นี้
+- **ยังไม่ได้ทดสอบ phone number บน browser จริง** — implement แล้ว commit แล้ว แต่ยังไม่ได้ verify ว่าเบอร์โชว์ถูกต้องใน UI
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `userPhone` parse จาก `session.user.email` — check `.endsWith("@dialybuddy.local")` ก่อน split เพื่อกันกรณีที่ email ปกติถูก parse ผิด
+- dev credentials (admin/user) ได้ `userPhone = ""` เพราะไม่มี Supabase session → phone field แสดง placeholder ว่าง — ถูกต้อง
+- logout reset `userPhone = ""` ด้วย
+
+### พรุ่งนี้เริ่มจาก
+- ทดสอบ phone number แสดงใน profile/settings จริงบน browser — register user ใหม่ → login → เปิด profile → ตรวจว่าเบอร์โผล่ใน phone field
+- ตัดสินใจว่าช่อง email ควรแสดงอะไร (ว่าง /숨기기 field เลย / แสดงข้อความ "ไม่มีอีเมล")
+
+---
+
 ## [2026-06-15] (session 28)
 
 ### ทำเสร็จวันนี้
