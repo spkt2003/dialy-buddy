@@ -26,7 +26,7 @@ export default function CaregiverDashboard() {
   }, [acceptingJobId, activeJob, router]);
 
   const handleAcceptJob = (jobId: string) => {
-    acceptJob(jobId);
+    acceptJob(jobId, userName);
     setAcceptingJobId(jobId);
   };
 

@@ -23,7 +23,7 @@ interface JobContextType {
   pendingJobs: Job[];
   activeJob: Job | null;
   completedJobs: Job[];
-  acceptJob: (jobId: string) => Promise<void>;
+  acceptJob: (jobId: string, caregiverName?: string) => Promise<void>;
   updateJobStep: (stepIndex: number) => void;
   completeJob: () => Promise<boolean>;
 }
@@ -243,7 +243,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
    * - เปลี่ยนสถานะให้เป็น "active" และเริ่มสเต็ปที่ 0
    * - Upsert ไปที่ active_jobs เพื่อให้ patient tracking page เห็น realtime
    */
-  const acceptJob = async (jobId: string) => {
+  const acceptJob = async (jobId: string, caregiverName?: string) => {
     if (activeJob) return; // ไม่สามารถรับซ้อนได้
 
     const jobToAccept = pendingJobs.find(j => j.id === jobId);
@@ -252,9 +252,17 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
       setActiveJob(newActive);
       setPendingJobs(prev => prev.filter(j => j.id !== jobId));
 
-      // ดึง caregiver_id จาก Supabase session (null สำหรับ dev credentials)
+      // ดึง caregiver_id จาก Supabase session หรือ fallback หา UUID จาก caregiver_profiles by name
       const { data: { user } } = await supabase.auth.getUser();
-      const caregiverId = user?.id ?? null;
+      let caregiverId = user?.id ?? null;
+      if (!caregiverId && caregiverName) {
+        const { data: profile } = await supabase
+          .from("caregiver_profiles")
+          .select("id")
+          .eq("name", caregiverName)
+          .maybeSingle();
+        caregiverId = profile?.id ?? null;
+      }
 
       // ลบออกจาก pending_jobs — realtime DELETE จะส่งไปยัง caregiver คนอื่นให้ซ่อนงานนี้ด้วย
       supabase.from("pending_jobs")

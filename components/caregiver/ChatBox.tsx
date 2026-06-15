@@ -17,6 +17,7 @@ type ChatRow = {
   sender: string;
   text: string;
   created_at: string;
+  read_at: string | null;
 };
 
 export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
@@ -34,6 +35,27 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
     onUnreadChange?.(0);
   }, [jobId, onUnreadChange]);
 
+  // โหลดข้อความเก่า
+  useEffect(() => {
+    if (!jobId) return;
+    supabase
+      .from("chat_messages")
+      .select("id, sender, text, created_at, read_at")
+      .eq("job_id", jobId)
+      .order("created_at", { ascending: true })
+      .then(({ data }) => {
+        if (!data) return;
+        setMessages(
+          data.map((row) => ({
+            id: new Date(row.created_at).getTime(),
+            sender: row.sender as Message["sender"],
+            text: row.text,
+            readAt: row.read_at ? new Date(row.read_at).getTime() : undefined,
+          }))
+        );
+      });
+  }, [jobId]);
+
   useEffect(() => {
     if (!jobId) return;
     const channel = supabase
@@ -46,7 +68,12 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
           setMessages((prev) => {
             const ts = new Date(row.created_at).getTime();
             if (prev.some((m) => m.id === ts)) return prev;
-            const msg: Message = { id: ts, sender: row.sender as Message["sender"], text: row.text };
+            const msg: Message = {
+              id: ts,
+              sender: row.sender as Message["sender"],
+              text: row.text,
+              readAt: row.read_at ? new Date(row.read_at).getTime() : undefined,
+            };
             if (row.sender === "patient") {
               setUnread((u) => {
                 const next = u + 1;
@@ -56,6 +83,18 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
             }
             return [...prev, msg];
           });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "chat_messages", filter: `job_id=eq.${jobId}` },
+        (payload) => {
+          const row = payload.new as ChatRow;
+          if (!row.read_at) return;
+          const ts = new Date(row.created_at).getTime();
+          setMessages((prev) =>
+            prev.map((m) => (m.id === ts ? { ...m, readAt: new Date(row.read_at!).getTime() } : m))
+          );
         }
       )
       .subscribe();
@@ -83,6 +122,11 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
       );
     }
   };
+
+  const lastCaregiverReadIdx = messages.reduce(
+    (acc, m, i) => (m.sender === "caregiver" && m.readAt !== undefined ? i : acc),
+    -1
+  );
 
   return (
     <div className="flex flex-col h-full bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border overflow-hidden">
@@ -117,15 +161,20 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
             ยังไม่มีข้อความ เริ่มแชทได้เลย
           </p>
         )}
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.sender === "caregiver" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
-              msg.sender === "caregiver"
-                ? "bg-primary text-on-primary rounded-br-sm"
-                : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
-            }`}>
-              {msg.text}
+        {messages.map((msg, idx) => (
+          <div key={msg.id} className={`flex flex-col ${msg.sender === "caregiver" ? "items-end" : "items-start"}`}>
+            <div className={`flex ${msg.sender === "caregiver" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
+                msg.sender === "caregiver"
+                  ? "bg-primary text-on-primary rounded-br-sm"
+                  : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
+              }`}>
+                {msg.text}
+              </div>
             </div>
+            {msg.sender === "caregiver" && idx === lastCaregiverReadIdx && (
+              <span className="text-[11px] text-on-surface-variant/60 mt-0.5 mr-1">อ่านแล้ว</span>
+            )}
           </div>
         ))}
         <div ref={bottomRef} />
