@@ -1,3 +1,35 @@
+## [2026-06-15] (session 36) — wrap
+
+### ทำเสร็จวันนี้
+- **E2E test chat ผ่าน** — ยืนยันว่า realtime chat ทำงานถูกต้องทั้งสองฝั่ง ✅
+- **Feature: Chat Read Receipts** (`2060175`) — เพิ่ม "อ่านแล้ว" ใต้ข้อความสุดท้ายที่อีกฝ่ายอ่าน (เหมือน LINE/IG)
+  - เพิ่ม `readAt?: number` ใน `Message` type
+  - `ChatBox.tsx`: initial fetch ข้อความเก่า, mark patient msgs as read on mount/INSERT, subscribe UPDATE events
+  - `tracking/page.tsx`: initial fetch, mark caregiver msgs as read เมื่อเปิดแชท, subscribe UPDATE events
+  - เพิ่ม `read_at TIMESTAMPTZ` column ใน `chat_messages` (user รัน SQL แล้ว)
+- **Feature: Caregiver Rating Display** (`2060175`) — settings แสดง "ยังไม่มีการให้คะแนน" เมื่อ reviews=0, เปลี่ยน "X รีวิว" → "จาก X คน", ซ่อนดาวเมื่อยังไม่มีรีวิว
+- **Fix: Rating submission ไม่ทำงาน** (`97e8e33`) — `payload.old` ของ DELETE event ไม่มี `caregiver_id` (ไม่มี REPLICA IDENTITY FULL) → เพิ่ม `caregiverIdRef` track `liveJob.caregiver_id` ผ่าน useEffect แทน
+- **Fix: "อ่านแล้ว" ไม่ขึ้น** (`97e8e33`) — Supabase ต้องการ REPLICA IDENTITY FULL สำหรับ UPDATE subscription ที่มี filter → ลบ filter ออก ใช้ client-side `row.job_id !== jobId` check แทน
+- **Fix: Caregiver settings rating ไม่ live update** (`97e8e33`, `53b0a77`) — เพิ่ม realtime subscription บน `caregiver_profiles`; แก้ React StrictMode error "cannot add callbacks after subscribe()" ด้วย `isMounted` flag + `user.id` ใน channel name
+- **SQL ที่ user รันใน Supabase**:
+  - `ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS read_at TIMESTAMPTZ;`
+  - `CREATE POLICY "public update" ON chat_messages FOR UPDATE USING (true) WITH CHECK (true);`
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ยังไม่ได้ทดสอบ "อ่านแล้ว" E2E จริง (caregiver + patient สองหน้าต่าง) หลัง RLS fix
+
+### ตัดสินใจ / โน้ตสำคัญ
+- **Root cause "อ่านแล้ว" ไม่ขึ้น**: ไม่ใช่ REPLICA IDENTITY แต่เป็น RLS — `chat_messages` ไม่มี UPDATE policy → `UPDATE read_at` ถูก block เงียบๆ ไม่มี error
+- **REPLICA IDENTITY กับ Supabase filter**: UPDATE subscription ที่มี `filter:` จะไม่ได้รับ event โดยไม่มี REPLICA IDENTITY FULL → วิธีแก้คือลบ filter ออก ใช้ client-side check แทน (pattern นี้ใช้กับทุก UPDATE subscription ในโปรเจกต์)
+- **React StrictMode double-mount**: async `getUser().then()` ที่สร้าง channel จะถูกเรียกสองครั้ง → ใช้ `isMounted` flag ใน cleanup เพื่อ skip การสร้าง channel ในรอบที่สอง
+- ไม่มี feature backlog ที่ค้างอยู่แล้ว
+
+### พรุ่งนี้เริ่มจาก
+- ทดสอบ "อ่านแล้ว" E2E: caregiver tracking (ChatBox visible) + patient tracking (เปิดแชท) → ข้อความควรขึ้น "อ่านแล้ว" ทั้งสองฝั่ง
+- ถ้าผ่าน → ไม่มี backlog เหลือ เลือก feature ใหม่
+
+---
+
 ## [2026-06-15] (session 35) — wrap
 
 ### ทำเสร็จวันนี้
