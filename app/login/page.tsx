@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Stethoscope, Mail, Lock, AlertCircle } from "lucide-react";
+import { ArrowLeft, Stethoscope, Phone, Lock, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -80,6 +80,7 @@ export default function LoginPage() {
         <h1 className="text-3xl font-extrabold font-headline mb-2 text-on-background">ยินดีต้อนรับกลับมา</h1>
         <p className="text-on-surface-variant font-body mb-6 text-lg">เข้าสู่ระบบเพื่อจัดการนัดหมายและข้อมูลสุขภาพของคุณ</p>
 
+
         {/* --- ส่วนแสดงข้อความแจ้งเตือนเมื่อกรอกผิด --- */}
         {error && (
           <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
@@ -90,14 +91,14 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-bold font-label text-on-surface w-full block">เบอร์โทรศัพท์ หรือ อีเมล</label>
+            <label className="text-sm font-bold font-label text-on-surface w-full block">เบอร์โทรศัพท์</label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant" />
+              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-outline-variant" />
               <input
-                type="text"
+                type="tel"
                 value={emailOrPhone}
                 onChange={(e) => setEmailOrPhone(e.target.value)}
-                placeholder="กรุณาระบุข้อมูลเข้าสู่ระบบ"
+                placeholder="ตัวอย่าง 0812345678"
                 required
                 className="w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface font-body focus:ring-2 focus:ring-primary/50 focus:outline-none text-base"
               />
