@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 import { Star, CheckCircle2, Clock, MapPin, Activity, AlertCircle, ArrowRight } from "lucide-react";
-import { ChatColumn } from "@/components/caregiver/ChatColumn";
+
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useJobContext } from "../../../context/JobContext";
 import { useAuth } from "@/context/AuthContext";
@@ -32,7 +32,7 @@ export default function CaregiverDashboard() {
 
   return (
     // Two-column on lg+: job list takes 2/3, chat widget takes 1/3.
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+    <div className="grid grid-cols-1 gap-6 md:gap-8">
       {/* Left Column: Profile & Jobs */}
       <div className="lg:col-span-2 space-y-6 md:space-y-8">
 
@@ -162,8 +162,8 @@ export default function CaregiverDashboard() {
         </section>
       </div>
 
-      {/* Right Column: Chat Widget */}
-      <ChatColumn />
+
+
     </div>
   );
 }

@@ -1,3 +1,29 @@
+## [2026-06-15] (session 33)
+
+### ทำเสร็จวันนี้
+- **Feature C: In-app Realtime Chat** ✅
+  - **SQL migration** — สร้างตาราง `chat_messages` (`id uuid`, `job_id text`, `sender text`, `text text`, `created_at timestamptz`) + RLS enable + policy INSERT/SELECT
+  - **`components/caregiver/ChatBox.tsx`** — rewrite ใหม่ทั้งหมด: subscribe `postgres_changes` INSERT บน `chat_messages` filter `job_id=eq.${jobId}`; optimistic update; duplicate prevention ด้วย `created_at` timestamp; unread badge บน avatar (นับเฉพาะข้อความจาก patient); auto-scroll bottomRef; empty state text; reset unread on mount
+  - **`components/caregiver/ChatColumn.tsx`** — เพิ่ม `jobId: string` prop, ส่งต่อ ChatBox
+  - **`app/caregiver/tracking/page.tsx`** — ส่ง `activeJob.id` ให้ `<ChatColumn jobId={activeJob.id} />`
+  - **`app/caregiver/dashboard/page.tsx`** — ลบ `<ChatColumn />` ออก (ไม่มี jobId; chat ไม่ relevant ในหน้า dashboard); ปรับ grid จาก `lg:grid-cols-3` → `grid-cols-1`
+  - **`app/tracking/page.tsx` (patient side)** — แทน mock messages ด้วย Supabase realtime subscription บน `chat_messages`; ส่งข้อความเป็น `sender: "patient"`; unread badge บนปุ่ม "แชท" (นับจาก caregiver); reset unread เมื่อเปิด modal; auto-scroll; redesign chat modal ให้ match ChatBox style (pill input, Send icon)
+- **TypeScript** — `npx tsc --noEmit` ผ่าน 0 errors ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ commit/push** — งาน session นี้ยังไม่ stage
+
+### ตัดสินใจ / โน้ตสำคัญ
+- channel name: caregiver ใช้ `chat_${jobId}`, patient ใช้ `chat_patient_${jobId}` — ต่างกันเพื่อไม่ชนกัน (Supabase channel name ต้อง unique per client)
+- optimistic message ID = `Date.now()` (milliseconds); realtime event ID = `new Date(created_at).getTime()` — ถ้าทั้งสองตรงกัน = duplicate ถูกกรองออก
+- ลบ `<ChatColumn />` จาก dashboard แทนการทำ `jobId` optional — เหมาะกว่า UX: chat ต้องมี job context
+
+### พรุ่งนี้เริ่มจาก
+- `git commit` + `git push` งาน session 32–33
+- ทดสอบ E2E: caregiver รับงาน → patient ส่งแชท → caregiver เห็น realtime → caregiver ตอบ → patient เห็น unread badge
+
+---
+
 ## [2026-06-15] (session 32)
 
 ### ทำเสร็จวันนี้
@@ -788,4 +814,7 @@
 - credential hardcode ใน `app/login/page.tsx` เป็นตั้งใจ (demo) ห้ามลบ
 
 ### พรุ่งนี้เริ่มจาก
+
+---
+
 - แก้ dark backgrounds: เปิด `DashboardPreview.tsx` + Footer component แล้วเปลี่ยน bg token ให้ตรงกับ warm teal system

@@ -1,40 +1,95 @@
 // components/caregiver/ChatBox.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Send, Phone } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 import type { Message } from "@/types";
 
-export default function ChatBox() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, sender: "patient", text: "สวัสดีค่ะ พี่ดูแล ผมมีคำถามเกี่ยวกับการนัดหมาย" },
-    { id: 2, sender: "caregiver", text: "สวัสดีค่ะ มีอะไรให้ช่วยบ้างคะ" },
-  ]);
-  const [input, setInput] = useState("");
+type ChatBoxProps = {
+  jobId: string;
+  onUnreadChange?: (count: number) => void;
+};
 
-  const handleSend = () => {
+type ChatRow = {
+  id: string;
+  job_id: string;
+  sender: string;
+  text: string;
+  created_at: string;
+};
+
+export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [unread, setUnread] = useState(0);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    setUnread(0);
+    onUnreadChange?.(0);
+  }, [jobId, onUnreadChange]);
+
+  useEffect(() => {
+    if (!jobId) return;
+    const channel = supabase
+      .channel(`chat_${jobId}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "chat_messages", filter: `job_id=eq.${jobId}` },
+        (payload) => {
+          const row = payload.new as ChatRow;
+          setMessages((prev) => {
+            const ts = new Date(row.created_at).getTime();
+            if (prev.some((m) => m.id === ts)) return prev;
+            const msg: Message = { id: ts, sender: row.sender as Message["sender"], text: row.text };
+            if (row.sender === "patient") {
+              setUnread((u) => {
+                const next = u + 1;
+                onUnreadChange?.(next);
+                return next;
+              });
+            }
+            return [...prev, msg];
+          });
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [jobId, onUnreadChange]);
+
+  const handleSend = async () => {
     if (!input.trim()) return;
-    const newMsg: Message = {
-      id: Date.now(),
-      sender: "caregiver",
-      text: input.trim(),
-    };
-    setMessages((prev) => [...prev, newMsg]);
+    const text = input.trim();
     setInput("");
+    const optimisticId = Date.now();
+    setMessages((prev) => [...prev, { id: optimisticId, sender: "caregiver", text }]);
+    const { error } = await supabase.from("chat_messages").insert({ job_id: jobId, sender: "caregiver", text });
+    if (error) console.error("ChatBox send:", error.message);
   };
 
   return (
     <div className="flex flex-col h-full bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border overflow-hidden">
-      {/* Header */}
       <div className="bg-surface-container-lowest border-b border-outline-variant/15 p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center font-bold text-on-surface-variant shrink-0">
-            ญ
+          <div className="relative">
+            <div className="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center font-bold text-on-surface-variant shrink-0">
+              ญ
+            </div>
+            {unread > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-error text-on-error text-[10px] font-bold rounded-full flex items-center justify-center">
+                {unread}
+              </span>
+            )}
           </div>
           <div>
             <h3 className="font-bold text-on-background leading-tight">แชทกับผู้ป่วย/ญาติ</h3>
             <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               ออนไลน์
             </p>
           </div>
@@ -44,27 +99,26 @@ export default function ChatBox() {
         </button>
       </div>
 
-      {/* Message list */}
       <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-surface-container-low/50">
+        {messages.length === 0 && (
+          <p className="text-center text-sm text-on-surface-variant/60 mt-8">
+            ยังไม่มีข้อความ — เริ่มแชทได้เลย
+          </p>
+        )}
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.sender === "caregiver" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
-                msg.sender === "caregiver"
-                  ? "bg-primary text-on-primary rounded-br-sm"
-                  : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
-              }`}
-            >
+          <div key={msg.id} className={`flex ${msg.sender === "caregiver" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
+              msg.sender === "caregiver"
+                ? "bg-primary text-on-primary rounded-br-sm"
+                : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
+            }`}>
               {msg.text}
             </div>
           </div>
         ))}
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input area */}
       <div className="p-4 bg-surface-container-lowest border-t border-outline-variant/15">
         <div className="flex items-center gap-2 bg-surface-container-low rounded-full p-1.5 border border-outline-variant/20 focus-within:border-primary/40 focus-within:ring-4 focus-within:ring-primary/10 transition-all">
           <input
@@ -73,12 +127,7 @@ export default function ChatBox() {
             placeholder="พิมพ์ข้อความ..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSend(); } }}
           />
           <button
             type="button"

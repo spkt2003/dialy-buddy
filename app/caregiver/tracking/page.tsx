@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useJobContext } from "../../../context/JobContext";
-import { ArrowLeft, MapPin, Clock, CheckCircle2, User, Phone, Check } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle2, Phone, Check } from "lucide-react";
 import { ChatColumn } from "@/components/caregiver/ChatColumn";
 
 const trackingSteps = [
@@ -11,7 +11,7 @@ const trackingSteps = [
   "ถึงที่พักผู้ป่วยแล้ว",
   "กำลังเดินทางไปโรงพยาบาล",
   "ถึงโรงพยาบาล / กำลังฟอกไต",
-  "ส่งผู้ป่วยกลับถึงบ้านเรียบร้อย"
+  "ส่งผู้ป่วยกลับถึงบ้านเรียบร้อย",
 ];
 
 export default function TrackingPage() {
@@ -19,15 +19,13 @@ export default function TrackingPage() {
   const router = useRouter();
   const [isCompleting, setIsCompleting] = useState(false);
 
-  // Wait for localStorage hydration before redirecting — avoids bouncing the user back
-  // to dashboard on the first render when acceptJob state hasn't committed yet.
   useEffect(() => {
     if (isInitialized && !activeJob) {
       router.push("/caregiver/dashboard");
     }
   }, [isInitialized, activeJob, router]);
 
-  if (!activeJob) return null; // Or a loading spinner
+  if (!activeJob) return null;
 
   const currentStepIndex = activeJob.currentStep ?? 0;
   const isFinished = currentStepIndex === trackingSteps.length - 1;
@@ -53,10 +51,10 @@ export default function TrackingPage() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Left Column: Job Info & Tracking */}
       <div className="lg:col-span-2 space-y-8">
-        
+
         {/* Header */}
         <div className="flex items-center gap-4 mb-2">
-          <button 
+          <button
             onClick={() => router.push("/caregiver/dashboard")}
             className="p-2 -ml-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant hover:text-on-background"
           >
@@ -69,9 +67,9 @@ export default function TrackingPage() {
         <section className="bg-surface-container-lowest rounded-[2rem] p-8 shadow-ambient ghost-border">
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between border-b border-outline-variant/15 pb-6 mb-6">
             <div className="flex items-center gap-4">
-              <img 
-                src={activeJob.patientImage} 
-                alt={activeJob.patientName} 
+              <img
+                src={activeJob.patientImage}
+                alt={activeJob.patientName}
                 className="w-16 h-16 rounded-full object-cover shadow-sm"
               />
               <div>
@@ -79,12 +77,14 @@ export default function TrackingPage() {
                 <p className="text-primary font-medium">{activeJob.type}</p>
               </div>
             </div>
-            
             <div className="flex flex-wrap items-center gap-3">
-               <a href="tel:0800000000" className="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant/20 text-on-surface px-4 py-2 rounded-xl transition-colors font-medium text-sm">
-                 <Phone className="w-4 h-4 text-primary" />
-                 โทรติดต่อญาติ
-               </a>
+              <a
+                href="tel:0800000000"
+                className="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant/20 text-on-surface px-4 py-2 rounded-xl transition-colors font-medium text-sm"
+              >
+                <Phone className="w-4 h-4 text-primary" />
+                โทรติดต่อญาติ
+              </a>
             </div>
           </div>
 
@@ -113,26 +113,22 @@ export default function TrackingPage() {
         {/* Tracking Progress Section */}
         <section className="bg-surface-container-lowest rounded-[2rem] p-8 shadow-ambient ghost-border">
           <h2 className="text-2xl font-bold font-headline text-on-background mb-8">สถานะการดำเนินการ</h2>
-          
+
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-outline-variant/30">
             {trackingSteps.map((step, index) => {
               const isActive = index === currentStepIndex;
               const isPast = index < currentStepIndex;
-              
               return (
                 <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  {/* Icon */}
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 transition-colors ${isPast ? 'bg-emerald-500' : isActive ? 'bg-primary ring-4 ring-primary/20' : 'bg-outline-variant/30'}`}>
+                  <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm z-10 transition-colors ${isPast ? "bg-emerald-500" : isActive ? "bg-primary ring-4 ring-primary/20" : "bg-outline-variant/30"}`}>
                     {isPast ? (
                       <Check className="w-5 h-5 text-white" />
                     ) : (
-                      <span className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-white' : 'bg-transparent'}`}></span>
+                      <span className={`w-2.5 h-2.5 rounded-full ${isActive ? "bg-white" : "bg-transparent"}`} />
                     )}
                   </div>
-                  
-                  {/* Text Container */}
                   <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-surface-container-low p-4 rounded-xl border border-outline-variant/15 shadow-sm transition-all">
-                    <p className={`font-bold ${isPast ? 'text-emerald-700' : isActive ? 'text-primary-dim' : 'text-on-surface-variant'}`}>
+                    <p className={`font-bold ${isPast ? "text-emerald-700" : isActive ? "text-primary-dim" : "text-on-surface-variant"}`}>
                       {step}
                     </p>
                     {isActive && (
@@ -168,7 +164,7 @@ export default function TrackingPage() {
       </div>
 
       {/* Right Column: Chat Widget */}
-      <ChatColumn />
+      <ChatColumn jobId={activeJob.id} />
     </div>
   );
 }
