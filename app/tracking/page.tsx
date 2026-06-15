@@ -161,7 +161,8 @@ export default function TrackingPage() {
             supabase
               .from("chat_messages")
               .update({ read_at: new Date().toISOString() })
-              .eq("id", row.id);
+              .eq("id", row.id)
+              .then();
           }
         }
       )
@@ -195,7 +196,8 @@ export default function TrackingPage() {
         .update({ read_at: new Date().toISOString() })
         .eq("job_id", liveJob.id)
         .eq("sender", "caregiver")
-        .is("read_at", null);
+        .is("read_at", null)
+        .then();
       setMessages((prev) =>
         prev.map((m) =>
           m.sender === "caregiver" && !m.readAt ? { ...m, readAt: Date.now() } : m

@@ -59,7 +59,8 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
           .update({ read_at: new Date().toISOString() })
           .eq("job_id", jobId)
           .eq("sender", "patient")
-          .is("read_at", null);
+          .is("read_at", null)
+          .then();
       });
   }, [jobId]);
 
@@ -91,7 +92,8 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
               supabase
                 .from("chat_messages")
                 .update({ read_at: new Date().toISOString() })
-                .eq("id", row.id);
+                .eq("id", row.id)
+                .then();
             }
             return [...prev, msg];
           });
