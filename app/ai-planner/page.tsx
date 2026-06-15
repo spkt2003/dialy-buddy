@@ -5,6 +5,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Apple,
   Upload,
@@ -15,6 +16,7 @@ import {
   Coffee,
   Moon,
   AlertCircle,
+  TestTube2,
 } from "lucide-react";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import type { SampleResult, BloodValue } from "@/lib/sampleResults";
@@ -90,10 +92,32 @@ export default function AIPlannerPage() {
         // Strip the "data:<mimeType>;base64," prefix added by readAsDataURL — API expects raw base64.
         const base64 = (reader.result as string).split(",")[1];
 
+        // Gemini is unreliable at decoding QR codes — decode client-side first with jsQR.
+        // If a valid sample ID is found, pass it to the API to skip the Gemini QR step entirely.
+        let detectedSampleId: string | undefined;
+        try {
+          const jsQR = (await import("jsqr")).default;
+          const img = new Image();
+          await new Promise<void>((resolve) => { img.onload = () => resolve(); img.src = reader.result as string; });
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d")!;
+          ctx.drawImage(img, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const qrResult = jsQR(imageData.data, imageData.width, imageData.height);
+          const VALID = ["SAMPLE_001", "SAMPLE_002", "SAMPLE_003"];
+          if (qrResult && VALID.includes(qrResult.data)) {
+            detectedSampleId = qrResult.data;
+          }
+        } catch {
+          // QR decode failure is non-fatal — API will fall back to Gemini.
+        }
+
         const res = await fetch("/api/analyze-blood", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageBase64: base64, mimeType: file.type }),
+          body: JSON.stringify({ imageBase64: base64, mimeType: file.type, ...(detectedSampleId && { sampleId: detectedSampleId }) }),
         });
 
         const data = await res.json();
@@ -129,6 +153,22 @@ export default function AIPlannerPage() {
           </div>
 
           <div className="grid gap-6 md:gap-8">
+
+            {/* Link to sample cards — shown only when idle so it doesn't distract during analysis */}
+            {status === "idle" && (
+              <Link
+                href="/ai-planner/samples"
+                className="flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-surface-container ghost-border text-sm font-bold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all group"
+              >
+                <div className="w-9 h-9 bg-surface-container-lowest rounded-xl flex items-center justify-center shadow-ambient shrink-0 group-hover:bg-primary/10 transition-colors">
+                  <TestTube2 className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-on-surface font-bold text-sm">ไม่มีใบผลตรวจ?</p>
+                  <p className="text-on-surface-variant text-xs">ดูใบผลตรวจตัวอย่างสำหรับทดสอบระบบ →</p>
+                </div>
+              </Link>
+            )}
 
             {/* Step 1: Upload — dashed border signals a drop/pick-file affordance */}
             {status === "idle" && (

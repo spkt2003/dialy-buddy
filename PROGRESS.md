@@ -1,3 +1,30 @@
+## [2026-06-15] (session 23)
+
+### ทำเสร็จวันนี้
+- **Blood test sample cards feature เสร็จแล้ว** — co-work สร้าง `app/ai-planner/samples/page.tsx`: 3 card แสดงค่าเลือด + QR code + print layout พร้อมใช้งาน ✅
+- **Fix QR decode bug** — อัพรูป card ไหนก็ได้ output เป็น SAMPLE_001 ทุกครั้ง; แก้ด้วย:
+  - ติดตั้ง `jsqr` — QR decoder ฝั่ง client
+  - `app/ai-planner/page.tsx` — decode QR จากรูปก่อนส่ง API, ถ้าเจอ sample ID ที่ valid → ส่งไปกับ request body ด้วย
+  - `app/api/analyze-blood/route.ts` — ถ้า request body มี `sampleId` ใน whitelist → ใช้เลย ข้าม Gemini
+  - ผู้ใช้ยืนยัน: อัพรูปแต่ละ card ได้ผลตรงแล้ว ✅
+- TypeScript ผ่าน 0 errors
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ commit** — 5 files modified + `app/ai-planner/samples/` untracked ยังไม่ stage
+- Realtime live-INSERT booth end-to-end test — ยังไม่ทดสอบ
+
+### ตัดสินใจ / โน้ตสำคัญ
+- **Root cause ของ bug**: Gemini ไม่ใช่ QR reader — อ่าน QR จากรูปไม่ได้จริง return `UNKNOWN` เงียบ ๆ → whitelist check ไม่ผ่าน → fallback SAMPLE_001 ทุกครั้ง; jsQR แก้ได้ตรงจุด
+- `else try { } catch { }` pattern ใน route.ts ถูกต้อง syntactically — try-catch เป็น statement ที่ใช้กับ else clause ได้
+- `app/ai-planner/samples` ถูก protect อยู่แล้วผ่าน `pathname.startsWith("/ai-planner")` ใน AuthGuard — co-work แก้ AuthGuard เพิ่มด้วย (modified แต่ยังไม่ commit)
+- link "ไม่มีใบผลตรวจ?" → `/ai-planner/samples` ถูก add ใน `ai-planner/page.tsx` โดย co-work ด้วย
+
+### พรุ่งนี้เริ่มจาก
+- **Commit** 5 files + `app/ai-planner/samples/` ทั้งหมด แล้ว push ขึ้น origin
+- จากนั้น: Realtime live-INSERT booth end-to-end test (ค้างมานาน)
+
+---
+
 ## [2026-06-13] (session 22)
 
 ### ทำเสร็จวันนี้

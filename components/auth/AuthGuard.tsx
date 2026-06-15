@@ -25,10 +25,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     // กำหนดกลุ่มของ URL ที่สงวนไว้สำหรับผู้ดูแล (Caregiver) และผู้ป่วย (Patient)
     const isCaregiverRoute = pathname.startsWith("/caregiver");
-    const isPatientRoute = 
-      pathname.startsWith("/find-buddy") || 
-      pathname.startsWith("/ai-planner") || 
-      pathname.startsWith("/booking") || 
+    const isPatientRoute =
+      pathname.startsWith("/find-buddy") ||
+      pathname.startsWith("/ai-planner") ||
+      pathname.startsWith("/booking") ||
       pathname === "/dashboard" ||
       pathname.startsWith("/tracking");
       

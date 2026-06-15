@@ -12,15 +12,19 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(request: NextRequest) {
   try {
-    const { imageBase64, mimeType } = await request.json();
+    const { imageBase64, mimeType, sampleId: clientSampleId } = await request.json();
     if (!imageBase64) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
 
     // Default to SAMPLE_001 (hyperkalemia) — the most clinically relevant fallback for this demo.
+    const VALID_SAMPLES = ["SAMPLE_001", "SAMPLE_002", "SAMPLE_003"];
     let sampleId = "SAMPLE_001";
 
-    try {
+    if (clientSampleId && VALID_SAMPLES.includes(clientSampleId)) {
+      // Client decoded the QR code reliably — trust the whitelist-validated result and skip Gemini.
+      sampleId = clientSampleId;
+    } else try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent([
         {
