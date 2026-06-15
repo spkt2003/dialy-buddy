@@ -32,24 +32,24 @@ export default function CaregiverSettingsPage() {
   }, [emailKey]);
 
   useEffect(() => {
+    let isMounted = true;
     let channel: ReturnType<typeof supabase.channel> | null = null;
     // ดึงคะแนนของตัวเองจาก caregiver_profiles + subscribe realtime เมื่อ patient ให้คะแนน
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
+      if (!user || !isMounted) return;
       supabase
         .from("caregiver_profiles")
         .select("rating, reviews")
         .eq("id", user.id)
         .maybeSingle()
         .then(({ data }) => {
-          if (data) {
-            setMyRating(data.rating);
-            setMyReviews(data.reviews);
-          }
+          if (!isMounted || !data) return;
+          setMyRating(data.rating);
+          setMyReviews(data.reviews);
         });
-      // ไม่ใช้ filter (ต้องการ REPLICA IDENTITY FULL) → filter client-side ด้วย user.id
+      // ใช้ user.id ใน channel name เพื่อหลีกเลี่ยง duplicate channel error ใน React StrictMode
       channel = supabase
-        .channel("caregiver_profile_rating")
+        .channel(`caregiver_profile_${user.id}`)
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "caregiver_profiles" },
@@ -62,7 +62,10 @@ export default function CaregiverSettingsPage() {
         )
         .subscribe();
     });
-    return () => { if (channel) supabase.removeChannel(channel); };
+    return () => {
+      isMounted = false;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleLogout = () => {
