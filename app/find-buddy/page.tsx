@@ -1,11 +1,47 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Star, ShieldCheck, MapPin, UserX, Calendar, Clock, ChevronDown } from "lucide-react";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { supabase } from "@/lib/supabaseClient";
 
-const caregivers = [
+type Caregiver = {
+  name: string;
+  rating: number;
+  reviews: number;
+  exp: string;
+  location: string;
+  rate: string;
+  tags: string[];
+};
+
+type CaregiverProfileRow = {
+  id: string;
+  name: string;
+  service_area: string;
+  certifications: string[];
+  rating: number;
+  reviews: number;
+};
+
+function profileToCaregiver(p: CaregiverProfileRow): Caregiver {
+  const exp =
+    p.certifications.length > 0
+      ? p.certifications.slice(0, 2).join(" · ")
+      : "ผู้ดูแลที่ผ่านการตรวจสอบจาก DialyBuddy";
+  return {
+    name: p.name,
+    rating: Number(p.rating),
+    reviews: p.reviews,
+    exp,
+    location: p.service_area,
+    rate: "350 บาท/ชม.",
+    tags: p.certifications,
+  };
+}
+
+const HARDCODED_CAREGIVERS: Caregiver[] = [
   {
     name: "สมศรี ใจดี (พยาบาลวิชาชีพ)",
     rating: 4.9,
@@ -41,7 +77,7 @@ const caregivers = [
     location: "เขตภาษีเจริญ (ใกล้ รพ. ธนบุรี 2)",
     rate: "200 บาท/ชม.",
     tags: ["ทำอาหารคุมเค็ม", "ช่วยพยุงเดิน"],
-  }
+  },
 ];
 
 const TIME_SLOTS = [
@@ -62,9 +98,16 @@ const HOSPITALS = [
 // Infer the nearest hospital from the caregiver's listed location.
 const HOSPITAL_FROM_LOCATION: Record<string, string> = {
   "เขตบางกอกน้อย (ใกล้ รพ. ศิริราช)": "โรงพยาบาลศิริราช (ศูนย์ไตเทียม)",
+  "เขตบางกอกน้อย": "โรงพยาบาลศิริราช (ศูนย์ไตเทียม)",
   "เขตดุสิต (ใกล้ รพ. วชิรพยาบาล)": "โรงพยาบาลวชิรพยาบาล",
+  "เขตดุสิต": "โรงพยาบาลวชิรพยาบาล",
   "เขตพญาไท (ใกล้ รพ. รามาธิบดี)": "โรงพยาบาลรามาธิบดี",
+  "เขตพญาไท": "โรงพยาบาลรามาธิบดี",
   "เขตภาษีเจริญ (ใกล้ รพ. ธนบุรี 2)": "โรงพยาบาลธนบุรี 2",
+  "เขตภาษีเจริญ": "โรงพยาบาลธนบุรี 2",
+  "เขตบางรัก": "โรงพยาบาลจุฬาลงกรณ์",
+  "เขตปทุมวัน": "โรงพยาบาลจุฬาลงกรณ์",
+  "เขตสาทร": "โรงพยาบาลจุฬาลงกรณ์",
 };
 
 export default function FindBuddyPage() {
@@ -72,13 +115,31 @@ export default function FindBuddyPage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState(caregivers);
+  const [allCaregivers, setAllCaregivers] = useState<Caregiver[]>([]);
+  const [filteredData, setFilteredData] = useState<Caregiver[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Index of the card currently showing the booking mini-form; null = none expanded.
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
   const [bookDate, setBookDate] = useState("");
   const [bookSlot, setBookSlot] = useState("");
   const [bookHospital, setBookHospital] = useState("");
+
+  useEffect(() => {
+    async function loadCaregivers() {
+      const { data } = await supabase
+        .from("caregiver_profiles")
+        .select("id, name, service_area, certifications, rating, reviews")
+        .order("created_at", { ascending: false });
+
+      const real = (data ?? []).map((row) => profileToCaregiver(row as CaregiverProfileRow));
+      const merged = [...real, ...HARDCODED_CAREGIVERS];
+      setAllCaregivers(merged);
+      setFilteredData(merged);
+      setLoading(false);
+    }
+    loadCaregivers();
+  }, []);
 
   const openForm = (idx: number) => {
     if (expandedIdx === idx) {
@@ -88,11 +149,10 @@ export default function FindBuddyPage() {
     setExpandedIdx(idx);
     setBookDate("");
     setBookSlot("");
-    // Pre-select the hospital nearest to this caregiver's location.
     setBookHospital(HOSPITAL_FROM_LOCATION[filteredData[idx].location] ?? "");
   };
 
-  const handleBooking = (caregiver: typeof caregivers[0]) => {
+  const handleBooking = (caregiver: Caregiver) => {
     const params = new URLSearchParams({
       name: caregiver.name,
       rating: String(caregiver.rating),
@@ -108,12 +168,21 @@ export default function FindBuddyPage() {
 
   const handleSearch = () => {
     setExpandedIdx(null);
-    const results = caregivers.filter((c) =>
-      c.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.exp.toLowerCase().includes(searchTerm.toLowerCase())
+    const q = searchTerm.toLowerCase();
+    setFilteredData(
+      allCaregivers.filter(
+        (c) =>
+          c.location.toLowerCase().includes(q) ||
+          c.name.toLowerCase().includes(q) ||
+          c.exp.toLowerCase().includes(q)
+      )
     );
-    setFilteredData(results);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setFilteredData(allCaregivers);
+    setExpandedIdx(null);
   };
 
   return (
@@ -148,7 +217,7 @@ export default function FindBuddyPage() {
               กำลังแสดงผลลัพธ์สำหรับ: <span className="font-bold text-primary">&quot;{searchTerm}&quot;</span>
             </p>
             <button
-              onClick={() => { setSearchTerm(""); setFilteredData(caregivers); setExpandedIdx(null); }}
+              onClick={clearSearch}
               className="text-sm font-bold text-on-surface-variant hover:text-error flex items-center gap-1 transition-colors"
             >
               ✕ ล้างการค้นหา
@@ -158,7 +227,21 @@ export default function FindBuddyPage() {
       </div>
 
       <div className="space-y-8">
-        {filteredData.length > 0 ? (
+        {loading ? (
+          // Skeleton placeholders while fetching
+          [1, 2, 3].map((n) => (
+            <div key={n} className="bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border p-8 animate-pulse">
+              <div className="flex gap-8 items-center">
+                <div className="w-24 h-24 rounded-full bg-surface-container-high shrink-0" />
+                <div className="flex-1 space-y-3">
+                  <div className="h-5 bg-surface-container-high rounded-xl w-1/2" />
+                  <div className="h-4 bg-surface-container-high rounded-xl w-1/3" />
+                  <div className="h-4 bg-surface-container-high rounded-xl w-3/4" />
+                </div>
+              </div>
+            </div>
+          ))
+        ) : filteredData.length > 0 ? (
           filteredData.map((c, i) => (
             <div key={i} className="bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
 
@@ -174,7 +257,7 @@ export default function FindBuddyPage() {
                   </div>
                   <div className="flex items-center gap-2 mb-3 text-lg">
                     <Star className="h-6 w-6 text-amber-400 fill-amber-400" />
-                    <span className="font-bold text-on-background">{c.rating}</span>
+                    <span className="font-bold text-on-background">{c.rating.toFixed(1)}</span>
                     <span className="text-on-surface-variant">({c.reviews} รีวิว)</span>
                   </div>
                   <p className="text-on-surface font-body text-base sm:text-xl mb-2 leading-relaxed">{c.exp}</p>
@@ -281,7 +364,7 @@ export default function FindBuddyPage() {
             dashed
             action={
               <button
-                onClick={() => { setSearchTerm(""); setFilteredData(caregivers); }}
+                onClick={clearSearch}
                 className="text-primary font-bold hover:underline"
               >
                 ล้างการค้นหาและแสดงทั้งหมด

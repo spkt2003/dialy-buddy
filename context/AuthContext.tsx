@@ -12,6 +12,7 @@ interface AuthContextType {
   userPhone: string;
   login: (role: Role, userName: string) => void;
   logout: () => void;
+  updateUserName: (newName: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -101,11 +102,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("userName");
   };
 
+  const updateUserName = async (newName: string) => {
+    const { error } = await supabase.auth.updateUser({ data: { userName: newName } });
+    if (error) {
+      // dev credentials path — no Supabase session
+      localStorage.setItem("userName", newName);
+    }
+    setUserName(newName);
+  };
+
   // รอจนกว่าจะตรวจสอบ localStorage เสร็จสมบูรณ์ ค่อยเริ่มแสดง UI เพื่อป้องกันจอแสดงข้อมูลสลับไปมาระหว่าง Guest กับ User
   if (!isInitialized) return null;
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, role, userName, userPhone, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, role, userName, userPhone, login, logout, updateUserName }}>
       {children}
     </AuthContext.Provider>
   );

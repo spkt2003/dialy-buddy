@@ -8,6 +8,7 @@ type FormInputProps = {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   disabled?: boolean;
+  readOnly?: boolean;
 };
 
 // Labelled input field using the shared INPUT_CLS constant; avoids repeating the long Tailwind string.
@@ -19,6 +20,7 @@ export function FormInput({
   onChange,
   placeholder,
   disabled = false,
+  readOnly = false,
 }: FormInputProps) {
   const controlled = value !== undefined;
   return (
@@ -29,6 +31,7 @@ export function FormInput({
         {...(controlled ? { value, onChange } : { defaultValue })}
         placeholder={placeholder}
         disabled={disabled}
+        readOnly={readOnly}
         className={INPUT_CLS}
       />
     </div>

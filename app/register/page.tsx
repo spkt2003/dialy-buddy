@@ -119,7 +119,7 @@ export default function RegisterPage() {
         ? { role: mappedRole, userName: name, relation }
         : { role: mappedRole, userName: name, serviceArea, certifications };
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: `${phone}@dialybuddy.local`,
       password,
       options: { data: metadata },
@@ -130,6 +130,17 @@ export default function RegisterPage() {
     if (error) {
       setRegisterError(toThaiRegisterError(error.message));
       return;
+    }
+
+    // Write caregiver profile to public table so find-buddy can query it
+    if (role === "buddy" && data.user) {
+      await supabase.from("caregiver_profiles").insert({
+        id: data.user.id,
+        name,
+        service_area: serviceArea,
+        certifications,
+      });
+      // ignore insert error — auth account was already created successfully
     }
 
     setPendingRedirect(true);

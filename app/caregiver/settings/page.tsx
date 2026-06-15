@@ -11,20 +11,34 @@ import { FADE_IN_UP, INPUT_CLS } from "@/lib/styles";
 export default function CaregiverSettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
-  const { logout, userName, userPhone } = useAuth();
+  const { logout, userName, userPhone, updateUserName } = useAuth();
 
   const nameParts = userName.trim().split(" ");
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ");
 
+  const [firstNameInput, setFirstNameInput] = useState(firstName);
+  const [lastNameInput, setLastNameInput] = useState(lastName);
   const [email, setEmail] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const emailKey = `userEmail_${userPhone || userName}`;
+
   useEffect(() => {
-    setEmail(localStorage.getItem("userEmail") ?? "");
-  }, []);
+    setEmail(localStorage.getItem(emailKey) ?? "");
+  }, [emailKey]);
 
   const handleLogout = () => {
     logout();
     router.push("/");
+  };
+
+  const handleSave = async () => {
+    const fullName = [firstNameInput, lastNameInput].filter(Boolean).join(" ");
+    await updateUserName(fullName);
+    localStorage.setItem(emailKey, email);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   return (
@@ -87,11 +101,11 @@ export default function CaregiverSettingsPage() {
 
               <form className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormInput label="ชื่อ" defaultValue={firstName} />
-                  <FormInput label="นามสกุล" defaultValue={lastName} />
+                  <FormInput label="ชื่อ" value={firstNameInput} onChange={e => setFirstNameInput(e.target.value)} />
+                  <FormInput label="นามสกุล" value={lastNameInput} onChange={e => setLastNameInput(e.target.value)} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormInput label="เบอร์โทรศัพท์" type="tel" defaultValue={userPhone} placeholder="เบอร์โทรศัพท์" />
+                  <FormInput label="เบอร์โทรศัพท์" type="tel" value={userPhone} readOnly placeholder="เบอร์โทรศัพท์" />
                   <FormInput label="อีเมล" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="อีเมล (ไม่บังคับ)" />
                 </div>
                 <div className="space-y-2">
@@ -99,14 +113,13 @@ export default function CaregiverSettingsPage() {
                     <BriefcaseMedical className="w-5 h-5 text-primary" />
                     ใบอนุญาตประกอบวิชาชีพ
                   </label>
-                  {/* disabled — license changes require admin support, not self-service. */}
                   <FormInput label="" defaultValue="พย. 12345678" disabled />
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
-                  <button type="button" onClick={() => localStorage.setItem("userEmail", email)} className="flex items-center gap-2 px-8 py-4 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-md active:scale-95 text-lg">
+                  <button type="button" onClick={handleSave} className="flex items-center gap-2 px-8 py-4 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-md active:scale-95 text-lg">
                     <Save className="w-5 h-5" />
-                    บันทึกข้อมูล
+                    {saved ? "บันทึกแล้ว ✓" : "บันทึกข้อมูล"}
                   </button>
                 </div>
               </form>

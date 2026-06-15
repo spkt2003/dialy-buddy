@@ -12,21 +12,34 @@ import { FADE_IN_UP } from "@/lib/styles";
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
-  const { logout, userName, userPhone } = useAuth();
+  const { logout, userName, userPhone, updateUserName } = useAuth();
 
   const nameParts = userName.trim().split(" ");
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ");
 
+  const [firstNameInput, setFirstNameInput] = useState(firstName);
+  const [lastNameInput, setLastNameInput] = useState(lastName);
   const [email, setEmail] = useState("");
-  useEffect(() => {
-    setEmail(localStorage.getItem("userEmail") ?? "");
-  }, []);
+  const [saved, setSaved] = useState(false);
 
-  // Uses AuthContext logout() so React state and all localStorage keys are cleared atomically.
+  const emailKey = `userEmail_${userPhone || userName}`;
+
+  useEffect(() => {
+    setEmail(localStorage.getItem(emailKey) ?? "");
+  }, [emailKey]);
+
   const handleLogout = () => {
     logout();
     router.push("/");
+  };
+
+  const handleSave = async () => {
+    const fullName = [firstNameInput, lastNameInput].filter(Boolean).join(" ");
+    await updateUserName(fullName);
+    localStorage.setItem(emailKey, email);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   return (
@@ -89,11 +102,11 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-on-surface">ชื่อ</label>
-                    <input type="text" defaultValue={firstName} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                    <input type="text" value={firstNameInput} onChange={e => setFirstNameInput(e.target.value)} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-on-surface">นามสกุล</label>
-                    <input type="text" defaultValue={lastName} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                    <input type="text" value={lastNameInput} onChange={e => setLastNameInput(e.target.value)} className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
                   </div>
                 </div>
 
@@ -104,13 +117,13 @@ export default function SettingsPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-on-surface">เบอร์โทรศัพท์</label>
-                  <input type="tel" defaultValue={userPhone} placeholder="เบอร์โทรศัพท์" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-on-surface text-sm" />
+                  <input type="tel" value={userPhone} readOnly placeholder="เบอร์โทรศัพท์" className="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/20 rounded-xl outline-none text-on-surface text-sm opacity-60 cursor-not-allowed" />
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">
-                  <button type="button" onClick={() => localStorage.setItem("userEmail", email)} className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-ambient active:scale-95">
+                  <button type="button" onClick={handleSave} className="flex items-center gap-2 px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-dim transition-colors shadow-ambient active:scale-95">
                     <Save className="w-4 h-4" />
-                    บันทึกข้อมูล
+                    {saved ? "บันทึกแล้ว ✓" : "บันทึกข้อมูล"}
                   </button>
                 </div>
               </form>
