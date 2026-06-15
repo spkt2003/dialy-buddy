@@ -68,8 +68,21 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
     setInput("");
     const optimisticId = Date.now();
     setMessages((prev) => [...prev, { id: optimisticId, sender: "caregiver", text }]);
-    const { error } = await supabase.from("chat_messages").insert({ job_id: jobId, sender: "caregiver", text });
-    if (error) console.error("ChatBox send:", error.message);
+    const { data, error } = await supabase
+      .from("chat_messages")
+      .insert({ job_id: jobId, sender: "caregiver", text })
+      .select()
+      .single();
+    if (error) {
+      console.error("ChatBox send:", error.message);
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+    } else if (data) {
+      // อัป optimistic ID → real timestamp เพื่อให้ realtime dedup ถูกต้อง
+      const realId = new Date((data as ChatRow).created_at).getTime();
+      setMessages((prev) =>
+        prev.map((m) => (m.id === optimisticId ? { ...m, id: realId } : m))
+      );
+    }
   };
 
   return (

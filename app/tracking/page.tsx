@@ -147,8 +147,21 @@ export default function TrackingPage() {
     setChatInput("");
     const optimisticId = Date.now();
     setMessages((prev) => [...prev, { id: optimisticId, sender: "patient", text }]);
-    const { error } = await supabase.from("chat_messages").insert({ job_id: liveJob.id, sender: "patient", text });
-    if (error) console.error("patient chat send:", error.message);
+    const { data, error } = await supabase
+      .from("chat_messages")
+      .insert({ job_id: liveJob.id, sender: "patient", text })
+      .select()
+      .single();
+    if (error) {
+      console.error("patient chat send:", error.message);
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+    } else if (data) {
+      // อัป optimistic ID -> real timestamp เพื่อให้ realtime dedup ถูกต้อง
+      const realId = new Date((data as { created_at: string }).created_at).getTime();
+      setMessages((prev) =>
+        prev.map((m) => (m.id === optimisticId ? { ...m, id: realId } : m))
+      );
+    }
   };
 
   const handleSubmitRating = async (skip = false) => {
@@ -175,7 +188,7 @@ export default function TrackingPage() {
 
   const handleEndCall = () => setCallOpen(false);
   const handleConfirmEmergency = () => {
-    alert("⚠️ รายงานเหตุฉุกเฉินสำเร็จ");
+    alert("รายงานเหตุฉุกเฉินสำเร็จ");
     setEmergencyOpen(false);
   };
 
@@ -384,7 +397,7 @@ export default function TrackingPage() {
                   <p className="text-xs text-emerald-600 font-medium">ออนไลน์</p>
                 </div>
               </div>
-              <button onClick={() => setChatOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-colors">✕</button>
+              <button onClick={() => setChatOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-on-surface transition-colors">X</button>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-3 p-5 bg-surface-container-low/40">

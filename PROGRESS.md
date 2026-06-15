@@ -1,3 +1,28 @@
+## [2026-06-15] (session 34)
+
+### ทำเสร็จวันนี้
+- **แก้ bug แชทโชว์ซ้ำ 2 ครั้ง** ✅
+  - สาเหตุ: optimistic ID = `Date.now()` (client) ≠ `new Date(created_at).getTime()` (server) → dedup miss → realtime event เพิ่มข้อความซ้ำ
+  - Fix ทั้งสองฝั่ง (`ChatBox.tsx` + `app/tracking/page.tsx`): เปลี่ยน `insert(...)` → `insert(...).select().single()` แล้ว map optimistic ID → real timestamp จาก DB ก่อน realtime event มาถึง
+  - error rollback: ถ้า insert fail → ลบ optimistic message ออก
+- **แก้ไฟล์ truncation (Windows→Linux mount)** — เขียนใหม่ผ่าน bash heredoc
+- TypeScript 0 errors ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ทดสอบ E2E chat หลัง Supabase SQL fix (`ALTER PUBLICATION supabase_realtime ADD TABLE chat_messages`)
+- `chat_messages` realtime ยังต้องการ user รัน SQL ใน Supabase
+
+### ตัดสินใจ / โน้ตสำคัญ
+- Pattern dedup ที่ถูกต้อง: insert → `.select().single()` → ได้ `created_at` จริง → `setMessages(prev => prev.map(m => m.id === optimisticId ? {...m, id: realId} : m))` → realtime event จะ find match และ skip
+- อย่า insert แล้ว depend แค่ realtime event (no optimistic): UX ช้า เห็น delay
+- อย่า optimistic-only (ไม่ update ID): duplicate เมื่อ realtime event มา
+
+### พรุ่งนี้เริ่มจาก
+- ผู้ใช้รัน SQL enable realtime บน `chat_messages`
+- E2E test: caregiver รับงาน → patient ส่งแชท → caregiver เห็น realtime → ตอบ → patient เห็น unread badge
+
+---
+
 ## [2026-06-15] (session 33) — wrap
 
 ### ทำเสร็จวันนี้
