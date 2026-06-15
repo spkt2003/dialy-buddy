@@ -1,3 +1,38 @@
+## [2026-06-15] (session 31)
+
+### ทำเสร็จวันนี้
+- **Push งาน session 30** ✅ — 2 commits (`8e8920c`, `d402425`) ขึ้น origin/main สำเร็จ
+- **Email key by user** (`app/profile/page.tsx`, `app/caregiver/settings/page.tsx`) — เปลี่ยน key จาก `userEmail` → `userEmail_${userPhone || userName}` ป้องกัน user คนละคน share email กัน ✅
+- **บันทึกข้อมูล save ชื่อจริง** — เพิ่ม `updateUserName()` ใน `AuthContext.tsx`; เรียก `supabase.auth.updateUser({ data: { userName } })` สำหรับ Supabase user, fallback ไป localStorage สำหรับ dev credentials; ปุ่มบันทึกแสดง toast "บันทึกแล้ว ✓" 2 วินาที ✅
+- **Phone field read-only** — ทั้ง patient profile และ caregiver settings; `FormInput` ได้รับ `readOnly` prop ใหม่ ✅
+- **Name inputs controlled** — `firstName`/`lastName` เปลี่ยนจาก `defaultValue` เป็น `value` + `onChange` ✅
+- **Real caregivers ใน find-buddy** (`app/find-buddy/page.tsx`) — fetch จาก `caregiver_profiles` table ใน Supabase, prepend ก่อน hardcoded; skeleton loading ขณะ fetch; `HOSPITAL_FROM_LOCATION` map เพิ่ม district-only keys สำหรับ real caregivers ✅
+- **Register insert caregiver_profiles** (`app/register/page.tsx`) — หลัง `supabase.auth.signUp` สำเร็จ (caregiver role) → insert `{ id, name, service_area, certifications }` ลง `caregiver_profiles` table ✅
+- **Playwright verify ผ่าน 13/13** — PASS ทุก test, FAIL 0, WARN 0 ✅
+- **Push `5a5082f`** — branch ตรงกับ origin/main ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **`caregiver_profiles` Supabase table** — user รัน SQL แล้ว แต่ยังไม่มี real caregiver register → find-buddy ยังแสดงแค่ 4 hardcoded cards
+- **Feature backlog ที่ยังไม่ทำ**: B (rating/review หลังจบงาน), C (in-app chat)
+
+### ตัดสินใจ / โน้ตสำคัญ
+- `updateUserName` ลอง Supabase ก่อน; ถ้า error (dev credentials ไม่มี session) → fallback localStorage — pattern สะอาด ไม่ต้องเช็ค session แยก
+- `caregiver_profiles` เป็น table แยก (ไม่ใช่ query `auth.users` โดยตรง) เพราะ `auth.users` ไม่ queryable จาก client โดยไม่มี admin key
+- find-buddy search ค้น name + location + exp พร้อมกัน → hardcoded cards ติด "ศิริราช" search เพราะ exp field มีคำนั้น — ไม่ใช่ bug
+- SQL ที่รันแล้ว:
+  ```sql
+  create table caregiver_profiles (id uuid primary key references auth.users(id) on delete cascade, name text not null, service_area text not null, certifications text[] not null default '{}', rating numeric(3,2) not null default 5.0, reviews int not null default 0, created_at timestamptz not null default now());
+  alter table caregiver_profiles enable row level security;
+  create policy "public read" on caregiver_profiles for select using (true);
+  create policy "public insert" on caregiver_profiles for insert with check (true);
+  ```
+
+### พรุ่งนี้เริ่มจาก
+- ทดสอบ end-to-end: register caregiver ใหม่ → login patient → find-buddy → ดูว่า real caregiver โผล่บน list
+- ตัดสินใจ feature B หรือ C ต่อไป
+
+---
+
 ## [2026-06-15] (session 30)
 
 ### ทำเสร็จวันนี้
