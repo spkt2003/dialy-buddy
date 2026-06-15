@@ -68,6 +68,13 @@ export default function BookingPage() {
       rate: params.get("rate") ?? "350 บาท/ชม.",
       location: params.get("location") ?? "",
     });
+    // Pre-fill date/time/hospital if passed from find-buddy
+    const date = params.get("date");
+    const slot = params.get("slot");
+    const hospital = params.get("hospital");
+    if (date) setSelectedDate(date);
+    if (slot) setSelectedSlot(slot);
+    if (hospital) setSelectedHospital(hospital);
   }, [router]);
 
   if (!caregiver) return null;

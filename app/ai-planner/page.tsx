@@ -126,6 +126,7 @@ export default function AIPlannerPage() {
         if (data.error) throw new Error(data.error);
 
         setAnalysisResult(data);
+        localStorage.setItem("lastBloodTest", JSON.stringify(data));
         setStatus("success");
       } catch {
         alert("เกิดข้อผิดพลาดในการวิเคราะห์ กรุณาลองใหม่อีกครั้ง");

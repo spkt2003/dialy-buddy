@@ -22,7 +22,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (pendingRedirect && isLoggedIn) {
       setPendingRedirect(false);
-      router.push(role === "caregiver" ? "/caregiver/dashboard" : "/dashboard");
+      router.push(role === "caregiver" ? "/caregiver/dashboard" : "/find-buddy");
     }
   }, [pendingRedirect, isLoggedIn, role, router]);
 
@@ -42,7 +42,7 @@ export default function LoginPage() {
     if (emailOrPhone === "user" && password === "user123") {
       await supabase.auth.signOut(); // ล้าง Supabase session ก่อน ป้องกัน onAuthStateChange override
       login("patient", "สมหมาย");
-      router.push("/dashboard");
+      router.push("/find-buddy");
       return;
     }
 
