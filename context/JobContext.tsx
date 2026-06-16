@@ -171,6 +171,15 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
           if (error) console.error("Supabase cleanup expired pending_jobs:", error.message);
         });
 
+      // ลบ completed_jobs ที่เก่าเกิน 365 วัน
+      const completedCutoff = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
+      supabase.from("completed_jobs")
+        .delete()
+        .lt("completed_at", completedCutoff)
+        .then(({ error }) => {
+          if (error) console.error("Supabase cleanup old completed_jobs:", error.message);
+        });
+
       // โหลด activeJob จาก Supabase ด้วย ID ที่เก็บไว้
       if (activeJobId) {
         const { data, error } = await supabase

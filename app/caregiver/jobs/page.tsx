@@ -31,7 +31,7 @@ export default function CaregiverJobsPage() {
             <Wallet className="w-10 h-10 text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-on-surface-variant font-headline mb-1">ยอดรายได้สะสม</h2>
+            <h2 className="text-xl font-bold text-on-surface-variant font-headline mb-1">ยอดรายได้สะสม (1 ปีล่าสุด)</h2>
             <div className="text-5xl font-extrabold text-on-background tracking-tight">
               ฿ {formatBaht(totalEarnings)}
             </div>
