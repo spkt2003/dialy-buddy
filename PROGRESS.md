@@ -1,3 +1,29 @@
+## [2026-06-16] (session 2 — DB cleanup)
+
+### ทำเสร็จวันนี้
+- **DB: FK CASCADE DELETE บน `chat_messages`** — ไม่มี code change, รัน SQL ใน Supabase dashboard เท่านั้น
+  - เหตุผล: ป้องกัน Supabase free tier 500MB storage เต็มจาก chat rows สะสม
+  - SQL ที่รัน:
+    ```sql
+    DELETE FROM chat_messages WHERE job_id NOT IN (SELECT id FROM active_jobs);
+    ALTER TABLE chat_messages ADD CONSTRAINT chat_messages_job_id_fkey FOREIGN KEY (job_id) REFERENCES active_jobs(id) ON DELETE CASCADE;
+    ```
+  - ต้องลบ orphaned rows ก่อน (job จบแล้วแต่ chat ยังค้าง) ถึงจะ ADD CONSTRAINT ได้
+  - ผลลัพธ์: ทุกครั้งที่ `active_jobs` row ถูกลบ (completeJob หรือ pendingActiveJobDeletes cleanup) → `chat_messages` ลบตาม auto
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ไม่มี
+
+### ตัดสินใจ / โน้ตสำคัญ
+- ทางเลือกแรกที่ลองคือเพิ่ม `DELETE policy USING (true)` + code ใน `completeJob` → ยกเลิก เพราะเปิด permission กว้างเกินและต้องแก้โค้ด
+- FK CASCADE ดีกว่าเพราะ: ไม่ต้อง DELETE policy, ไม่ต้องแก้โค้ด, DB จัดการเองระดับ atomic
+- `completed_jobs` และ `pending_jobs` ยังไม่มี cleanup — ถ้าใช้งานจริงนานๆ อาจต้องทำ แต่ยังไม่เร่ง
+
+### พรุ่งนี้เริ่มจาก
+- ไม่มี backlog — เลือก feature ใหม่
+
+---
+
 ## [2026-06-16]
 
 ### ทำเสร็จวันนี้
