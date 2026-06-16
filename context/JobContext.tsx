@@ -161,6 +161,16 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
         });
       }
 
+      // ลบ pending_jobs ที่ค้างเกิน 24 ชั่วโมงโดยไม่มีใครรับ
+      // Realtime DELETE event จะ propagate ให้ caregiver ทุกคนที่ออนไลน์อยู่อัตโนมัติ
+      const expiredCutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      supabase.from("pending_jobs")
+        .delete()
+        .lt("created_at", expiredCutoff)
+        .then(({ error }) => {
+          if (error) console.error("Supabase cleanup expired pending_jobs:", error.message);
+        });
+
       // โหลด activeJob จาก Supabase ด้วย ID ที่เก็บไว้
       if (activeJobId) {
         const { data, error } = await supabase
