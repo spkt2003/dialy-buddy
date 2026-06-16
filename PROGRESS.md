@@ -1,3 +1,30 @@
+## [2026-06-16] (session 3 — DB cleanup ต่อ)
+
+### ทำเสร็จวันนี้
+- **feat: auto-expire pending_jobs เกิน 24 ชั่วโมง** (`d3d1588`)
+  - SQL: `ALTER TABLE pending_jobs ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();` — user รันแล้ว
+  - `context/JobContext.tsx`: เพิ่ม cleanup ใน `loadData()` — ลบ row ที่ `created_at < now - 24h` ทุกครั้งที่ caregiver mount
+  - Realtime DELETE event propagate ให้ caregiver ทุกคนที่ออนไลน์อยู่อัตโนมัติ — ไม่ต้องแก้ไฟล์อื่น
+- **feat: auto-delete completed_jobs เกิน 365 วัน** (`b22f47b`)
+  - ไม่ต้องรัน SQL เพิ่ม — `completed_at` มีอยู่แล้ว (ใช้ใน `.order()`)
+  - `context/JobContext.tsx`: เพิ่ม cleanup ใน `loadData()` — ลบ row ที่ `completed_at < now - 365 วัน`
+  - `app/caregiver/jobs/page.tsx`: label เปลี่ยนเป็น "ยอดรายได้สะสม (1 ปีล่าสุด)" เพื่อความถูกต้อง
+- Push ขึ้น origin/main แล้ว ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ไม่มี
+
+### ตัดสินใจ / โน้ตสำคัญ
+- cleanup ทั้งสอง table ใช้ pattern เดิม (non-blocking `.then()`) เหมือน orphaned active_jobs cleanup — consistent กับโค้ดที่มีอยู่
+- `booking/page.tsx` ไม่ต้องแก้ — `DEFAULT NOW()` จัดการ `created_at` อัตโนมัติตอน INSERT
+- `completed_jobs` ไม่มี filter by `caregiver_id` — caregiver ทุกคนเห็น completed jobs ของทุกคน (known limitation, acceptable สำหรับ prototype)
+- DB cleanup ครบ 3 table แล้ว: `chat_messages` (FK CASCADE), `pending_jobs` (24h), `completed_jobs` (365 วัน)
+
+### พรุ่งนี้เริ่มจาก
+- ไม่มี backlog — เลือก feature ใหม่
+
+---
+
 ## [2026-06-16] (session 2 — DB cleanup)
 
 ### ทำเสร็จวันนี้
