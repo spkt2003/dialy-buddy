@@ -110,6 +110,37 @@ const HOSPITAL_FROM_LOCATION: Record<string, string> = {
   "เขตสาทร": "โรงพยาบาลจุฬาลงกรณ์",
 };
 
+function StatusBadge({ name, onlineNames, busyNames, statusLoaded }: {
+  name: string;
+  onlineNames: Set<string>;
+  busyNames: Set<string>;
+  statusLoaded: boolean;
+}) {
+  if (!statusLoaded) return null;
+  if (busyNames.has(name)) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200">
+        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+        กำลังรับงาน
+      </span>
+    );
+  }
+  if (onlineNames.has(name)) {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-200">
+        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        ว่างรับงาน
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200">
+      <span className="w-2 h-2 rounded-full bg-slate-400" />
+      ออฟไลน์
+    </span>
+  );
+}
+
 export default function FindBuddyPage() {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
@@ -125,6 +156,12 @@ export default function FindBuddyPage() {
   const [bookSlot, setBookSlot] = useState("");
   const [bookHospital, setBookHospital] = useState("");
 
+  // ชื่อผู้ดูแลที่ online อยู่ (จาก Supabase Realtime Presence)
+  const [onlineNames, setOnlineNames] = useState<Set<string>>(new Set());
+  // ชื่อผู้ดูแลที่กำลังรับงานอยู่ (จาก active_jobs JOIN caregiver_profiles)
+  const [busyNames, setBusyNames] = useState<Set<string>>(new Set());
+  const [statusLoaded, setStatusLoaded] = useState(false);
+
   useEffect(() => {
     async function loadCaregivers() {
       const { data } = await supabase
@@ -139,6 +176,54 @@ export default function FindBuddyPage() {
       setLoading(false);
     }
     loadCaregivers();
+  }, []);
+
+  // Subscribe to Supabase Realtime Presence — อัปเดต onlineNames ทุกครั้งที่ผู้ดูแลเข้า/ออกระบบ
+  useEffect(() => {
+    const channel = supabase.channel("caregiver-presence")
+      .on("presence", { event: "sync" }, () => {
+        const state = channel.presenceState<{ name: string }>();
+        const names = new Set(
+          Object.values(state).flat().map((p) => p.name).filter(Boolean)
+        );
+        setOnlineNames(names);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  // ดึงและ subscribe realtime เพื่อรู้ว่าผู้ดูแลคนไหนกำลังรับงานอยู่
+  useEffect(() => {
+    const fetchBusy = async () => {
+      const { data: activeJobsData } = await supabase
+        .from("active_jobs")
+        .select("caregiver_id")
+        .not("caregiver_id", "is", null);
+
+      const ids = (activeJobsData ?? [])
+        .map((j: { caregiver_id: string }) => j.caregiver_id)
+        .filter(Boolean);
+
+      if (ids.length > 0) {
+        const { data: profiles } = await supabase
+          .from("caregiver_profiles")
+          .select("name")
+          .in("id", ids);
+        setBusyNames(new Set((profiles ?? []).map((p: { name: string }) => p.name)));
+      } else {
+        setBusyNames(new Set());
+      }
+      setStatusLoaded(true);
+    };
+
+    fetchBusy();
+
+    const realtimeChannel = supabase
+      .channel("active_jobs_find_buddy")
+      .on("postgres_changes", { event: "*", schema: "public", table: "active_jobs" }, fetchBusy)
+      .subscribe();
+
+    return () => { supabase.removeChannel(realtimeChannel); };
   }, []);
 
   const openForm = (idx: number) => {
@@ -247,13 +332,23 @@ export default function FindBuddyPage() {
 
               {/* Caregiver info row */}
               <div className="p-5 sm:p-8 flex flex-col md:flex-row gap-6 sm:gap-8 items-start md:items-center">
-                <div className="w-24 h-24 rounded-full bg-primary/10 border-4 border-surface-container-lowest shadow-ambient flex items-center justify-center shrink-0">
-                  <span className="text-primary font-bold text-3xl">{c.name.charAt(0)}</span>
+                <div className="relative w-24 h-24 shrink-0">
+                  <div className="w-24 h-24 rounded-full bg-primary/10 border-4 border-surface-container-lowest shadow-ambient flex items-center justify-center">
+                    <span className="text-primary font-bold text-3xl">{c.name.charAt(0)}</span>
+                  </div>
+                  {statusLoaded && (
+                    <span className={`absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-surface-container-lowest ${
+                      busyNames.has(c.name) ? "bg-amber-500" :
+                      onlineNames.has(c.name) ? "bg-green-500" :
+                      "bg-slate-400"
+                    }`} />
+                  )}
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="text-lg sm:text-2xl font-bold font-headline text-on-background">{c.name}</h3>
                     <ShieldCheck className="h-7 w-7 text-primary" />
+                    <StatusBadge name={c.name} onlineNames={onlineNames} busyNames={busyNames} statusLoaded={statusLoaded} />
                   </div>
                   <div className="flex items-center gap-2 mb-3 text-lg">
                     <Star className="h-6 w-6 text-amber-400 fill-amber-400" />

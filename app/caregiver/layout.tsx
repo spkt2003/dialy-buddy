@@ -5,7 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Home, Users, Settings, LogOut, HeartPulse } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function CaregiverLayout({
   children,
@@ -14,7 +16,18 @@ export default function CaregiverLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout, isLoggedIn, role } = useAuth();
+  const { logout, isLoggedIn, role, userName } = useAuth();
+
+  // แจ้งสถานะออนไลน์ผ่าน Supabase Realtime Presence เพื่อให้หน้า find-buddy เห็นว่าใครออนไลน์อยู่
+  useEffect(() => {
+    if (!isLoggedIn || role !== "caregiver") return;
+    const channel = supabase.channel("caregiver-presence").subscribe(async (status) => {
+      if (status === "SUBSCRIBED") {
+        await channel.track({ name: userName });
+      }
+    });
+    return () => { supabase.removeChannel(channel); };
+  }, [isLoggedIn, role, userName]);
 
   if (!isLoggedIn || role !== "caregiver") return null;
 
