@@ -1,3 +1,25 @@
+## [2026-06-16]
+
+### ทำเสร็จวันนี้
+- **Feature: Caregiver online/offline + availability status บนหน้า find-buddy** (`4c1372e`)
+  - `app/caregiver/layout.tsx`: join Supabase Realtime Presence channel `"caregiver-presence"` เมื่อ caregiver login, track `{ name: userName }`, cleanup เมื่อ logout/unmount
+  - `app/find-buddy/page.tsx`: subscribe presence channel → `onlineNames`; query `active_jobs` + `caregiver_profiles` → `busyNames`; realtime subscription บน `active_jobs` อัปเดตทันที
+  - Status badge: **ว่างรับงาน** (เขียว), **กำลังรับงาน** (amber), **ออฟไลน์** (เทา) — แสดงทั้งเป็น dot บน avatar และ pill badge ข้างชื่อ
+- **Fix: caregiver คนแรกแสดง "กำลังรับงาน" ผิด** — เกิดจาก stale record ค้างใน `active_jobs` ใน Supabase (DELETE ล้มเหลวครั้งก่อน) → user ลบ record ใน Supabase dashboard แล้ว ทำงานถูกต้อง
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ไม่มี
+
+### ตัดสินใจ / โน้ตสำคัญ
+- ใช้ Supabase Realtime Presence (ไม่ต้องเพิ่ม column ใน DB) สำหรับ online tracking — ถ้า caregiver ปิด browser สถานะหาย auto
+- busy status ดูจาก `active_jobs.caregiver_id` JOIN `caregiver_profiles.id` — ใช้ได้กับ Supabase auth users (id ตรงกัน); dev credentials (admin) `caregiver_id` จะเป็น null เพราะไม่มี profile ชื่อ "ผู้ดูแลระบบ" → แสดง offline (acceptable)
+- stale `active_jobs` rows จะทำให้ status ผิดพลาด — ถ้าเจออีกให้ลบใน Supabase dashboard
+
+### พรุ่งนี้เริ่มจาก
+- เลือก feature ใหม่ — ไม่มี backlog ค้าง
+
+---
+
 ## [2026-06-15] (session 36) — wrap
 
 ### ทำเสร็จวันนี้
