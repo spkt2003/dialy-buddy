@@ -32,7 +32,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       pathname === "/dashboard" ||
       pathname.startsWith("/tracking") ||
       pathname.startsWith("/transactions") ||
-      pathname.startsWith("/ranking");
+      pathname.startsWith("/ranking") ||
+      pathname.startsWith("/subscription") ||
+      pathname.startsWith("/rewards");
       
     // เส้นทางใดๆ ที่ต้องล็อกอินก่อนถึงจะเข้าใช้งานได้
     const isProtectedRoute = isCaregiverRoute || isPatientRoute || pathname.startsWith("/profile");

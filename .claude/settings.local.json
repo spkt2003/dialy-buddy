@@ -50,7 +50,11 @@
       "PowerShell(git push *)",
       "Bash(cat)",
       "Bash(python3 -c ' *)",
-      "Bash(Remove-Item *)"
+      "Bash(Remove-Item *)",
+      "Bash(git -C \"C:/Users/tkps_/OneDrive/Desktop/dialy-buddy\" log --oneline -10)",
+      "Bash(git -C \"C:/Users/tkps_/OneDrive/Desktop/dialy-buddy\" status)",
+      "Bash(grep *)",
+      "PowerShell(Start-Process \"cmd.exe\" -ArgumentList \"/c\",\"cd /d `\"C:\\\\Users\\\\tkps_\\\\OneDrive\\\\Desktop\\\\dialy-buddy`\" && npm run dev\" -WindowStyle Hidden; Start-Sleep 8; Invoke-WebRequest -Uri \"http://localhost:3000\" -UseBasicParsing -TimeoutSec 5 | Select-Object -ExpandProperty StatusCode)"
     ]
   }
 }

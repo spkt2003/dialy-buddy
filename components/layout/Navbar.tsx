@@ -18,6 +18,8 @@ import {
   Home,
   History,
   Trophy,
+  Gift,
+  Crown,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -78,6 +80,7 @@ export default function Navbar() {
               <Link href="/find-buddy" className={navLinkClass}>ค้นหาผู้ดูแล</Link>
               <Link href="/ai-planner" className={navLinkClass}>AI จัดโภชนาการ</Link>
               <Link href="/ranking" className={navLinkClass}>อันดับผู้ดูแล</Link>
+              <Link href="/rewards" className={navLinkClass}>รางวัล</Link>
             </>
           )}
         </nav>
@@ -161,6 +164,26 @@ export default function Navbar() {
                         >
                           <History className="h-4 w-4 text-secondary" />
                           ประวัติธุรกรรม
+                        </Link>
+                      )}
+                      {role !== "caregiver" && (
+                        <Link
+                          href="/rewards"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium font-label text-on-surface hover:bg-surface-container-low transition-colors"
+                        >
+                          <Gift className="h-4 w-4 text-secondary" />
+                          รางวัลสะสม
+                        </Link>
+                      )}
+                      {role !== "caregiver" && (
+                        <Link
+                          href="/subscription"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium font-label text-amber-600 hover:bg-amber-50 transition-colors"
+                        >
+                          <Crown className="h-4 w-4 text-amber-500" />
+                          สมาชิก Premium
                         </Link>
                       )}
                       <Link
@@ -285,6 +308,14 @@ export default function Navbar() {
                 <Link href="/ranking" className={mobileNavLinkClass}>
                   <Trophy className="h-5 w-5 text-secondary" />
                   อันดับผู้ดูแล
+                </Link>
+                <Link href="/rewards" className={mobileNavLinkClass}>
+                  <Gift className="h-5 w-5 text-secondary" />
+                  รางวัลสะสม
+                </Link>
+                <Link href="/subscription" className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-label font-bold text-amber-600 hover:bg-amber-50 transition-colors">
+                  <Crown className="h-5 w-5 text-amber-500" />
+                  สมาชิก Premium
                 </Link>
                 <Link href="/profile" className={mobileNavLinkClass}>
                   <Settings className="h-5 w-5 text-secondary" />

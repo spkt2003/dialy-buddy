@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { ArrowLeft, Stethoscope, User, Phone, Lock, CreditCard, MapPin, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Stethoscope, User, Phone, Lock, CreditCard, MapPin, AlertCircle, CheckCircle2, X, ShieldAlert } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -76,6 +76,8 @@ export default function RegisterPage() {
   const [registerError, setRegisterError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState(false);
+  const [pdpaAccepted, setPdpaAccepted] = useState(false);
+  const [showPdpa, setShowPdpa] = useState(false);
 
   const router = useRouter();
   const { isLoggedIn, role: authRole } = useAuth();
@@ -116,8 +118,8 @@ export default function RegisterPage() {
 
     const metadata =
       role === "patient"
-        ? { role: mappedRole, userName: name, relation }
-        : { role: mappedRole, userName: name, serviceArea, certifications };
+        ? { role: mappedRole, userName: name, relation, pdpaConsented: true, pdpaConsentedAt: new Date().toISOString() }
+        : { role: mappedRole, userName: name, serviceArea, certifications, pdpaConsented: true, pdpaConsentedAt: new Date().toISOString() };
 
     const { data, error } = await supabase.auth.signUp({
       email: `${phone}@dialybuddy.local`,
@@ -153,6 +155,7 @@ export default function RegisterPage() {
     "w-full bg-surface-container-high border-none rounded-xl py-4 pl-12 pr-4 text-on-surface font-body focus:ring-2 focus:ring-primary/50 focus:outline-none text-base appearance-none";
 
   return (
+    <>
     <div className="min-h-screen bg-surface-container-low flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md bg-surface-container-lowest rounded-[2rem] shadow-ambient ghost-border border border-outline-variant/20 p-8">
 
@@ -292,7 +295,28 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button type="submit" disabled={isSubmitting}
+          {/* PDPA Consent */}
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              checked={pdpaAccepted}
+              onChange={(e) => setPdpaAccepted(e.target.checked)}
+              className="mt-1 w-4 h-4 accent-primary shrink-0 cursor-pointer"
+            />
+            <span className="text-sm text-on-surface-variant font-body leading-relaxed">
+              ฉันได้อ่านและยอมรับ{" "}
+              <button
+                type="button"
+                onClick={() => setShowPdpa(true)}
+                className="text-primary font-bold underline hover:no-underline"
+              >
+                นโยบายความเป็นส่วนตัว (PDPA)
+              </button>{" "}
+              และยินยอมให้แพลตฟอร์มประมวลผลข้อมูลส่วนบุคคลของฉัน
+            </span>
+          </label>
+
+          <button type="submit" disabled={isSubmitting || !pdpaAccepted}
             className="w-full mt-2 flex items-center justify-center bg-primary text-on-primary font-bold font-label py-4 rounded-xl shadow-ambient hover:bg-primary-dim transition-colors text-lg disabled:opacity-60">
             {isSubmitting ? "กำลังสร้างบัญชี..." : "ลงทะเบียนใช้งาน"}
           </button>
@@ -303,5 +327,83 @@ export default function RegisterPage() {
         </p>
       </div>
     </div>
+
+    {/* PDPA Policy Modal */}
+    {showPdpa && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowPdpa(false)} />
+        <div className="relative z-10 w-full max-w-lg bg-surface-container-lowest rounded-[2rem] shadow-xl ghost-border overflow-hidden flex flex-col max-h-[85vh]">
+          <div className="flex items-center justify-between px-8 pt-8 pb-4 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                <ShieldAlert className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold font-headline text-on-background">นโยบายความเป็นส่วนตัว</h2>
+                <p className="text-xs text-on-surface-variant">ตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล (PDPA) พ.ศ. 2562</p>
+              </div>
+            </div>
+            <button onClick={() => setShowPdpa(false)} className="p-2 rounded-xl hover:bg-surface-container-low text-on-surface-variant transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="px-8 pb-4 overflow-y-auto text-sm text-on-surface font-body space-y-4 leading-relaxed">
+            <p className="font-bold text-on-background">1. ผู้ควบคุมข้อมูลส่วนบุคคล</p>
+            <p>Dialybuddy Platform ("แพลตฟอร์ม") ทำหน้าที่เป็นผู้ควบคุมข้อมูลส่วนบุคคลตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562</p>
+
+            <p className="font-bold text-on-background">2. ข้อมูลส่วนบุคคลที่เก็บรวบรวม</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>ข้อมูลระบุตัวตน: ชื่อ-นามสกุล, เบอร์โทรศัพท์</li>
+              <li>ข้อมูลสุขภาพ (ข้อมูลอ่อนไหว): ผลตรวจเลือดที่อัปโหลดผ่านระบบ AI โภชนาการ</li>
+              <li>ข้อมูลการใช้งาน: ประวัติการจอง, บันทึกการสนทนา</li>
+              <li>สำหรับผู้ดูแล: ใบรับรองวิชาชีพ, พื้นที่ให้บริการ</li>
+            </ul>
+
+            <p className="font-bold text-on-background">3. วัตถุประสงค์การใช้ข้อมูล</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>จับคู่ผู้ป่วยกับผู้ดูแลที่เหมาะสม</li>
+              <li>วิเคราะห์และแนะนำแผนโภชนาการผ่าน AI</li>
+              <li>ปรับปรุงคุณภาพบริการและประสบการณ์ผู้ใช้</li>
+              <li>ออกใบเสร็จและเอกสารทางการเงิน</li>
+            </ul>
+
+            <p className="font-bold text-on-background">4. ฐานทางกฎหมายในการประมวลผล</p>
+            <p>แพลตฟอร์มประมวลผลข้อมูลบนฐาน <strong>ความยินยอม (Consent)</strong> ของเจ้าของข้อมูล และ <strong>การปฏิบัติตามสัญญา</strong> เพื่อให้บริการได้อย่างสมบูรณ์</p>
+
+            <p className="font-bold text-on-background">5. สิทธิ์ของเจ้าของข้อมูล</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>สิทธิ์เข้าถึงและรับสำเนาข้อมูล</li>
+              <li>สิทธิ์แก้ไขข้อมูลให้ถูกต้อง</li>
+              <li>สิทธิ์ลบข้อมูล (Right to Erasure)</li>
+              <li>สิทธิ์คัดค้านการประมวลผล</li>
+              <li>สิทธิ์ถอนความยินยอมเมื่อใดก็ได้</li>
+            </ul>
+
+            <p className="font-bold text-on-background">6. ระยะเวลาเก็บรักษาข้อมูล</p>
+            <p>แพลตฟอร์มเก็บข้อมูลตลอดระยะเวลาที่ท่านใช้บริการ และเก็บต่ออีก 3 ปีหลังยกเลิกบัญชี เพื่อวัตถุประสงค์ทางกฎหมายและการเงิน</p>
+
+            <p className="font-bold text-on-background">7. การติดต่อ</p>
+            <p>หากมีข้อสงสัยหรือต้องการใช้สิทธิ์ ติดต่อเจ้าหน้าที่คุ้มครองข้อมูล (DPO) ได้ที่ privacy@dialybuddy.th</p>
+          </div>
+
+          <div className="px-8 py-5 border-t border-outline-variant/20 shrink-0 flex gap-3">
+            <button
+              onClick={() => { setPdpaAccepted(true); setShowPdpa(false); }}
+              className="flex-1 bg-primary text-on-primary font-bold font-label py-3 rounded-xl hover:brightness-105 transition-colors"
+            >
+              รับทราบและยอมรับ
+            </button>
+            <button
+              onClick={() => setShowPdpa(false)}
+              className="px-5 bg-surface-container-high text-on-surface font-bold font-label py-3 rounded-xl hover:bg-surface-container transition-colors"
+            >
+              ปิด
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

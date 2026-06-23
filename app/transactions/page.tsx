@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { History, CalendarDays, Clock, MapPin, ShieldCheck, FileText } from "lucide-react";
+import { History, CalendarDays, Clock, MapPin, ShieldCheck, FileText, Receipt } from "lucide-react";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ReceiptModal } from "@/components/patient/ReceiptModal";
+import { TaxInvoiceModal } from "@/components/patient/TaxInvoiceModal";
 import { MOCK_PATIENT_TRANSACTIONS } from "@/lib/mockData";
 import type { PatientTransaction } from "@/types";
 import { formatBaht } from "@/lib/utils";
@@ -38,6 +39,7 @@ export default function TransactionsPage() {
   }>({ transactions: [], initialized: false });
 
   const [selected, setSelected] = useState<PatientTransaction | null>(null);
+  const [taxSelected, setTaxSelected] = useState<PatientTransaction | null>(null);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -117,13 +119,22 @@ export default function TransactionsPage() {
                     <p className="text-xs text-on-surface-variant font-body">ชำระแล้ว</p>
                     <p className="text-2xl font-extrabold text-primary">฿ {formatBaht(tx.totalPaid)}</p>
                   </div>
-                  <button
-                    onClick={() => setSelected(tx)}
-                    className="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant/20 text-on-surface font-bold text-sm px-4 py-2.5 rounded-xl transition-colors shrink-0"
-                  >
-                    <FileText className="w-4 h-4" />
-                    ดูใบเสร็จ
-                  </button>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => setSelected(tx)}
+                      className="flex items-center gap-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant/20 text-on-surface font-bold text-sm px-4 py-2.5 rounded-xl transition-colors shrink-0"
+                    >
+                      <FileText className="w-4 h-4" />
+                      ดูใบเสร็จ
+                    </button>
+                    <button
+                      onClick={() => setTaxSelected(tx)}
+                      className="flex items-center gap-2 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary font-bold text-sm px-4 py-2.5 rounded-xl transition-colors shrink-0"
+                    >
+                      <Receipt className="w-4 h-4" />
+                      ใบกำกับภาษี
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -132,6 +143,7 @@ export default function TransactionsPage() {
       )}
 
       <ReceiptModal transaction={selected} onClose={() => setSelected(null)} />
+      <TaxInvoiceModal transaction={taxSelected} onClose={() => setTaxSelected(null)} />
     </PatientPageShell>
   );
 }

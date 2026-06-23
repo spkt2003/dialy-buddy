@@ -42,6 +42,8 @@ DialyBuddy is a Thai-language healthcare platform that connects **dialysis patie
 | Tailwind PostCSS | @tailwindcss/postcss | ^4 |
 | Icons | lucide-react | ^1.8.0 |
 | AI SDK | @google/generative-ai | ^0.24.1 |
+| Backend / DB | Supabase (@supabase/supabase-js) | ^2.108.0 |
+| QR | jsqr (decode) + qrcode.react (generate) | ^1.4 / ^4.2 |
 | Fonts | Manrope, Lexend (Google Fonts via next/font) | — |
 | Linter | ESLint + eslint-config-next | 16.2.3 |
 
@@ -52,7 +54,10 @@ DialyBuddy is a Thai-language healthcare platform that connects **dialysis patie
 ## 3. Project Structure
 
 - `app/` — App Router pages. `layout.tsx` wraps everything in `AuthProvider → AuthGuard → JobProvider`. `globals.css` defines the full M3 token system and font variables.
-- `app/caregiver/` — Caregiver sub-app with its **own** `layout.tsx` (sticky header + footer already included — do not add `<Navbar />` inside caregiver pages). Patient pages include `<Navbar />` manually.
+- `app/caregiver/` — Caregiver sub-app with its **own** `layout.tsx` (sticky header + footer already included — do not add `<Navbar />` inside caregiver pages). Patient pages include `<Navbar />` manually. Sub-routes: `dashboard/`, `jobs/`, `tracking/`, `settings/`.
+- `app/api/analyze-blood/route.ts` — The only Next.js Route Handler. Receives a blood-test image, decodes QR via jsqr to short-circuit known sample IDs, otherwise calls Gemini. **No other API routes exist.**
+- `app/admin/page.tsx` — PIN-gated admin dashboard (PIN: `db2025`). Not in AuthGuard — PIN is the only protection.
+- `lib/supabaseClient.ts` — Single shared Supabase client instance. Auth uses phone-as-email (`{phone}@dialybuddy.local`) so real phone numbers are stored in the email field, not the phone field.
 - `components/auth/AuthGuard.tsx` — All route protection and role-based redirects live here. Must be updated when adding protected routes.
 - `components/layout/Navbar.tsx` — Role-aware; renders different nav for `patient` vs `caregiver`.
 - `context/AuthContext.tsx` / `context/JobContext.tsx` — Only two global state providers. Both use the `isInitialized` localStorage guard pattern.
@@ -71,7 +76,7 @@ npm start        # Serve production build (next start)
 npm run lint     # Run ESLint (eslint)
 ```
 
-There is no test runner configured. There are no database migrations (data is localStorage-only).
+There is no test runner configured (`playwright` is installed as a dev dependency but no test files exist). There are no database migrations (data is localStorage-only for patient transactions; Supabase holds auth, caregiver profiles, active/pending/completed jobs, and chat messages).
 
 ---
 
