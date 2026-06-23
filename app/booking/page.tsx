@@ -6,6 +6,7 @@ import { Calendar, Clock, MapPin, ShieldCheck, AlertCircle, Loader2, ChevronDown
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
+import type { PatientTransaction } from "@/types";
 
 type Caregiver = {
   name: string;
@@ -94,7 +95,7 @@ export default function BookingPage() {
     setSubmitting(true);
     setSubmitError(null);
 
-    const { error } = await supabase.from("pending_jobs").insert({
+    const { data: insertData, error } = await supabase.from("pending_jobs").insert({
       patient_name: userName,
       patient_image: `https://i.pravatar.cc/150?u=${encodeURIComponent(userName)}`,
       destination: selectedHospital,
@@ -103,7 +104,7 @@ export default function BookingPage() {
       type: "พาไปฟอกไต",
       status: "pending",
       earning: base,
-    });
+    }).select("id").single();
 
     if (error) {
       console.error("Booking submission failed:", error.message);
@@ -111,6 +112,21 @@ export default function BookingPage() {
       setSubmitting(false);
       return;
     }
+
+    const tx: PatientTransaction = {
+      id: insertData?.id ?? "",
+      caregiverName: caregiver.name,
+      destination: selectedHospital,
+      date: formatThaiDate(selectedDate),
+      timeSlot: selectedSlot,
+      basePay: base,
+      platformFee: fee,
+      discount,
+      totalPaid: total,
+      bookedAt: new Date().toISOString(),
+    };
+    const stored = JSON.parse(localStorage.getItem("patientTransactions") ?? "[]") as PatientTransaction[];
+    localStorage.setItem("patientTransactions", JSON.stringify([tx, ...stored]));
 
     router.push("/tracking");
   };

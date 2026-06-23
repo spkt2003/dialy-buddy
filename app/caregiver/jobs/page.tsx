@@ -1,15 +1,37 @@
 "use client";
 
 import { useJobContext } from "../../../context/JobContext";
-import { Wallet, CheckCircle2, Clock, CalendarDays, Coins } from "lucide-react";
+import { Wallet, CheckCircle2, Clock, CalendarDays, Coins, TrendingUp } from "lucide-react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatBaht } from "@/lib/utils";
+
+function getWeekStart(): Date {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 6 : day - 1;
+  const start = new Date(now);
+  start.setDate(now.getDate() - diff);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function getMonthStart(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
 
 export default function CaregiverJobsPage() {
   const { completedJobs } = useJobContext();
 
-  // Calculate total earnings, defaulting to 500 if earning is not defined
   const totalEarnings = completedJobs.reduce((sum, job) => sum + (job.earning ?? 500), 0);
+
+  const weekStart = getWeekStart().getTime();
+  const monthStart = getMonthStart().getTime();
+
+  const thisWeekJobs = completedJobs.filter(j => j.completedAt && j.completedAt >= weekStart);
+  const thisMonthJobs = completedJobs.filter(j => j.completedAt && j.completedAt >= monthStart);
+  const weekEarnings = thisWeekJobs.reduce((s, j) => s + (j.earning ?? 500), 0);
+  const monthEarnings = thisMonthJobs.reduce((s, j) => s + (j.earning ?? 500), 0);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
@@ -18,6 +40,31 @@ export default function CaregiverJobsPage() {
         <h1 className="text-3xl font-bold font-headline text-on-background mb-2">งานของฉัน</h1>
         <p className="text-lg text-on-surface-variant font-body">ประวัติการทำงานและยอดรายได้สะสมของคุณ</p>
       </div>
+
+      {/* Period breakdown */}
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold font-headline text-on-background">รายได้ตามช่วงเวลา</h2>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-surface-container-lowest rounded-2xl p-5 ghost-border shadow-ambient text-center">
+            <p className="text-sm text-on-surface-variant font-body mb-1">สัปดาห์นี้</p>
+            <p className="text-2xl font-extrabold text-on-background">฿ {formatBaht(weekEarnings)}</p>
+            <p className="text-xs text-on-surface-variant mt-1">{thisWeekJobs.length} งาน</p>
+          </div>
+          <div className="bg-surface-container-lowest rounded-2xl p-5 ghost-border shadow-ambient text-center">
+            <p className="text-sm text-on-surface-variant font-body mb-1">เดือนนี้</p>
+            <p className="text-2xl font-extrabold text-on-background">฿ {formatBaht(monthEarnings)}</p>
+            <p className="text-xs text-on-surface-variant mt-1">{thisMonthJobs.length} งาน</p>
+          </div>
+          <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5 text-center">
+            <p className="text-sm text-primary font-bold font-body mb-1">1 ปีล่าสุด</p>
+            <p className="text-2xl font-extrabold text-primary">฿ {formatBaht(totalEarnings)}</p>
+            <p className="text-xs text-primary/70 mt-1">{completedJobs.length} งาน</p>
+          </div>
+        </div>
+      </section>
 
       {/* Earnings Summary Card */}
       <section className="bg-surface-container-lowest rounded-[2rem] p-8 shadow-ambient ghost-border flex flex-col sm:flex-row items-center gap-6 justify-between relative overflow-hidden">

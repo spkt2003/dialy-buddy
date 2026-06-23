@@ -16,6 +16,7 @@ import {
   Brain,
   Briefcase,
   Home,
+  History,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -27,7 +28,9 @@ export default function Navbar() {
   const router = useRouter();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMobileOpen(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsProfileOpen(false);
   }, [pathname]);
 
@@ -148,6 +151,16 @@ export default function Navbar() {
                           แผงควบคุม (Dashboard)
                         </Link>
                       )}
+                      {role !== "caregiver" && (
+                        <Link
+                          href="/transactions"
+                          onClick={() => setIsProfileOpen(false)}
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium font-label text-on-surface hover:bg-surface-container-low transition-colors"
+                        >
+                          <History className="h-4 w-4 text-secondary" />
+                          ประวัติธุรกรรม
+                        </Link>
+                      )}
                       <Link
                         href={role === "caregiver" ? "/caregiver/settings" : "/profile"}
                         onClick={() => setIsProfileOpen(false)}
@@ -262,6 +275,10 @@ export default function Navbar() {
                 <Link href="/ai-planner" className={mobileNavLinkClass}>
                   <Brain className="h-5 w-5 text-secondary" />
                   AI จัดโภชนาการ
+                </Link>
+                <Link href="/transactions" className={mobileNavLinkClass}>
+                  <History className="h-5 w-5 text-secondary" />
+                  ประวัติธุรกรรม
                 </Link>
                 <Link href="/profile" className={mobileNavLinkClass}>
                   <Settings className="h-5 w-5 text-secondary" />

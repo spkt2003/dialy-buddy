@@ -16,6 +16,7 @@ export interface Job {
   status: JobStatus;
   currentStep?: number;
   earning?: number;
+  completedAt?: number;
 }
 
 interface JobContextType {
@@ -92,6 +93,7 @@ type CompletedJobRow = {
   date: string;
   type: string;
   earning: number;
+  completed_at: string | null;
 };
 
 function completedRowToJob(row: CompletedJobRow): Job {
@@ -105,6 +107,7 @@ function completedRowToJob(row: CompletedJobRow): Job {
     type: row.type,
     status: "completed",
     earning: row.earning,
+    completedAt: row.completed_at ? new Date(row.completed_at).getTime() : undefined,
   };
 }
 
@@ -198,7 +201,7 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
       // โหลด completedJobs จาก Supabase — เรียงล่าสุดก่อน
       const { data: completedData, error: completedError } = await supabase
         .from("completed_jobs")
-        .select("id, patient_name, patient_image, destination, time_slot, date, type, earning")
+        .select("id, patient_name, patient_image, destination, time_slot, date, type, earning, completed_at")
         .order("completed_at", { ascending: false });
       if (completedError) console.error("Supabase load completed_jobs:", completedError.message);
       if (completedData) setCompletedJobs(completedData.map(completedRowToJob));

@@ -5,16 +5,9 @@ import { Search, Star, ShieldCheck, MapPin, UserX, Calendar, Clock, ChevronDown 
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { supabase } from "@/lib/supabaseClient";
+import { MOCK_CAREGIVERS, type CaregiverCard } from "@/lib/mockData";
 
-type Caregiver = {
-  name: string;
-  rating: number;
-  reviews: number;
-  exp: string;
-  location: string;
-  rate: string;
-  tags: string[];
-};
+type Caregiver = CaregiverCard;
 
 type CaregiverProfileRow = {
   id: string;
@@ -41,44 +34,7 @@ function profileToCaregiver(p: CaregiverProfileRow): Caregiver {
   };
 }
 
-const HARDCODED_CAREGIVERS: Caregiver[] = [
-  {
-    name: "สมศรี ใจดี (พยาบาลวิชาชีพ)",
-    rating: 4.9,
-    reviews: 124,
-    exp: "เชี่ยวชาญการดูแลผู้ป่วยฟอกไต 5 ปี",
-    location: "เขตบางกอกน้อย (ใกล้ รพ. ศิริราช)",
-    rate: "350 บาท/ชม.",
-    tags: ["ฉีดยาเบื้องต้นได้", "ขับรถยนต์ส่วนตัว"],
-  },
-  {
-    name: "วิภา รักษ์สุขภาพ (ผู้ช่วยพยาบาล)",
-    rating: 4.8,
-    reviews: 89,
-    exp: "ประสบการณ์ดูแลผู้สูงอายุติดเตียง 3 ปี",
-    location: "เขตดุสิต (ใกล้ รพ. วชิรพยาบาล)",
-    rate: "250 บาท/ชม.",
-    tags: ["ดูแลให้อาหารทางสายยาง", "ใจเย็น"],
-  },
-  {
-    name: "ธนา มีสุข (พยาบาลวิชาชีพ)",
-    rating: 5.0,
-    reviews: 210,
-    exp: "อดีตพยาบาลศูนย์ไตเทียม 8 ปี",
-    location: "เขตพญาไท (ใกล้ รพ. รามาธิบดี)",
-    rate: "400 บาท/ชม.",
-    tags: ["วิเคราะห์ผลงดน้ำ", "เชี่ยวชาญไตวายเรื้อรัง"],
-  },
-  {
-    name: "มาลี ศรีเมือง (ผู้ดูแลผ่านการอบรม)",
-    rating: 4.7,
-    reviews: 45,
-    exp: "ผ่านการอบรมดูแลผู้ป่วยโรคไต (120 ชม.)",
-    location: "เขตภาษีเจริญ (ใกล้ รพ. ธนบุรี 2)",
-    rate: "200 บาท/ชม.",
-    tags: ["ทำอาหารคุมเค็ม", "ช่วยพยุงเดิน"],
-  },
-];
+const HARDCODED_CAREGIVERS: Caregiver[] = MOCK_CAREGIVERS;
 
 const TIME_SLOTS = [
   "08:00 - 12:00 น.",

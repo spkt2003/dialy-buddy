@@ -6,3 +6,16 @@ export interface Message {
   text: string;
   readAt?: number;
 }
+
+export interface PatientTransaction {
+  id: string;
+  caregiverName: string;
+  destination: string;
+  date: string;
+  timeSlot: string;
+  basePay: number;
+  platformFee: number;
+  discount: number;
+  totalPaid: number;
+  bookedAt: string;
+}
