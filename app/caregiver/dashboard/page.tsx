@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useJobContext } from "../../../context/JobContext";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function CaregiverDashboard() {
   // All job state lives in JobContext — this page is purely presentational.
@@ -15,6 +16,26 @@ export default function CaregiverDashboard() {
   const { userName } = useAuth();
   const router = useRouter();
   const [acceptingJobId, setAcceptingJobId] = useState<string | null>(null);
+
+  // Rating/reviews ของผู้ดูแลคนนี้จริง ๆ — เดิม hardcode 4.9/(128 รีวิว) ไว้ในทุกคน
+  // ตอนนี้ดึงจาก caregiver_profiles ตาม userName ให้ตรงกับที่ find-buddy page แสดง
+  const [profileStats, setProfileStats] = useState<{ rating: number; reviews: number } | null>(null);
+
+  useEffect(() => {
+    if (!userName) return;
+    supabase
+      .from("caregiver_profiles")
+      .select("rating, reviews")
+      .eq("name", userName)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Supabase load caregiver_profiles stats:", error.message);
+          return;
+        }
+        if (data) setProfileStats({ rating: Number(data.rating), reviews: data.reviews });
+      });
+  }, [userName]);
 
   // Navigate only after context confirms activeJob is set — avoids the race where
   // tracking page mounts before setActiveJob commits and immediately redirects back.
@@ -50,12 +71,12 @@ export default function CaregiverDashboard() {
             <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
               <div className="flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-xl border border-primary/20 text-primary">
                 <Star className="w-5 h-5 fill-current" />
-                <span className="font-bold">4.9</span>
-                <span className="text-sm">(128 รีวิว)</span>
+                <span className="font-bold">{profileStats ? profileStats.rating.toFixed(1) : "—"}</span>
+                <span className="text-sm">({profileStats ? profileStats.reviews : 0} รีวิว)</span>
               </div>
               <div className="flex items-center gap-2 bg-tertiary-container px-4 py-2 rounded-xl border border-tertiary-container text-on-tertiary-container">
                 <Activity className="w-5 h-5" />
-                <span className="font-bold">42</span>
+                <span className="font-bold">{completedJobs.length}</span>
                 <span className="text-sm">งานสำเร็จ</span>
               </div>
             </div>
@@ -161,9 +182,6 @@ export default function CaregiverDashboard() {
           )}
         </section>
       </div>
-
-
-
     </div>
   );
 }
