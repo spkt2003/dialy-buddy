@@ -1,93 +1,118 @@
-# 🏥 DialyBuddy | The Curated Caregiver
+# DialyBuddy | The Curated Caregiver
 
-DialyBuddy is a specialized healthcare web platform designed to seamlessly connect dialysis patients (and their relatives) with certified, professional caregivers. 
-
-By focusing heavily on **Role-Based Access Control (RBAC)** and an **Elderly-Friendly Accessible UI**, the platform ensures a safe, reliable, and user-friendly experience for managing medical transportation and patient care.
+DialyBuddy is a Thai-language healthcare platform that connects **dialysis patients** (and their families) with certified, professional caregivers (Care Buddies). Designed for the Thai market with an elderly-friendly UI, it handles the full lifecycle from matching and booking to real-time job tracking and earnings.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🎭 Role-Based Access Control (RBAC)
-- **Strict Route Protection:** Dedicated, isolated environments for `Patient` and `Caregiver` roles.
-- **Dynamic Navigation:** The UI adapts intelligently based on the authenticated user's role.
+### For Caregivers (ผู้ดูแล)
+- **Job Board** — Browse pending jobs, accept a single active job, and complete it step by step.
+- **Interactive Progress Tracker** — Step-by-step status updates: on the way → at pick-up → at hospital → returned home.
+- **Earnings Dashboard** — Completed jobs, accumulated earnings, and an itemized breakdown with fee/discount details.
+- **Tier Badges & Leaderboard** — Ranked by completed jobs; badge tiers unlock higher visibility.
+- **Ratings & Reviews** — Real ratings loaded from Supabase; shown on the caregiver dashboard.
+- **Profile & Settings** — Professional credentials, banking details, and notification preferences.
 
-### 🩺 For Caregivers (ผู้ดูแล)
-- **Job Board & Single Active Flow:** View pending jobs, accept a single active job, and prevent overlapping schedules.
-- **Interactive Progress Tracker:** Step-by-step job tracking (e.g., *On the way to pick up* ➔ *At hospital* ➔ *Returned home safely*).
-- **Earnings & History:** Comprehensive dashboard to view completed jobs and accumulated earnings.
-- **Profile Management:** Manage professional credentials, banking details, and alert preferences.
+### For Patients / Relatives (ผู้ป่วย / ญาติ)
+- **Find a Buddy** — Browse and hire caregivers filtered by specialty, rating, and availability.
+- **Booking Flow** — Book appointments with fee calculation, discounts, and Supabase-persisted receipts.
+- **AI Nutrition Planner** — Upload a blood-test image; Gemini Vision generates a personalized Thai-language meal plan.
+- **Appointment Tracking** — View upcoming and past dialysis sessions.
+- **Transaction History** — Itemized receipts with tax invoices.
+- **PDPA Consent** — In-app consent management for personal data handling.
+- **Rewards & Subscriptions** — Loyalty points and subscription plan selection.
 
-### 👥 For Patients / Relatives (ผู้ป่วย / ญาติ)
-- **Buddy Matching:** Easily find and hire specialized caregivers for dialysis transportation.
-- **Health Tracking:** (Upcoming) Track dialysis schedules and vital health metrics.
-- **Secure Profiles:** Manage patient requirements and emergency contacts.
-
-### 🎨 The "Dialy-UI" Design System
-Designed specifically for accessibility and an aging population using our internal **Clarify** design principles:
-- **High Legibility:** Large typography (Manrope & Lexend fonts) and high-contrast text (`slate-900`).
-- **Soothing Aesthetics:** Soft medical blues (`blue-600`), gentle backgrounds (`slate-50`), and `emerald` accents for success states.
-- **Friendly Shapes:** Heavily rounded corners (`rounded-[2rem]`) and prominent, easy-to-tap buttons.
-
----
-
-## 🛠️ Tech Stack
-
-- **Framework:** [Next.js](https://nextjs.org/) (App Router)
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS (Vanilla + Custom Tokens)
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **State Management:** React Context API (`AuthContext`, `JobContext`)
+### Platform / Admin
+- **Admin Dashboard** — PIN-gated operator panel (`/booth/operator`) for job oversight and system stats.
+- **Role-Based Access Control** — Strict route protection via `AuthGuard`; caregivers and patients see completely separate UIs.
+- **In-App Chat** — Real-time chat widget between patient and assigned caregiver.
+- **QR Integration** — QR code generation and decoding (jsqr + qrcode.react) for session verification.
 
 ---
 
-## 📂 Project Structure
+## Tech Stack
 
-```text
-Dialy-Buddy/
+| Layer | Tool | Version |
+|---|---|---|
+| Framework | Next.js (App Router) | 16.2.3 |
+| Language | TypeScript (strict) | ^5 |
+| Styling | Tailwind CSS v4 | ^4 |
+| Icons | lucide-react | ^1.8.0 |
+| Backend / DB | Supabase | ^2.108.0 |
+| AI | Google Generative AI (Gemini) | ^0.24.1 |
+| QR | jsqr + qrcode.react | — |
+| Fonts | Manrope, Lexend (Google Fonts) | — |
+
+State is split between **Supabase** (auth, caregiver profiles, jobs, chat, ratings) and **localStorage** (patient-side session state, booking context).
+
+---
+
+## Project Structure
+
+```
+dialy-buddy/
 ├── app/
-│   ├── caregiver/      # Protected routes for Caregivers (Dashboard, Tracking, Jobs, Settings)
-│   ├── patient/        # Protected routes for Patients/Relatives
-│   ├── login/          # Authentication entry point
-│   ├── register/       # Role-based onboarding
-│   └── layout.tsx      # Root layout containing AuthProvider & AuthGuard
+│   ├── caregiver/        # Caregiver sub-app (dashboard, jobs, tracking, settings)
+│   ├── dashboard/        # Patient dashboard
+│   ├── find-buddy/       # Caregiver search & booking
+│   ├── ai-planner/       # Gemini-powered nutrition planner
+│   ├── booking/          # Appointment booking flow
+│   ├── tracking/         # Patient appointment tracker
+│   ├── booth/operator/   # PIN-gated admin panel
+│   ├── login/            # Authentication
+│   ├── register/         # Role-based onboarding
+│   ├── api/analyze-blood/ # Route handler: Gemini blood-test analysis
+│   └── layout.tsx        # Root: AuthProvider → AuthGuard → JobProvider
 ├── components/
-│   ├── auth/           # Route protection guards
-│   ├── layout/         # Dynamic Navbar & Footer
-│   ├── caregiver/      # Caregiver specific UI (ChatBox)
-│   └── dialy-ui/       # (Core) Reusable, accessible UI component system
+│   ├── auth/             # AuthGuard (route protection)
+│   ├── layout/           # Role-aware Navbar & Footer
+│   └── caregiver/        # ChatBox and caregiver-specific widgets
 ├── context/
-│   ├── AuthContext.tsx # Global authentication & role state (localStorage mocked)
-│   └── JobContext.tsx  # Global job queue & tracking state
-└── public/             # Static assets (Logos, Icons)
+│   ├── AuthContext.tsx   # Global auth & role state
+│   └── JobContext.tsx    # Job queue, active job, tracking state
+├── lib/
+│   └── supabaseClient.ts # Shared Supabase client
+└── dialy-ui/             # Static HTML mockups & design references (not built)
 ```
 
 ---
 
-## 🚀 Getting Started
-
-First, install the dependencies:
+## Getting Started
 
 ```bash
 npm install
+npm run dev       # http://localhost:3000
 ```
 
-Then, run the development server:
+### Environment Variables
 
-```bash
-npm run dev
+Create `.env.local` with:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+NEXT_PUBLIC_GEMINI_API_KEY=...
+NEXT_PUBLIC_OPERATOR_PIN=123456
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Dev Credentials
 
-### 🧪 How to Test the Flow
+Three hardcoded accounts are available for testing without registering:
 
-1. Go to **Login** or **Register**.
-2. Select your desired role (**ผู้ดูแล** for Caregiver, or **ผู้ป่วย/ญาติ** for Patient).
-3. The `AuthGuard` will automatically route you to the correct, protected dashboard.
-4. If testing the **Caregiver**, try accepting a job to see the interactive tracking system in action!
+| Username | Password | Role |
+|---|---|---|
+| `admin` | `admin123` | Caregiver |
+| `user` | `user123` | Patient |
+
+Phone/password accounts created via `/register` are also persisted to localStorage.
 
 ---
 
-## 🔒 Security Note
-*Currently, authentication and state management are mocked using React Context and `localStorage` for frontend demonstration and UI/UX validation purposes. In a production environment, this should be replaced with secure, server-side session management (e.g., NextAuth.js) and a robust backend database.*
+## Other Commands
+
+```bash
+npm run build    # Production build
+npm start        # Serve production build
+npm run lint     # ESLint
+```
