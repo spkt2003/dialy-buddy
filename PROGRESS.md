@@ -1,3 +1,36 @@
+## [2026-06-23] (session 6 — consolidate + hardcode audit)
+
+### ทำเสร็จวันนี้
+- **Commit + push group-3** (`fc8c45e`) — PDPA, TaxInvoiceModal, subscription, rewards ที่ค้างจาก session 5
+- **รวม `/admin` กับ `/booth/operator` เป็นหน้าเดียว** (`5cd1d5b`)
+  - `/booth/operator` เขียนใหม่ทั้งไฟล์: ใช้ดีไซน์ M3 light-theme ของ admin รวม 3 section (platform overview mock / top-5 caregiver / demo booth live Supabase); PIN เดิม `db2025`
+  - `/admin/page.tsx` เปลี่ยนเป็น server-side `redirect("/booth/operator")` — ไม่ต้อง maintain 2 หน้าแล้ว
+- **Hardcode audit** — ทำ list สิ่งที่ต้องแก้เพื่อลด hardcode (ดู "ตัดสินใจ" ด้านล่าง)
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ไม่มี code ค้าง — working tree clean, branch ตรงกับ origin/main
+
+### ตัดสินใจ / โน้ตสำคัญ
+- **`/booth/operator` เป็น path หลักสำหรับ operator/admin ทั้งหมด** — `/admin` แค่ redirect ไป; PIN เดียว `db2025`
+- **Hardcode backlog ที่ระบุได้ในวันนี้ (เรียงตาม priority):**
+  - 🔴 Premium fee ไม่ถูก enforce: `booking/page.tsx:87` ใช้ 15% คงที่ ไม่ตรวจ `isPremium` (ควรเป็น 10% สำหรับ Premium)
+  - 🔴 Discount ฿200 คงที่ทุก booking: `booking/page.tsx:88` `const discount = 200`
+  - 🔴 Transaction history ไม่เชื่อม Supabase: อ่านแค่ localStorage → fallback mock
+  - 🔴 Find-buddy ใช้ MOCK_CAREGIVERS แทน Supabase `caregiver_profiles` เป็น primary
+  - 🟡 `isPremium` อยู่แค่ใน localStorage — ควรบันทึกลง Supabase user_metadata
+  - 🟡 Rewards points ไม่ persist ใน Supabase
+  - 🟡 Caregiver earnings fallback `?? 500` ใน `caregiver/jobs/page.tsx` — ควรแสดง 0 ถ้าไม่มีค่า
+  - 🟡 Ranking page เป็น Server Component คำนวณ compile-time จาก mock — ควร query Supabase
+  - 🟢 PIN `db2025` hardcode ในไฟล์ — ควรเป็น env var
+  - 🟢 Platform fee 15% / VAT 7% กระจายหลายที่ — ควรรวมไว้ใน `lib/config.ts`
+  - 🟢 ข้อมูลรถ "ฮอนด้า ซิตี้ กท 1234" hardcode ใน `tracking/page.tsx`
+
+### พรุ่งนี้เริ่มจาก
+- สร้าง `lib/config.ts` รวม `PLATFORM_FEE_RATE`, `PLATFORM_FEE_RATE_PREMIUM`, `VAT_RATE` — เร็ว 5 นาที แต่ทำให้ข้อ 🔴 ถัดไปแก้ง่ายขึ้น
+- จากนั้นแก้ Premium fee enforce ใน `booking/page.tsx` (ตรวจ `isPremium` localStorage → ใช้ rate 10%)
+
+---
+
 ## [2026-06-23] (session 5 — group-3 features)
 
 ### ทำเสร็จวันนี้
