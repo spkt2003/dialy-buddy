@@ -1,3 +1,41 @@
+## [2026-06-23] (session 7 — hardcode backlog ครบ)
+
+### ทำเสร็จวันนี้
+- **Commit + push hardcode backlog ทั้งหมด** (`2e50bf8`) — 14 files, 311 insertions
+
+**🔴 Priority สูง:**
+- **Premium fee enforce** (`booking/page.tsx`) — `feeRate = isPremium ? 10% : 15%` อ่านจาก Supabase `user_metadata` ก่อน, fallback localStorage
+- **Discount ฿200 เฉพาะครั้งแรก** (`booking/page.tsx`) — ตรวจ `patientTransactions` ใน localStorage; `isNewMember` → discount 200, มีประวัติ → 0; UI ซ่อน row ถ้าไม่มีสิทธิ์
+- **Transaction history เชื่อม Supabase** — สร้าง `patient_transactions` table (user รัน SQL); `booking` เขียนทั้ง localStorage + Supabase; `transactions` และ `rewards` อ่าน Supabase-first, fallback localStorage → mock
+- **Find-buddy ใช้ Supabase primary** — ลบ `HARDCODED_CAREGIVERS` merge ออก; `MOCK_CAREGIVERS` เป็น fallback offline เท่านั้น; mock caregivers ถูก add ลง `caregiver_profiles` โดย user แล้ว
+
+**🟡 Priority กลาง:**
+- **isPremium persist Supabase** (`subscription/page.tsx`, `booking/page.tsx`) — อ่าน `user_metadata.isPremium`; subscribe/cancel เขียน `updateUser({ data: { isPremium } })`; dev credentials fallback localStorage
+- **Rewards อ่าน Supabase** (`rewards/page.tsx`) — เปลี่ยน `loadTransactions` เป็น async, query `patient_transactions` by `user_id`; points derive จากข้อมูลจริง
+- **Caregiver earnings fallback** (`caregiver/jobs/page.tsx`) — `?? 500` → `?? 0` ทุก 4 จุด
+- **Ranking query Supabase** (`ranking/page.tsx`) — เปลี่ยนจาก Server Component compile-time เป็น Client Component; query `caregiver_profiles` เรียง `rating DESC, reviews DESC`; เกณฑ์เปลี่ยนจาก earnings → rating เพราะ `completed_jobs` ไม่มี `caregiver_id`
+
+**🟢 Priority ต่ำ:**
+- **PIN เป็น env var** — `NEXT_PUBLIC_OPERATOR_PIN=123456` ใน `.env.local`; `booth/operator` อ่าน `process.env.NEXT_PUBLIC_OPERATOR_PIN`
+- **Platform fee / VAT centralize** — `lib/config.ts` (ใหม่): `PLATFORM_FEE_RATE`, `PLATFORM_FEE_RATE_PREMIUM`, `VAT_RATE` + PCT helpers; ใช้ใน `TaxInvoiceModal` (การคำนวณ), `ReceiptModal` (derive % จาก tx จริง), `subscription`, `booth/operator`
+- **Vehicle info จาก database** — SQL: `ALTER TABLE caregiver_profiles ADD COLUMN IF NOT EXISTS vehicle_info TEXT`; `caregiver/settings` เพิ่ม field กรอก+บันทึก; `tracking/page.tsx` fetch ชื่อ+รถจาก `caregiver_profiles` by `caregiver_id` แทน hardcode
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ไม่มี code ค้าง — working tree clean, branch ตรงกับ origin/main
+- **Hardcode backlog เคลียร์หมดแล้วทุกข้อ** (🔴🟡🟢)
+
+### ตัดสินใจ / โน้ตสำคัญ
+- **`patient_transactions` RLS**: `INSERT WITH CHECK (auth.uid() = user_id)` + `SELECT USING (auth.uid() = user_id)` — dev credentials ไม่มี Supabase session → ข้าม Supabase insert/read อัตโนมัติ (fallback localStorage)
+- **`patient_transactions` ไม่ต้อง realtime** — เขียนครั้งเดียวตอน booking, page re-fetch ทุก mount อยู่แล้ว
+- **Ranking เปลี่ยนเกณฑ์เป็น rating** — `completed_jobs` ไม่มี `caregiver_id`/`caregiver_name` เลย aggregate earnings ต่อ caregiver ไม่ได้จาก DB; `patient_transactions` มี RLS ดูได้แค่ของตัวเอง; จึงใช้ `caregiver_profiles.rating` แทน
+- **ReceiptModal แสดง % จาก tx จริง** — `Math.round(platformFee / basePay * 100)` รองรับทั้ง 10% (premium) และ 15% (free) อัตโนมัติ
+- **`NEXT_PUBLIC_` PIN มองเห็นใน browser bundle** — ยอมรับได้สำหรับ prototype PIN gate; ถ้า production ต้องย้ายเป็น server-side check
+
+### พรุ่งนี้เริ่มจาก
+- ไม่มี backlog เหลือจาก hardcode audit — เลือก feature ใหม่หรือ polish
+
+---
+
 ## [2026-06-23] (session 6 — consolidate + hardcode audit)
 
 ### ทำเสร็จวันนี้
