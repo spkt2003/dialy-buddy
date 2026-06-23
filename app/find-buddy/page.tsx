@@ -125,8 +125,11 @@ export default function FindBuddyPage() {
         .order("created_at", { ascending: false });
 
       const real = (data ?? []).map((row) => profileToCaregiver(row as CaregiverProfileRow));
-      // Supabase เป็น primary — fallback mock เฉพาะกรณี table ว่าง (dev/offline)
-      const caregivers = real.length > 0 ? real : MOCK_CAREGIVERS;
+      // Merge: Supabase profiles ก่อน ตามด้วย mock ที่ยังไม่มีชื่อซ้ำใน Supabase
+      // mock จะแสดงเป็น offline เสมอ (ไม่มีใน onlineNames/busyNames)
+      const realNames = new Set(real.map(c => c.name));
+      const extraMock = MOCK_CAREGIVERS.filter(m => !realNames.has(m.name));
+      const caregivers = [...real, ...extraMock];
       setAllCaregivers(caregivers);
       setFilteredData(caregivers);
       setLoading(false);

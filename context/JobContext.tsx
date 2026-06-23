@@ -196,6 +196,18 @@ export const JobProvider = ({ children }: { children: React.ReactNode }) => {
           // แถวถูกลบไปแล้ว (งานเสร็จ/ยกเลิก) — ล้าง ID ออก
           localStorage.removeItem("activeJobId");
         }
+      } else {
+        // ไม่มี activeJobId ใน localStorage — ลบ orphaned active_jobs row ที่อาจค้างอยู่สำหรับ caregiver คนนี้
+        // (เกิดจาก completeJob หรือ clear localStorage โดยไม่ได้ลบ Supabase row)
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.id) {
+          supabase.from("active_jobs")
+            .delete()
+            .eq("caregiver_id", user.id)
+            .then(({ error }) => {
+              if (error) console.error("Supabase cleanup orphan active_jobs by caregiver_id:", error.message);
+            });
+        }
       }
 
       // โหลด completedJobs จาก Supabase — เรียงล่าสุดก่อน
