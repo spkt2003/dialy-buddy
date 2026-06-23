@@ -1,5 +1,16 @@
 // Centralized mock data for demo and development.
 
+export type CaregiverTier = "พยาบาลวิชาชีพ" | "ผช.พยาบาล" | "ผู้ดูแลผ่านการอบรม";
+
+export function getCaregiverTier(name: string, certifications?: string[]): CaregiverTier {
+  if (name.includes("พยาบาลวิชาชีพ")) return "พยาบาลวิชาชีพ";
+  if (name.includes("ผู้ช่วยพยาบาล")) return "ผช.พยาบาล";
+  const certs = certifications ?? [];
+  if (certs.some((c) => c.includes("พยาบาลวิชาชีพ"))) return "พยาบาลวิชาชีพ";
+  if (certs.some((c) => c.includes("ผู้ช่วยพยาบาล") || c.includes("ผช."))) return "ผช.พยาบาล";
+  return "ผู้ดูแลผ่านการอบรม";
+}
+
 export type CaregiverCard = {
   name: string;
   rating: number;

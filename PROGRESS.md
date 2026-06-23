@@ -1,3 +1,31 @@
+## [2026-06-23] (session 4 — group-2 features)
+
+### ทำเสร็จวันนี้
+- **`lib/mockData.ts`** — เพิ่ม `CaregiverTier` type + `getCaregiverTier(name, certifications?)` helper; parse tier จากชื่อก่อน fallback ไปดูจาก certifications array
+- **`components/ui/TierBadge.tsx`** (ใหม่) — reusable badge component; 3 tier: indigo=พยาบาลวิชาชีพ (Stethoscope icon), sky=ผช.พยาบาล (Heart), emerald=ผู้ดูแลผ่านการอบรม (GraduationCap); รองรับ `size="sm"|"xs"`
+- **`app/find-buddy/page.tsx`** — import TierBadge + getCaregiverTier; แสดง badge ใน name row ของทุก caregiver card; ทำงานทั้ง mock caregivers (parse จากชื่อ) และ Supabase real caregivers (parse จาก tags/certifications)
+- **`app/ranking/page.tsx`** (ใหม่, Server Component) — leaderboard หน้าผู้ดูแลยอดเยี่ยม; aggregate จาก MOCK_PATIENT_TRANSACTIONS ตาม basePay; top 3 มี Medal icon สีทอง/เงิน/ทองแดง; แสดง tier badge, rating, จำนวนงาน, รายได้รวม; อันดับ 1 = สมศรี ใจดี ฿4,200 (3 งาน)
+- **`app/admin/page.tsx`** (ใหม่, Client Component) — PIN-gated admin dashboard; PIN: `db2025`; หลัง unlock แสดง: 4 stat cards (ผู้ดูแล 10 คน / งาน 10 ครั้ง / รายได้แพลตฟอร์ม ฿2,070 / ค่าเฉลี่ย ฿207), top 5 caregivers พร้อม tier badges, recent 5 transactions
+- **`components/auth/AuthGuard.tsx`** — เพิ่ม `/ranking` ใน isPatientRoute (ต้อง login, caregiver ถูก redirect ไป caregiver dashboard)
+- **`components/layout/Navbar.tsx`** — เพิ่ม "อันดับผู้ดูแล" (Trophy icon) ใน desktop patient nav + mobile patient menu
+- TypeScript 0 errors ✅; ยังไม่ commit/push
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ commit/push** — 5 files modified + 3 untracked (app/admin/, app/ranking/, components/ui/TierBadge.tsx); wrap commit `2270af1` ก็ยังไม่ push ด้วย (ahead 1)
+
+### ตัดสินใจ / โน้ตสำคัญ
+- **`/ranking` เป็น patient route** (ไม่ใช่ public) — caregiver เข้าไม่ได้ (redirect ไป caregiver dashboard); เหมาะกับ perspective ของ patient ที่จะดูก่อนเลือกผู้ดูแล
+- **`/admin` ไม่อยู่ใน AuthGuard** — PIN เป็น protection เดียว (เหมือน /booth/operator); ไม่ต้องเพิ่ม role ใหม่
+- **Ranking page เป็น Server Component** — ข้อมูลคำนวณ compile time จาก mock data ที่ static; ไม่ต้องใช้ hook → ไม่ต้อง "use client"
+- **getCaregiverTier parse ชื่อก่อน certifications** — MOCK_CAREGIVERS มี tier ใน parenthetical suffix ของชื่อ; Supabase real caregivers ไม่มี → detect จาก certifications/tags แทน; ทั้งสอง path ทำงานถูกต้องจาก verify
+- **ESLint pre-existing errors** — errors ทั้งหมดใน lint output เป็น pre-existing จากไฟล์อื่น; ไฟล์ใหม่ที่สร้างวันนี้ไม่มี error ใหม่
+
+### พรุ่งนี้เริ่มจาก
+- `git add` + `git commit` งาน group-2 ทั้งหมด แล้ว `git push` (รวม wrap commit `2270af1` ที่ค้างอยู่)
+- เลือก feature กลุ่ม 3: Premium subscription UI / Rewards / ใบกำกับภาษี / PDPA consent
+
+---
+
 ## [2026-06-23] (session 3 — group-1 features)
 
 ### ทำเสร็จวันนี้

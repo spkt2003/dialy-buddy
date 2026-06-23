@@ -5,7 +5,8 @@ import { Search, Star, ShieldCheck, MapPin, UserX, Calendar, Clock, ChevronDown 
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { supabase } from "@/lib/supabaseClient";
-import { MOCK_CAREGIVERS, type CaregiverCard } from "@/lib/mockData";
+import { MOCK_CAREGIVERS, type CaregiverCard, getCaregiverTier } from "@/lib/mockData";
+import { TierBadge } from "@/components/ui/TierBadge";
 
 type Caregiver = CaregiverCard;
 
@@ -304,6 +305,7 @@ export default function FindBuddyPage() {
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
                     <h3 className="text-lg sm:text-2xl font-bold font-headline text-on-background">{c.name}</h3>
                     <ShieldCheck className="h-7 w-7 text-primary" />
+                    <TierBadge tier={getCaregiverTier(c.name, c.tags)} />
                     <StatusBadge name={c.name} onlineNames={onlineNames} busyNames={busyNames} statusLoaded={statusLoaded} />
                   </div>
                   <div className="flex items-center gap-2 mb-3 text-lg">

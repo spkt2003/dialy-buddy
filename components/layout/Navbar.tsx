@@ -17,6 +17,7 @@ import {
   Briefcase,
   Home,
   History,
+  Trophy,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -76,6 +77,7 @@ export default function Navbar() {
             <>
               <Link href="/find-buddy" className={navLinkClass}>ค้นหาผู้ดูแล</Link>
               <Link href="/ai-planner" className={navLinkClass}>AI จัดโภชนาการ</Link>
+              <Link href="/ranking" className={navLinkClass}>อันดับผู้ดูแล</Link>
             </>
           )}
         </nav>
@@ -279,6 +281,10 @@ export default function Navbar() {
                 <Link href="/transactions" className={mobileNavLinkClass}>
                   <History className="h-5 w-5 text-secondary" />
                   ประวัติธุรกรรม
+                </Link>
+                <Link href="/ranking" className={mobileNavLinkClass}>
+                  <Trophy className="h-5 w-5 text-secondary" />
+                  อันดับผู้ดูแล
                 </Link>
                 <Link href="/profile" className={mobileNavLinkClass}>
                   <Settings className="h-5 w-5 text-secondary" />
