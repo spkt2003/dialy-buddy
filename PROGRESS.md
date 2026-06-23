@@ -1,3 +1,34 @@
+## [2026-06-23] (session 3 — group-1 features)
+
+### ทำเสร็จวันนี้
+- **Commit 3 files ค้าง** (`Navbar.tsx`, `ChatBox.tsx`, `tracking/page.tsx`, `PROGRESS.md`) — `94c59ac`
+- **lib/mockData.ts** (ใหม่) — `CaregiverCard[]` 10 คน + `MOCK_PATIENT_TRANSACTIONS` 10 รายการ; เป็น centralized source สำหรับ find-buddy และ transactions page
+- **find-buddy refactor** — ลบ `HARDCODED_CAREGIVERS` inline, import `MOCK_CAREGIVERS` จาก mockData แทน; ตอนนี้มี 10 card แทน 4
+- **app/booking/page.tsx** — เปลี่ยน insert เป็น `.select("id").single()` เพื่อได้ ID กลับ; บันทึก `PatientTransaction` ลง `localStorage.patientTransactions` ทุกครั้งที่ patient ชำระเงิน
+- **types/index.ts** — เพิ่ม `PatientTransaction` interface
+- **app/transactions/page.tsx** (ใหม่) — หน้าประวัติธุรกรรม patient: อ่าน localStorage; ถ้าว่างแสดง MOCK_PATIENT_TRANSACTIONS; summary strip ยอดใช้จ่ายสะสม + จำนวนครั้ง; ปุ่ม "ดูใบเสร็จ" ต่อ row
+- **components/patient/ReceiptModal.tsx** (ใหม่) — modal ใบเสร็จ: รายละเอียดการเดินทาง + fee breakdown (ค่าบริการ/ค่าธรรมเนียม 15%/ส่วนลด/ยอดสุทธิ) + ปุ่มพิมพ์ (เปิด popup window + window.print())
+- **AuthGuard.tsx** — เพิ่ม `/transactions` เป็น patient route
+- **Navbar.tsx** — เพิ่ม "ประวัติธุรกรรม" (History icon) ใน desktop profile dropdown (patient) + mobile menu (patient)
+- **context/JobContext.tsx** — เพิ่ม `completedAt?: number` ใน `Job`, เพิ่ม `completed_at` ใน CompletedJobRow + Supabase query + completedRowToJob mapping
+- **app/caregiver/jobs/page.tsx** — เพิ่ม stats grid 3 column: สัปดาห์นี้ / เดือนนี้ / 1 ปีล่าสุด คำนวณจาก `completedAt` timestamp
+- TypeScript 0 errors, ESLint 0 errors ✅; Push ขึ้น origin/main แล้ว ✅ (`3bb3411`)
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- ไม่มี — กลุ่ม 1 ทั้งหมดเสร็จแล้ว
+
+### ตัดสินใจ / โน้ตสำคัญ
+- **Patient transaction history ใช้ localStorage ไม่ใช่ Supabase** — completed_jobs ไม่มี patient_id; กรองด้วย patient_name เป็นไปได้แต่ไม่ robust; localStorage บันทึกตอน booking เก็บข้อมูลครบ (caregiver name, fee breakdown) ซึ่ง completed_jobs ไม่มี
+- **Mock data แสดงแทนเมื่อ localStorage ว่าง** — dev credentials (user/user123) ที่ไม่เคยจองจะเห็นข้อมูลตัวอย่าง 10 รายการ; ไม่มี flag แยก "isMockData" เพราะ prototype
+- **MOCK_CAREGIVERS ใช้ `type Caregiver = CaregiverCard`** — find-buddy ไม่มี type ซ้ำอีกแล้ว; ถ้าจะเพิ่ม caregiver mock ใหม่แก้ที่ lib/mockData.ts ที่เดียว
+- **`react-hooks/set-state-in-effect` rule** — ESLint rule นี้ block setState ใน useEffect ทุกที่; ใช้ `// eslint-disable-next-line` สำหรับ pattern localStorage-read-on-mount เพราะเป็น pattern มาตรฐาน codebase นี้ (ดู booking/page.tsx บรรทัด 64, Navbar.tsx บรรทัด 31)
+- **ค่าธรรมเนียม 15% ใน booking** — เสร็จมานานแล้ว (ไม่ใช่ feature ใหม่); item 4 ของ backlog จริงๆ หมายถึง earnings breakdown caregiver ซึ่งทำเสร็จแล้ว
+
+### พรุ่งนี้เริ่มจาก
+- เลือก feature กลุ่ม 2: Admin dashboard / monthly top caregiver ranking / caregiver tier (basic/ผช.พยาบาล/พยาบาลวิชาชีพ)
+
+---
+
 ## [2026-06-23] (session 2 — feature planning)
 
 ### ทำเสร็จวันนี้
