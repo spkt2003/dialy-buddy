@@ -1,3 +1,57 @@
+## [2026-06-23] (session 2 — feature planning)
+
+### ทำเสร็จวันนี้
+- **ไม่มี code change** — session นี้เป็นการสำรวจโค้ดและวางแผน feature backlog
+- ทำ inventory ฟีเจอร์ที่มีอยู่ทั้งหมด + ฟีเจอร์ที่ยังขาด จากโจทย์ที่ปรึกษา
+- จัดลำดับ backlog เป็น 4 กลุ่มตามความยาก/เร็ว พร้อมเหตุผล
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **3 files ยังไม่ commit** (`Navbar.tsx`, `ChatBox.tsx`, `app/tracking/page.tsx`) — ค้างมาจาก session ก่อน ต้อง stage + commit ก่อนเริ่มงานใหม่
+- **Feature backlog (กลุ่ม 1 ทำก่อน):**
+  1. Mock data 10 patients + 10 caregivers (`lib/mockData.ts` หรือคล้ายกัน)
+  2. ประวัติรายการธุรกรรม (patient) — หน้าใหม่ใช้ข้อมูล completed jobs
+  3. ใบเสร็จรับเงิน per transaction — component modal/page
+  4. แสดงค่าธรรมเนียม 15% ใน booking + caregiver earnings breakdown
+  5. Caregiver earnings breakdown รายสัปดาห์/รายเดือน
+
+### ตัดสินใจ / โน้ตสำคัญ
+- กลุ่ม 2: Admin dashboard, monthly top caregiver ranking, caregiver tier (basic/ผช.พยาบาล/พยาบาลวิชาชีพ)
+- กลุ่ม 3: Premium subscription UI, Rewards, ใบกำกับภาษี, PDPA consent
+- กลุ่ม 4 (ไม่ทำ prototype): Hospital portal, real payment gateway
+- ระบบชำระเงินจริง — เก็บไว้ในแผนระยะยาว ยังไม่ทำ
+
+### พรุ่งนี้เริ่มจาก
+- Commit 3 files ค้างก่อน (`Navbar.tsx`, `ChatBox.tsx`, `tracking/page.tsx`)
+- เริ่ม mock data (กลุ่ม 1 ข้อ 1) — ไม่ต้องแตะ UI เลย ทำได้เร็ว
+
+---
+
+## [2026-06-23]
+
+### ทำเสร็จวันนี้
+- **fix: Navbar แสดงปุ่มเข้าสู่ระบบบน mobile** — ลบ `hidden sm:block` ออกจาก login link ใน `components/layout/Navbar.tsx`
+- **feat: Navbar burger menu สำหรับ mobile** (`components/layout/Navbar.tsx`) — เพิ่มปุ่ม hamburger (`Menu`/`X` icon) ที่โชว์เฉพาะ `< md breakpoint`; mobile drawer แสดง nav ครบตามสิทธิ์:
+  - ไม่ได้ login: หน้าหลัก / ค้นหาผู้ดูแล / AI จัดโภชนาการ / ปุ่มลงทะเบียน
+  - Patient: แผงควบคุม / ค้นหาผู้ดูแล / AI จัดโภชนาการ / ตั้งค่าบัญชี / ออกจากระบบ
+  - Caregiver: แผงควบคุม / งานของฉัน / ตั้งค่าบัญชี / ออกจากระบบ
+  - menu ปิดอัตโนมัติเมื่อเปลี่ยน route (useEffect บน pathname)
+- **fix: chat bubble ขนาดล็อค** (`components/caregiver/ChatBox.tsx`, `app/tracking/page.tsx`) — เพิ่ม `w-fit` บน bubble div; root cause: bubble เป็น block div ที่ stretch เต็ม 80% container เสมอ ทำให้ข้อความสั้น เช่น "สวัสดีครับ" ถูก wrap แยกบรรทัดโดยไม่จำเป็น; ตอนนี้ bubble fit ตามเนื้อหา ยังมี `max-w-[80%]` cap ไว้สำหรับข้อความยาว
+- TypeScript 0 errors ✅
+
+### ค้างอยู่ / ยังไม่เสร็จ
+- **ยังไม่ commit** — 3 files modified (`Navbar.tsx`, `ChatBox.tsx`, `app/tracking/page.tsx`) ยังไม่ stage
+
+### ตัดสินใจ / โน้ตสำคัญ
+- Burger menu ใช้ drawer แบบ dropdown ใต้ header (ไม่ใช่ slide-in จากข้าง) เพื่อให้ simple และ consistent กับ design
+- Desktop nav และ profile dropdown ยังเหมือนเดิมทุกอย่าง — แก้เฉพาะ mobile layer เพิ่มเข้ามา
+- `w-fit` fix ใช้ได้กับทุก browser ที่ support `width: fit-content` — ไม่ต้อง polyfill
+
+### พรุ่งนี้เริ่มจาก
+- Commit 3 files ที่แก้วันนี้แล้ว push ขึ้น origin
+- ทดสอบ mobile view บน Chrome DevTools ครบทุก state (unauthenticated / patient / caregiver)
+
+---
+
 ## [2026-06-16] (session 3 — DB cleanup ต่อ)
 
 ### ทำเสร็จวันนี้

@@ -178,7 +178,7 @@ export default function ChatBox({ jobId, onUnreadChange }: ChatBoxProps) {
         {messages.map((msg, idx) => (
           <div key={msg.id} className={`flex flex-col ${msg.sender === "caregiver" ? "items-end" : "items-start"}`}>
             <div className={`flex ${msg.sender === "caregiver" ? "justify-end" : "justify-start"}`}>
-              <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
+              <div className={`max-w-[80%] w-fit rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
                 msg.sender === "caregiver"
                   ? "bg-primary text-on-primary rounded-br-sm"
                   : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"

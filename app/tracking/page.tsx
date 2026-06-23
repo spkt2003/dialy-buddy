@@ -475,7 +475,7 @@ export default function TrackingPage() {
               {messages.map((msg, idx) => (
                 <div key={msg.id} className={`flex flex-col ${msg.sender === "patient" ? "items-end" : "items-start"} mb-3`}>
                   <div className={`flex ${msg.sender === "patient" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
+                    <div className={`max-w-[80%] w-fit rounded-2xl px-4 py-3 text-[15px] leading-relaxed shadow-sm ${
                       msg.sender === "patient"
                         ? "bg-primary text-on-primary rounded-br-sm"
                         : "bg-surface-container-lowest border border-outline-variant/15 text-on-surface rounded-bl-sm"
