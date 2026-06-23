@@ -9,8 +9,9 @@ import { supabase } from "@/lib/supabaseClient";
 import { MOCK_PATIENT_TRANSACTIONS, MOCK_CAREGIVERS, getCaregiverTier } from "@/lib/mockData";
 import { TierBadge } from "@/components/ui/TierBadge";
 import { formatBaht } from "@/lib/utils";
+import { PLATFORM_FEE_PCT } from "@/lib/config";
 
-const OPERATOR_PIN = "db2025";
+const OPERATOR_PIN = process.env.NEXT_PUBLIC_OPERATOR_PIN ?? "";
 
 // ---------- Platform stats (mock) ----------
 const PLATFORM_FEE_TOTAL = MOCK_PATIENT_TRANSACTIONS.reduce((s, tx) => s + tx.platformFee, 0);
@@ -189,7 +190,7 @@ export default function BoothOperatorPage() {
             />
             <StatCard
               icon={<Coins className="w-6 h-6 text-amber-600" />}
-              label="รายได้แพลตฟอร์ม (15%)"
+              label={`รายได้แพลตฟอร์ม (${PLATFORM_FEE_PCT}%)`}
               value={`฿ ${formatBaht(PLATFORM_FEE_TOTAL)}`}
               color="bg-amber-50 border-amber-200"
             />

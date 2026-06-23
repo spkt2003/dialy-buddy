@@ -56,7 +56,7 @@ DialyBuddy is a Thai-language healthcare platform that connects **dialysis patie
 - `app/` — App Router pages. `layout.tsx` wraps everything in `AuthProvider → AuthGuard → JobProvider`. `globals.css` defines the full M3 token system and font variables.
 - `app/caregiver/` — Caregiver sub-app with its **own** `layout.tsx` (sticky header + footer already included — do not add `<Navbar />` inside caregiver pages). Patient pages include `<Navbar />` manually. Sub-routes: `dashboard/`, `jobs/`, `tracking/`, `settings/`.
 - `app/api/analyze-blood/route.ts` — The only Next.js Route Handler. Receives a blood-test image, decodes QR via jsqr to short-circuit known sample IDs, otherwise calls Gemini. **No other API routes exist.**
-- `app/admin/page.tsx` — PIN-gated admin dashboard (PIN: `db2025`). Not in AuthGuard — PIN is the only protection.
+- `app/admin/page.tsx` — PIN-gated admin dashboard (PIN from `NEXT_PUBLIC_OPERATOR_PIN` in `.env.local`, currently `123456`). Not in AuthGuard — PIN is the only protection.
 - `lib/supabaseClient.ts` — Single shared Supabase client instance. Auth uses phone-as-email (`{phone}@dialybuddy.local`) so real phone numbers are stored in the email field, not the phone field.
 - `components/auth/AuthGuard.tsx` — All route protection and role-based redirects live here. Must be updated when adding protected routes.
 - `components/layout/Navbar.tsx` — Role-aware; renders different nav for `patient` vs `caregiver`.

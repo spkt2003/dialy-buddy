@@ -23,15 +23,15 @@ function getMonthStart(): Date {
 export default function CaregiverJobsPage() {
   const { completedJobs } = useJobContext();
 
-  const totalEarnings = completedJobs.reduce((sum, job) => sum + (job.earning ?? 500), 0);
+  const totalEarnings = completedJobs.reduce((sum, job) => sum + (job.earning ?? 0), 0);
 
   const weekStart = getWeekStart().getTime();
   const monthStart = getMonthStart().getTime();
 
   const thisWeekJobs = completedJobs.filter(j => j.completedAt && j.completedAt >= weekStart);
   const thisMonthJobs = completedJobs.filter(j => j.completedAt && j.completedAt >= monthStart);
-  const weekEarnings = thisWeekJobs.reduce((s, j) => s + (j.earning ?? 500), 0);
-  const monthEarnings = thisMonthJobs.reduce((s, j) => s + (j.earning ?? 500), 0);
+  const weekEarnings = thisWeekJobs.reduce((s, j) => s + (j.earning ?? 0), 0);
+  const monthEarnings = thisMonthJobs.reduce((s, j) => s + (j.earning ?? 0), 0);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12">
@@ -104,7 +104,7 @@ export default function CaregiverJobsPage() {
         ) : (
           <div className="space-y-5">
             {completedJobs.map((job) => {
-              const earning = job.earning ?? 500;
+              const earning = job.earning ?? 0;
               return (
                 <div 
                   key={job.id} 

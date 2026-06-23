@@ -35,8 +35,6 @@ function profileToCaregiver(p: CaregiverProfileRow): Caregiver {
   };
 }
 
-const HARDCODED_CAREGIVERS: Caregiver[] = MOCK_CAREGIVERS;
-
 const TIME_SLOTS = [
   "08:00 - 12:00 น.",
   "09:00 - 13:00 น.",
@@ -127,9 +125,10 @@ export default function FindBuddyPage() {
         .order("created_at", { ascending: false });
 
       const real = (data ?? []).map((row) => profileToCaregiver(row as CaregiverProfileRow));
-      const merged = [...real, ...HARDCODED_CAREGIVERS];
-      setAllCaregivers(merged);
-      setFilteredData(merged);
+      // Supabase เป็น primary — fallback mock เฉพาะกรณี table ว่าง (dev/offline)
+      const caregivers = real.length > 0 ? real : MOCK_CAREGIVERS;
+      setAllCaregivers(caregivers);
+      setFilteredData(caregivers);
       setLoading(false);
     }
     loadCaregivers();

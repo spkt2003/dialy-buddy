@@ -109,7 +109,7 @@ export function ReceiptModal({ transaction, onClose }: ReceiptModalProps) {
               <span className="font-bold text-on-background">{formatBaht(transaction.basePay)} ฿</span>
             </div>
             <div className="flex justify-between text-on-surface">
-              <span>ค่าธรรมเนียมแพลตฟอร์ม (15%)</span>
+              <span>ค่าธรรมเนียมแพลตฟอร์ม ({Math.round(transaction.platformFee / transaction.basePay * 100)}%)</span>
               <span className="font-bold text-on-background">{formatBaht(transaction.platformFee)} ฿</span>
             </div>
             {transaction.discount > 0 && (

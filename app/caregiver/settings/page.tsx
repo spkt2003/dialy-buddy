@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Shield, Bell, Camera, Save, LogOut, WalletCards, BriefcaseMedical, Star } from "lucide-react";
+import { User, Shield, Bell, Camera, Save, LogOut, WalletCards, BriefcaseMedical, Star, Car } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { SettingsTabButton } from "@/components/ui/SettingsTabButton";
@@ -24,6 +24,7 @@ export default function CaregiverSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [myRating, setMyRating] = useState<number | null>(null);
   const [myReviews, setMyReviews] = useState<number | null>(null);
+  const [vehicleInfo, setVehicleInfo] = useState("");
 
   const emailKey = `userEmail_${userPhone || userName}`;
 
@@ -38,13 +39,14 @@ export default function CaregiverSettingsPage() {
       if (!user || !isMounted) return;
       supabase
         .from("caregiver_profiles")
-        .select("rating, reviews")
+        .select("rating, reviews, vehicle_info")
         .eq("id", user.id)
         .maybeSingle()
         .then(({ data }) => {
           if (!isMounted || !data) return;
           setMyRating(data.rating);
           setMyReviews(data.reviews);
+          setVehicleInfo((data.vehicle_info as string) ?? "");
         });
       channel = supabase
         .channel(`caregiver_profile_${user.id}`)
@@ -75,6 +77,13 @@ export default function CaregiverSettingsPage() {
     const fullName = [firstNameInput, lastNameInput].filter(Boolean).join(" ");
     await updateUserName(fullName);
     localStorage.setItem(emailKey, email);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from("caregiver_profiles")
+        .update({ vehicle_info: vehicleInfo })
+        .eq("id", user.id);
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -179,6 +188,19 @@ export default function CaregiverSettingsPage() {
                     ใบอนุญาตประกอบวิชาชีพ
                   </label>
                   <FormInput label="" defaultValue="พย. 12345678" disabled />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-base font-bold text-on-surface flex items-center gap-2">
+                    <Car className="w-5 h-5 text-primary" />
+                    ข้อมูลยานพาหนะ
+                  </label>
+                  <FormInput
+                    label=""
+                    value={vehicleInfo}
+                    onChange={e => setVehicleInfo(e.target.value)}
+                    placeholder="เช่น ฮอนด้า ซิตี้ สีขาว กท 1234 กรุงเทพมหานคร"
+                  />
                 </div>
 
                 <div className="pt-6 mt-8 border-t border-outline-variant/15 flex justify-end">

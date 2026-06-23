@@ -6,6 +6,7 @@ import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { MOCK_PATIENT_TRANSACTIONS } from "@/lib/mockData";
 import type { PatientTransaction } from "@/types";
 import { formatBaht } from "@/lib/utils";
+import { supabase } from "@/lib/supabaseClient";
 
 interface Tier {
   name: string;
@@ -29,15 +30,37 @@ const CATALOG = [
   { points: 1500, reward: "อัปเกรด Premium ฟรี 1 เดือน", badge: "" },
 ];
 
-function loadTransactions(): PatientTransaction[] {
-  const stored = localStorage.getItem("patientTransactions");
-  if (!stored) return MOCK_PATIENT_TRANSACTIONS;
-  try {
-    const parsed = JSON.parse(stored) as PatientTransaction[];
-    return parsed.length > 0 ? parsed : MOCK_PATIENT_TRANSACTIONS;
-  } catch {
-    return MOCK_PATIENT_TRANSACTIONS;
+async function loadTransactions(): Promise<PatientTransaction[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data } = await supabase
+      .from("patient_transactions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("booked_at", { ascending: false });
+    if (data && data.length > 0) {
+      return data.map((row) => ({
+        id: row.id as string,
+        caregiverName: row.caregiver_name as string,
+        destination: row.destination as string,
+        date: row.date as string,
+        timeSlot: row.time_slot as string,
+        basePay: row.base_pay as number,
+        platformFee: row.platform_fee as number,
+        discount: row.discount as number,
+        totalPaid: row.total_paid as number,
+        bookedAt: row.booked_at as string,
+      }));
+    }
   }
+  try {
+    const stored = localStorage.getItem("patientTransactions");
+    if (stored) {
+      const parsed = JSON.parse(stored) as PatientTransaction[];
+      if (parsed.length > 0) return parsed;
+    }
+  } catch { /* ignore */ }
+  return MOCK_PATIENT_TRANSACTIONS;
 }
 
 function getTier(points: number): Tier {
@@ -54,10 +77,12 @@ export default function RewardsPage() {
   const [redeemMsg, setRedeemMsg] = useState("");
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTransactions(loadTransactions());
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setInitialized(true);
+    loadTransactions().then((txs) => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTransactions(txs);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInitialized(true);
+    });
   }, []);
 
   if (!initialized) return null;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, FileText, Printer, Building2, Hash, MapPin, ArrowLeft } from "lucide-react";
 import type { PatientTransaction } from "@/types";
 import { formatBaht } from "@/lib/utils";
+import { VAT_RATE, VAT_PCT } from "@/lib/config";
 
 interface TaxInvoiceModalProps {
   transaction: PatientTransaction | null;
@@ -27,8 +28,8 @@ export function TaxInvoiceModal({ transaction, onClose }: TaxInvoiceModalProps) 
     ? `DBTV-${transaction.id.toUpperCase()}`
     : `DBTV-${transaction.id.slice(0, 8).toUpperCase()}`;
 
-  // VAT-inclusive breakdown: totalPaid already includes 7% VAT
-  const preTax = Math.round(transaction.totalPaid / 1.07);
+  // VAT-inclusive breakdown: totalPaid already includes VAT
+  const preTax = Math.round(transaction.totalPaid / (1 + VAT_RATE));
   const vat = transaction.totalPaid - preTax;
 
   const validate = (): boolean => {
@@ -189,7 +190,7 @@ export function TaxInvoiceModal({ transaction, onClose }: TaxInvoiceModalProps) 
                   <span className="font-bold text-on-background shrink-0 ml-2">{formatBaht(preTax)} ฿</span>
                 </div>
                 <div className="flex justify-between text-on-surface-variant">
-                  <span>ภาษีมูลค่าเพิ่ม (VAT 7%)</span>
+                  <span>ภาษีมูลค่าเพิ่ม (VAT {VAT_PCT}%)</span>
                   <span className="font-bold shrink-0 ml-2">{formatBaht(vat)} ฿</span>
                 </div>
               </div>

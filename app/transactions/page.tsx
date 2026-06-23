@@ -9,6 +9,7 @@ import { TaxInvoiceModal } from "@/components/patient/TaxInvoiceModal";
 import { MOCK_PATIENT_TRANSACTIONS } from "@/lib/mockData";
 import type { PatientTransaction } from "@/types";
 import { formatBaht } from "@/lib/utils";
+import { supabase } from "@/lib/supabaseClient";
 
 function formatBookedDate(iso: string): string {
   const d = new Date(iso);
@@ -21,15 +22,42 @@ function formatBookedDate(iso: string): string {
   });
 }
 
-function loadTransactions(): PatientTransaction[] {
-  const stored = localStorage.getItem("patientTransactions");
-  if (!stored) return MOCK_PATIENT_TRANSACTIONS;
-  try {
-    const parsed = JSON.parse(stored) as PatientTransaction[];
-    return parsed.length > 0 ? parsed : MOCK_PATIENT_TRANSACTIONS;
-  } catch {
-    return MOCK_PATIENT_TRANSACTIONS;
+async function loadTransactions(): Promise<PatientTransaction[]> {
+  // Supabase-first: อ่านของ user ที่ login อยู่ (real session เท่านั้น)
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data } = await supabase
+      .from("patient_transactions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("booked_at", { ascending: false });
+    if (data && data.length > 0) {
+      const txs: PatientTransaction[] = data.map((row) => ({
+        id: row.id as string,
+        caregiverName: row.caregiver_name as string,
+        destination: row.destination as string,
+        date: row.date as string,
+        timeSlot: row.time_slot as string,
+        basePay: row.base_pay as number,
+        platformFee: row.platform_fee as number,
+        discount: row.discount as number,
+        totalPaid: row.total_paid as number,
+        bookedAt: row.booked_at as string,
+      }));
+      // sync กลับมา localStorage เผื่อ offline
+      localStorage.setItem("patientTransactions", JSON.stringify(txs));
+      return txs;
+    }
   }
+  // Fallback: localStorage (dev credentials หรือ Supabase ยังไม่มีข้อมูล)
+  try {
+    const stored = localStorage.getItem("patientTransactions");
+    if (stored) {
+      const parsed = JSON.parse(stored) as PatientTransaction[];
+      if (parsed.length > 0) return parsed;
+    }
+  } catch { /* ignore */ }
+  return MOCK_PATIENT_TRANSACTIONS;
 }
 
 export default function TransactionsPage() {
@@ -42,8 +70,10 @@ export default function TransactionsPage() {
   const [taxSelected, setTaxSelected] = useState<PatientTransaction | null>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPageState({ transactions: loadTransactions(), initialized: true });
+    loadTransactions().then((transactions) => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPageState({ transactions, initialized: true });
+    });
   }, []);
 
   if (!pageState.initialized) return null;

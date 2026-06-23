@@ -3,17 +3,19 @@
 import { useState, useEffect } from "react";
 import { Crown, Check, Zap, Clock, Star, Headphones, Percent, X } from "lucide-react";
 import { PatientPageShell } from "@/components/layout/PatientPageShell";
+import { supabase } from "@/lib/supabaseClient";
+import { PLATFORM_FEE_PCT, PLATFORM_FEE_PCT_PREMIUM } from "@/lib/config";
 
 const FREE_FEATURES = [
   "จับคู่ผู้ดูแลผ่านระบบอัตโนมัติ",
   "AI วิเคราะห์โภชนาการจากผลตรวจเลือด",
   "ติดตามงานแบบ real-time",
   "แชทในแอปกับผู้ดูแล",
-  "ค่าธรรมเนียมแพลตฟอร์ม 15%",
+  `ค่าธรรมเนียมแพลตฟอร์ม ${PLATFORM_FEE_PCT}%`,
 ];
 
 const PREMIUM_FEATURES = [
-  { icon: Percent, text: "ค่าธรรมเนียมแพลตฟอร์มลดเหลือ 10% (ประหยัด 5%)" },
+  { icon: Percent, text: `ค่าธรรมเนียมแพลตฟอร์มลดเหลือ ${PLATFORM_FEE_PCT_PREMIUM}% (ประหยัด ${PLATFORM_FEE_PCT - PLATFORM_FEE_PCT_PREMIUM}%)` },
   { icon: Clock, text: "จองล่วงหน้าได้สูงสุด 3 เดือน (ปกติ 2 สัปดาห์)" },
   { icon: Star, text: "รับแต้ม Rewards สะสม 2 เท่าในทุกการจอง" },
   { icon: Crown, text: "แสดงสัญลักษณ์ Premium ให้ผู้ดูแลเห็น — เพิ่มความน่าเชื่อถือ" },
@@ -27,23 +29,38 @@ export default function SubscriptionPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsPremium(localStorage.getItem("isPremium") === "true");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setInitialized(true);
+    async function init() {
+      const { data: { user } } = await supabase.auth.getUser();
+      const premium = user
+        ? user.user_metadata?.isPremium === true
+        : localStorage.getItem("isPremium") === "true";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsPremium(premium);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInitialized(true);
+    }
+    init();
   }, []);
 
   if (!initialized) return null;
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     localStorage.setItem("isPremium", "true");
     setIsPremium(true);
     setShowConfirm(false);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.auth.updateUser({ data: { isPremium: true } });
+    }
   };
 
-  const handleCancel = () => {
+  const handleCancel = async () => {
     localStorage.removeItem("isPremium");
     setIsPremium(false);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.auth.updateUser({ data: { isPremium: false } });
+    }
   };
 
   return (
@@ -148,7 +165,7 @@ export default function SubscriptionPage() {
         {[
           { q: "ชำระเงินอย่างไร?", a: "ในเวอร์ชัน prototype นี้การสมัครสมาชิกไม่มีการชำระเงินจริง เพื่อทดสอบฟีเจอร์ระบบ" },
           { q: "ยกเลิกได้ตลอดเวลาหรือไม่?", a: "ใช่ คุณสามารถยกเลิกได้ตลอดเวลา สิทธิ์ Premium จะยังคงอยู่จนถึงสิ้นรอบบิล" },
-          { q: "ค่าธรรมเนียม 10% คำนวณอย่างไร?", a: "เฉพาะการจองที่เกิดขึ้นหลังจากสมัคร Premium เท่านั้นที่ได้อัตรา 10% แทน 15%" },
+          { q: `ค่าธรรมเนียม ${PLATFORM_FEE_PCT_PREMIUM}% คำนวณอย่างไร?`, a: `เฉพาะการจองที่เกิดขึ้นหลังจากสมัคร Premium เท่านั้นที่ได้อัตรา ${PLATFORM_FEE_PCT_PREMIUM}% แทน ${PLATFORM_FEE_PCT}%` },
         ].map(({ q, a }) => (
           <div key={q} className="bg-surface-container-lowest rounded-2xl ghost-border p-5">
             <p className="font-bold text-on-background text-sm">{q}</p>

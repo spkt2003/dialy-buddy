@@ -7,6 +7,7 @@ import { PatientPageShell } from "@/components/layout/PatientPageShell";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import type { PatientTransaction } from "@/types";
+import { PLATFORM_FEE_RATE, PLATFORM_FEE_RATE_PREMIUM } from "@/lib/config";
 
 type Caregiver = {
   name: string;
@@ -53,6 +54,8 @@ export default function BookingPage() {
   const [selectedHospital, setSelectedHospital] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
+  const [isNewMember, setIsNewMember] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -76,6 +79,17 @@ export default function BookingPage() {
     if (date) setSelectedDate(date);
     if (slot) setSelectedSlot(slot);
     if (hospital) setSelectedHospital(hospital);
+    // Supabase metadata first, localStorage fallback (dev credentials)
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      const premium = user
+        ? user.user_metadata?.isPremium === true
+        : localStorage.getItem("isPremium") === "true";
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsPremium(premium);
+    });
+    const prevTx = JSON.parse(localStorage.getItem("patientTransactions") ?? "[]") as unknown[];
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsNewMember(prevTx.length === 0);
   }, [router]);
 
   if (!caregiver) return null;
@@ -84,8 +98,9 @@ export default function BookingPage() {
   const ratePerHour = parseRatePerHour(caregiver.rate);
   const hours = 4;
   const base = ratePerHour * hours;
-  const fee = Math.round(base * 0.15);
-  const discount = 200;
+  const feeRate = isPremium ? PLATFORM_FEE_RATE_PREMIUM : PLATFORM_FEE_RATE;
+  const fee = Math.round(base * feeRate);
+  const discount = isNewMember ? 200 : 0;
   const total = base + fee - discount;
 
   const canSubmit = !!(selectedDate && selectedSlot && selectedHospital && !submitting);
@@ -127,6 +142,24 @@ export default function BookingPage() {
     };
     const stored = JSON.parse(localStorage.getItem("patientTransactions") ?? "[]") as PatientTransaction[];
     localStorage.setItem("patientTransactions", JSON.stringify([tx, ...stored]));
+
+    // บันทึกลง Supabase ถ้ามี session จริง (dev credentials ข้ามได้)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("patient_transactions").insert({
+        id: tx.id,
+        user_id: user.id,
+        caregiver_name: tx.caregiverName,
+        destination: tx.destination,
+        date: tx.date,
+        time_slot: tx.timeSlot,
+        base_pay: tx.basePay,
+        platform_fee: tx.platformFee,
+        discount: tx.discount,
+        total_paid: tx.totalPaid,
+        booked_at: tx.bookedAt,
+      });
+    }
 
     router.push("/tracking");
   };
@@ -246,13 +279,15 @@ export default function BookingPage() {
                 <span className="font-bold text-on-background">{base.toLocaleString()} ฿</span>
               </div>
               <div className="flex justify-between items-center text-on-surface">
-                <span>ค่าธรรมเนียมแพลตฟอร์ม (Fair GP 15%)</span>
+                <span>ค่าธรรมเนียมแพลตฟอร์ม{isPremium ? " (Premium 10%)" : " (Fair GP 15%)"}</span>
                 <span className="font-bold text-on-background">{fee.toLocaleString()} ฿</span>
               </div>
-              <div className="flex justify-between items-center text-tertiary bg-tertiary-container/30 p-2 rounded-lg">
-                <span>ส่วนลดสมาชิกใหม่</span>
-                <span className="font-bold">-{discount.toLocaleString()} ฿</span>
-              </div>
+              {isNewMember && (
+                <div className="flex justify-between items-center text-tertiary bg-tertiary-container/30 p-2 rounded-lg">
+                  <span>ส่วนลดสมาชิกใหม่ (ครั้งแรก)</span>
+                  <span className="font-bold">-{discount.toLocaleString()} ฿</span>
+                </div>
+              )}
             </div>
 
             <div className="border-t-2 border-on-background py-6 mb-6">

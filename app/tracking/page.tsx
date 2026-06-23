@@ -53,6 +53,8 @@ export default function TrackingPage() {
   const [ratingComment, setRatingComment] = useState("");
   const [ratingSubmitting, setRatingSubmitting] = useState(false);
 
+  const [caregiverProfile, setCaregiverProfile] = useState<{ name: string; vehicleInfo: string } | null>(null);
+
   const [isChatOpen, setChatOpen] = useState(false);
   const [isCallOpen, setCallOpen] = useState(false);
   const [isEmergencyOpen, setEmergencyOpen] = useState(false);
@@ -110,6 +112,24 @@ export default function TrackingPage() {
       supabase.removeChannel(pendingChannel);
     };
   }, [userName]);
+
+  // ดึงข้อมูลผู้ดูแล (ชื่อ + ยานพาหนะ) จาก caregiver_profiles เมื่อรู้ caregiver_id
+  useEffect(() => {
+    if (!liveJob?.caregiver_id) return;
+    supabase
+      .from("caregiver_profiles")
+      .select("name, vehicle_info")
+      .eq("id", liveJob.caregiver_id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCaregiverProfile({
+          name: data.name as string,
+          vehicleInfo: (data.vehicle_info as string) ?? "",
+        });
+      });
+  }, [liveJob?.caregiver_id]);
 
   // โหลดข้อความเก่าเมื่อมี active job
   useEffect(() => {
@@ -383,17 +403,19 @@ export default function TrackingPage() {
               <div className="flex items-center gap-5 w-full lg:w-auto">
                 <div className="relative">
                   <div className="w-20 h-20 bg-gradient-to-tr from-primary to-primary-fixed rounded-full flex items-center justify-center shadow-ambient">
-                    <span className="text-on-primary font-bold text-3xl">ส</span>
+                    <span className="text-on-primary font-bold text-3xl">{(caregiverProfile?.name ?? "ผ").charAt(0)}</span>
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-tertiary border-2 border-surface-container-lowest rounded-full" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-2xl text-on-background">สมศรี สมหมาย</h3>
-                  <p className="text-primary font-medium text-sm md:text-base mb-2">ผู้ดูแล (พยาบาลวิชาชีพ)</p>
-                  <div className="flex items-center gap-2 text-on-surface-variant text-sm bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/10 w-fit">
-                    <Car className="w-4 h-4 text-on-surface-variant" />
-                    <span>ฮอนด้า ซิตี้ สีขาว <span className="font-bold">กท 1234 กรุงเทพมหานคร</span></span>
-                  </div>
+                  <h3 className="font-bold text-2xl text-on-background">{caregiverProfile?.name ?? "ผู้ดูแล"}</h3>
+                  <p className="text-primary font-medium text-sm md:text-base mb-2">ผู้ดูแล</p>
+                  {caregiverProfile?.vehicleInfo && (
+                    <div className="flex items-center gap-2 text-on-surface-variant text-sm bg-surface-container-low px-3 py-1.5 rounded-lg border border-outline-variant/10 w-fit">
+                      <Car className="w-4 h-4 text-on-surface-variant" />
+                      <span>{caregiverProfile.vehicleInfo}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex flex-wrap lg:flex-nowrap gap-3 w-full lg:w-auto">
@@ -459,7 +481,7 @@ export default function TrackingPage() {
           <div className="bg-surface-container-lowest w-full max-w-md h-full flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-outline-variant/20 px-5 py-4 bg-surface-container-lowest">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0">ส</div>
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary shrink-0">{(caregiverProfile?.name ?? "ผ").charAt(0)}</div>
                 <div>
                   <h2 className="text-base font-bold text-on-background">แชทกับผู้ดูแล</h2>
                   <p className="text-xs text-emerald-600 font-medium">ออนไลน์</p>
@@ -515,9 +537,9 @@ export default function TrackingPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setCallOpen(false)}>
           <div className="bg-surface-container-lowest p-6 rounded-xl shadow-ambient w-80 text-center" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto w-20 h-20 bg-gradient-to-tr from-primary to-primary-fixed rounded-full flex items-center justify-center shadow-ambient mb-4">
-              <span className="text-on-primary font-bold text-3xl">ส</span>
+              <span className="text-on-primary font-bold text-3xl">{(caregiverProfile?.name ?? "ผ").charAt(0)}</span>
             </div>
-            <h3 className="text-xl font-semibold text-on-background mb-2">สมศรี สมหมาย</h3>
+            <h3 className="text-xl font-semibold text-on-background mb-2">{caregiverProfile?.name ?? "ผู้ดูแล"}</h3>
             <p className="text-on-surface-variant mb-4 animate-pulse">กำลังโทร...</p>
             <button className="px-4 py-2 bg-error text-on-error rounded-md hover:brightness-110" onClick={handleEndCall}>วางสาย</button>
           </div>
